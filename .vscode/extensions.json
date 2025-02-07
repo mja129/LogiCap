@@ -1,0 +1,19 @@
+{
+    "recommendations": [
+        "ardenivanov.svelte-intellisense",
+        "svelte.svelte-vscode",
+        "jabedhossain.web-preview",
+        "redhat.fabric8-analytics",
+        "esbenp.prettier-vscode",
+        "ms-vsliveshare.vsliveshare",
+        "dbaeumer.vscode-eslint",
+        "jbockle.jbockle-format-files",
+        "mhutchie.git-graph",
+        "github.vscode-github-actions",
+        "eamodio.gitlens",
+        "sidthesloth.html5-boilerplate",
+        "ecmel.vscode-html-css",
+        "xabikos.javascriptsnippets",
+        "ms-vscode.vscode-typescript-next"
+    ]
+}
