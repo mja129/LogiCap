@@ -2,15 +2,18 @@
     // import Graph from './lib/Graph.svelte';
     import { Svelvet, Node, Anchor, Minimap } from 'svelvet';
     import AndGate from './lib/AndGate.svelte';
+    import type { CSSColorString } from 'svelvet';
+    // import the type and the actual object
+    import { readable, type Readable } from 'svelte/store';
+    // const blackColor: Readable<CSSColorString> = Readable<CSSColorString>("red");
+    const blackColor: Readable<CSSColorString> = readable("red");
 
-    let nodes = [
-        { id: 1, position: { x: 100, y: 100 }},
-        { id: 2, position: { x: 500, y: 100 }}
-    ]
 </script>
 
 <main>
     <h1> Svelvet Graph</h1>
+    <div id="TopBar"></div>
+    <div id=""></div>
     <div id="graph">
         <Svelvet theme="LogiCap">
             <Minimap width="{100}" corner="NE" mapColor="blue" slot="minimap" />
@@ -23,7 +26,7 @@
                     <Anchor direction="west" input bgColor=red multiple={false}/>
                 </div>
                 <div class="output-1">
-                    <Anchor direction="east" output bgColor=green multiple={false}/>
+                    <Anchor direction="east" bgColor=green multiple={false}/>
                 </div>
             </Node>
             <Node id="And_Node_2" drop="cursor">
@@ -44,6 +47,9 @@
 </main>
 
 <style>
+    main {
+        
+    }
     :global(.svelvet-node) {
         background: none !important;
         box-shadow: none !important;
