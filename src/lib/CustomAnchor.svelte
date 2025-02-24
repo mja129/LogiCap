@@ -46,7 +46,7 @@
     }
     .mid {
         position: absolute;
-        top: 39.5%;
+        top: 40%;
     }
     .left {
         position: absolute;

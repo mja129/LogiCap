@@ -15,7 +15,7 @@
     <div class="side_menu"></div>
     <div id="svelvet_canvas">
         <Svelvet theme="LogiCap">
-            <Minimap width={100} corner="NE" mapColor="blue" slot="minimap" />
+            <Minimap width={100} corner="NE" slot="minimap" />
             <AndGate width={80} height={50} />
             <AndGate width={80} height={50} />
         </Svelvet>

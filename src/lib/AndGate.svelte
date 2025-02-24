@@ -3,22 +3,8 @@
     import { Node, Anchor } from 'svelvet'
     export let width: number = 80
     export let height: number = 50
-
-    import { readable } from 'svelte/store'
     import CustomAnchor from './CustomAnchor.svelte'
 
-    // function accessLocalStorage(key: string, initialValue: string) {
-    //     const storedValue = localStorage.getItem(key)
-    //     const store = readable(
-    //         storedValue ? JSON.parse(storedValue) : initialValue
-    //     )
-    //
-    //     store.subscribe((value) => {
-    //         localStorage.setItem(key, JSON.stringify(value))
-    //     })
-    //
-    //     return store
-    // }
     // If a node is deleted, the number will continue to increment
     // the purpose of this is just so all of them have a semi-recognizable unique ID
     // So this code will be important but not in this current format I think

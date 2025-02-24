@@ -4,13 +4,13 @@
     --node-selection-color: hsl(45, 90%, 60%);
     --text-color: hsl(0, 0%, 100%);
 
-    --background-color: hsl(225, 28%, 17%);
-    --dot-color: hsl(225, 100%, 100%);
+    --background-color: white;
+    --dot-color: black;
 
     --accent-color: hsl(45, 90%, 60%);
     --primary-color: hsl(225, 30%, 66%);
 
-    --edge-color: hsl(0, 0%, 100%);
+    --edge-color: black;
     --target-edge-color: hsl(225, 20%, 40%);
 
     --anchor-color: hsl(45, 90%, 67%);
@@ -35,11 +35,12 @@
     --theme-toggle-color: hsl(225, 20%, 27%);
 
     .svelvet-wrapper {
-        border-radius: 50px;
+        border-radius: 38px;
         outline: 10px solid rgb(100, 100, 100);
     }
+
     .svelvet-wrapper:focus-visible {
-        border-radius: 50px;
+        border-radius: 38px;
         outline: 10px solid black;
     }
 
