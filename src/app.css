@@ -4,8 +4,8 @@
     --node-selection-color: hsl(45, 90%, 60%);
     --text-color: hsl(0, 0%, 100%);
 
-    --background-color: hsl(225, 20%, 27%);
-    --dot-color: hsl(225, 10%, 50%);
+    --background-color: hsl(225, 28%, 17%);
+    --dot-color: hsl(225, 100%, 100%);
 
     --accent-color: hsl(45, 90%, 60%);
     --primary-color: hsl(225, 30%, 66%);
@@ -33,7 +33,18 @@
 
     --theme-toggle-text-color: hsl(0, 0%, 100%);
     --theme-toggle-color: hsl(225, 20%, 27%);
-}
+
+    .svelvet-wrapper {
+        border-radius: 50px;
+        outline: 10px solid rgb(100, 100, 100);
+    }
+    .svelvet-wrapper:focus-visible {
+        border-radius: 50px;
+        outline: 10px solid black;
+    }
+
+} 
+
 
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -50,11 +61,11 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+
 *
 *, *::before, *::after {
     /* changes how the width and height of elements are calculated to include padding and border within the total height */
     box-sizing: border-box;
-
 }
 
 * {
@@ -81,6 +92,7 @@ html {
 
 /* removes default margin around the body element */
 body {
+    background-color: rgba(255, 240, 220, 1);
     /* 
       small viewport height (svh),
       height of the viewport excluding the mobile default browser address bar.
@@ -129,16 +141,6 @@ h1 {
     font-size: 3.2em;
     line-height: 1.1;
     text-align: center;
-}
-
-
-#graph {
-    width: 80vw;
-    height: 80vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
 }
 
 
