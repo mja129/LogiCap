@@ -1,9 +1,13 @@
 <script lang="ts">
     import image from './svg/andgate.svg'
-    import { Node, Anchor } from 'svelvet'
+    import { Node, Anchor, generateOutput } from 'svelvet'
     export let width: number = 80
     export let height: number = 50
     import CustomAnchor from './CustomAnchor.svelte'
+    import { circuitStore } from './stores/circuitStore'
+    import type { Device } from './stores/circuitStore'
+
+    // Define a new device
 
     // If a node is deleted, the number will continue to increment
     // the purpose of this is just so all of them have a semi-recognizable unique ID
@@ -18,10 +22,39 @@
         nextNum++
         localStorage.setItem('and_node_num', nextNum.toString())
     }
-    const nodeId = `And_Gate_Node_${nextNum}`
+    const nodeId = `And_${nextNum}`
     localStorage.setItem(`And_Gate_Node_${nextNum}`, nextNum.toString())
     // console.log(storedValue)
     // const store = readable(storedValue ? JSON.parse(storedValue) : initialValue)
+    const newDevice: Device = {
+        type: 'And',
+        label: nodeId,
+    }
+
+    // Define a connector that connects the output of an existing device to this new device
+    // define connector on node connection
+    // const newConnector: Connector = {
+    //     from: {
+    //         id: 'someExistingDeviceId',
+    //         port: 'output',
+    //     },
+    //     to: {
+    //         id: 'newDeviceId', // The ID we're assigning to our new device
+    //         port: 'input1',
+    //     },
+    // }
+
+    // Update the store
+    circuitStore.update((currentCircuit) => {
+        // Add the new device with a unique ID, e.g., 'newDeviceId'
+        currentCircuit.devices[nodeId] = newDevice
+
+        // Add the new connector
+        // currentCircuit.connectors.push(newConnector)
+
+        // Return the updated circuit
+        return currentCircuit
+    })
 </script>
 
 <Node let:selected id={nodeId} drop="cursor">
