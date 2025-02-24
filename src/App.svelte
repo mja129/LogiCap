@@ -1,5 +1,6 @@
 <script lang="ts">
-    // import Graph from './lib/Graph.svelte';
+    //te a new git branch with my current changes and push it to github then push my local changes to that branch
+
     import { Svelvet, Node, Anchor, Minimap } from 'svelvet'
     import AndGate from './lib/AndGate.svelte'
     import type { CSSColorString } from 'svelvet'
