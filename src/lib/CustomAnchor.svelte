@@ -4,8 +4,8 @@
         handleUnlinkAnchorConnection,
     } from './stores/circuitStore'
     import type {
-        ConnectionFrom,
-        ConnectionTo,
+        ConnectorFrom,
+        ConnectorTo,
         ConnectorPiece,
         Connector,
     } from './stores/circuitStore'
@@ -36,9 +36,9 @@
         }
 
         if (port.startsWith('input')) {
-            return { to: connection } as ConnectionTo
+            return { to: connection } as ConnectorTo
         } else {
-            return { from: connection } as ConnectionFrom
+            return { from: connection } as ConnectorFrom
         }
     }
     // ASSUMPTION: Input can only ever have 1 thing connected to it, but an output can be outputting to multiple inputs

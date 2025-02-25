@@ -7,15 +7,17 @@ export type Device = {
     label: string
 }
 
-export type Connection = {
+export type LinkData = {
     id: string
     port: string
 }
 
-export type ConnectionFrom = Record<'from', Connection>
-export type ConnectionTo = Record<'to', Connection>
+export type ConnectorFrom = Record<'from', LinkData>
+export type ConnectorTo = Record<'to', LinkData>
+export type ConnectorPiece = ConnectorTo | ConnectorFrom
 
-export type Connector = ConnectionFrom & ConnectionTo
+
+export type Connector = ConnectorFrom & ConnectorTo
 
 type Subcircuit = {
     devices: Record<string, Device>
@@ -32,15 +34,14 @@ export type Circuit = {
 // NOTE, I changed connectors to a map of "{ nodeId }" : "Connections[]"
 // In order to fi
 
-export type ConnectorPiece = ConnectionFrom | ConnectionTo
-
-let pendingConnection: ConnectorPiece | null = null
 
 const initialCircuit: Circuit = {
     devices: {},
     connectors: [],
     subcircuits: {},
 }
+
+let pendingConnection: ConnectorPiece | null = null
 
 function createGlobalTimeoutManager() {
     let timeoutId: ReturnType<typeof setTimeout> | null = null
