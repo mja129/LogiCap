@@ -8,6 +8,10 @@
     import { readable, type Readable } from 'svelte/store'
     // const blackColor: Readable<CSSColorString> = Readable<CSSColorString>("red");
     const blackColor: Readable<CSSColorString> = readable('red')
+    import { circuitStore, type Connector } from './lib/stores/circuitStore'
+
+    let lastLinked_0: Connection | '' = $state('')
+    let lastLinked_1: Connection | '' = $state('')
 
     // in order to implement dragging circuits from the side menu into the main window
     // we need app.svelte to maintain an array or a global store of the elements currently on the canvas
@@ -16,6 +20,44 @@
     // <svelte:component this={component}> or we could make a generic component that took params to become a specific type of circuit
     // This pattern is known as a "Factory Pattern" where a component is dynamically instantiated based on parameters or conditions
     // you would probably need a "key'd" each block for one of these options, not sure which tbh
+
+    function makeConnection() {
+        let newConnector: Connector = {
+            from: {
+                id: 'someExistingDeviceId',
+                port: 'output',
+            },
+            to: {
+                id: 'newDeviceId', // The ID we're assigning to our new device
+                port: 'input1',
+            },
+        }
+    }
+    // define connector on node connection
+    $effect(() => {
+        if (lastLinked_0 !== '' && lastLinked_1 !== '') {
+            circuitStore.update((currentCircuit) => {
+                currentCircuit.connectors.push({
+                    ...lastLinked_0,
+                    ...lastLinked_1,
+                })
+                console.log(JSON.stringify(currentCircuit.connectors))
+                return currentCircuit
+            })
+            lastLinked_0 = ''
+            lastLinked_1 = ''
+            // make the global object
+        }
+        // else if (lastLinked_0 === undefined && lastLinked_1 === undefined) {
+        //     // we have transitioned from full to empty by some means
+        // } else {
+        //     // one is not empty
+        //     // the whole concept of reality has gone to shit.
+        //     // or the state management is trash.
+        // }
+        // $inspect(lastLinked_0).with(console.log)
+        // $inspect(lastLinked_1).with(console.log)
+    })
 </script>
 
 <div id="app_bar"></div>
@@ -25,16 +67,11 @@
     <div id="svelvet_canvas">
         <Svelvet theme="LogiCap" fitView={true} edgeStyle="step">
             <Minimap width={100} corner="NE" slot="minimap" />
-            <AndGate width={80} height={50} />
-            <AndGate width={80} height={50} />
+            <AndGate bind:lastLinked={lastLinked_0} width={80} height={50} />
+            <AndGate bind:lastLinked={lastLinked_1} width={80} height={50} />
         </Svelvet>
     </div>
 </main>
-
-<my-anchor>
-    onlink_input = {() => console.log('input linked')}
-    onlink_output = {() => console.log('output linked')}
-</my-anchor>
 
 <style>
     :root {

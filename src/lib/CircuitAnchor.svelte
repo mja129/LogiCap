@@ -4,11 +4,25 @@
         hovering,
         connecting,
         io,
-    }: { linked: boolean; hovering: boolean; connecting: boolean; io: string } =
-        $props()
+        onLinkChanged,
+    }: {
+        linked: boolean
+        hovering: boolean
+        connecting: boolean
+        io: string
+        onLinkChanged: (isConnected: boolean) => void
+    } = $props()
 
     // dispatch a message.
-    function dispatch(type: string) {}
+    // use the function we passed in to update the value from the parent
+    // kinda a scope reacharound type thing, I wish it could be different.
+    // to figure out how to make it different one must have a very good understanding of the let: directive present in the default anchor component, and possibly some binding rune.
+    $effect(() => {
+        onLinkChanged(linked)
+        // $inspect(linked).with(console.log)
+    })
+    // TODO, may need to listen to onUnmount
+    // I think on disconnect has a default event from svelvet, try that out also this effect may set state to false many times, but honestly nah.
 </script>
 
 <div
