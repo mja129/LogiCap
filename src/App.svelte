@@ -10,8 +10,9 @@
     const blackColor: Readable<CSSColorString> = readable('red')
     import { circuitStore, type Connector } from './lib/stores/circuitStore'
 
-    let lastLinked_0: Connection | '' = $state('')
-    let lastLinked_1: Connection | '' = $state('')
+    // TODO: this is an annoying type to define
+    let lastLinked_0: any = $state('')
+    let lastLinked_1: any = $state('')
 
     // in order to implement dragging circuits from the side menu into the main window
     // we need app.svelte to maintain an array or a global store of the elements currently on the canvas
@@ -21,18 +22,6 @@
     // This pattern is known as a "Factory Pattern" where a component is dynamically instantiated based on parameters or conditions
     // you would probably need a "key'd" each block for one of these options, not sure which tbh
 
-    function makeConnection() {
-        let newConnector: Connector = {
-            from: {
-                id: 'someExistingDeviceId',
-                port: 'output',
-            },
-            to: {
-                id: 'newDeviceId', // The ID we're assigning to our new device
-                port: 'input1',
-            },
-        }
-    }
     // define connector on node connection
     $effect(() => {
         if (lastLinked_0 !== '' && lastLinked_1 !== '') {

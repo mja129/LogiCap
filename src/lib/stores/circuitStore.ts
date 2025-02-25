@@ -5,18 +5,16 @@ export type Device = {
     label: string
 }
 
-export type Connector =
-    | {
-          from: {
-              id: string
-              port: string
-          }
-          to: {
-              id: string
-              port: string
-          }
-      }
-    | { Connection; Connection }
+export type Connector = {
+    from: {
+        id: string
+        port: string
+    }
+    to: {
+        id: string
+        port: string
+    }
+}
 
 type Subcircuit = {
     devices: Record<string, Device>

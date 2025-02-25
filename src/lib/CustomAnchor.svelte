@@ -10,12 +10,12 @@
         location = ['left', 'top'],
         id,
         io,
-        onConnectAnchor,
+        linkData = $bindable(''),
     }: {
         location: LocationTuple
         id: string
         io: 'input' | 'output'
-        onConnectAnchor: (anchorId: port_names) => void
+        linkData: `input${number}` | 'output' | '' | Connection
     } = $props()
     const anchorId = `${id}_${io}_${location[0]}_${location[1]}`
 
@@ -32,18 +32,19 @@
         connectedPort = 'output'
     }
 
-    // get state of linked node from child via closure function
-    // if we could get rid of circuit anchor that might be cool too honestly.
     let link = $state()
-    // set inputParent at some point during the svelte file execution
     function updateLinkState(newValue: boolean) {
         link = newValue
     }
+
+    // get state of linked node from child via closure function
+    // if we could get rid of circuit anchor that might be cool too honestly.
+    // set inputParent at some point during the svelte file execution
     $effect(() => {
         // $inspect(link).with(console.log)
         // I am 95% sure this is really stupid code, the other 5% is: maybe it does less re-rendering
         if (link) {
-            onConnectAnchor(connectedPort)
+            linkData = connectedPort
         } else {
             // onDisconnectAnchor(connectedPort)
             // send the one that disconnected instead
@@ -106,24 +107,5 @@
     }
     .center {
         left: calc((100% / 2) - 10px);
-    }
-    .custom_anchor {
-        border-radius: 50%;
-        height: 10px;
-        width: 10px;
-    }
-    .linked {
-        background-color: purple !important;
-        border: 1px solid black;
-    }
-    .hovering {
-        border: 2px solid black;
-    }
-
-    .input {
-        background-color: red;
-    }
-    .output {
-        background-color: green;
     }
 </style>

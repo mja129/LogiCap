@@ -107,15 +107,15 @@
     // the node needs to know what anchors were triggered
     // push up lastLinked.
     $effect(() => {
-        if (typeof lastLinked !== 'object' && lastLinked !== '') {
+        if (typeof lastLinked !== 'object' && lastLinked !== '')
             lastLinked = createConnectionJsonOneWay(nodeId, lastLinked)
-        } else if (typeof lastLinked === 'object') {
-            // the object should be cleared by the parent
-            // other paths will lead here too.
-            // if the object itself changes??
-        } else if (lastLinked === '') {
-            // empty connection, this connection has either never been initalized or has been handled and stored and reset.
-        }
+        // } else if (typeof lastLinked === 'object') {
+        //     // the object should be cleared by the parent
+        //     // other paths will lead here too.
+        //     // if the object itself changes??
+        // } else if (lastLinked === '') {
+        //     // empty connection, this connection has either never been initalized or has been handled and stored and reset.
+        // }
         // $inspect(lastLinked).with(console.log)
 
         // $inspect(lastUnlinked).with(console.log)
@@ -128,19 +128,19 @@
         location={['left', 'bot']}
         id={nodeId}
         io="input"
-        onConnectAnchor={getLinkData}
+        bind:linkData={lastLinked}
     />
     <CustomAnchor
         location={['left', 'top']}
         id={nodeId}
         io="input"
-        onConnectAnchor={getLinkData}
+        bind:linkData={lastLinked}
     />
     <CustomAnchor
         location={['right', 'mid']}
         id={nodeId}
         io="output"
-        onConnectAnchor={getLinkData}
+        bind:linkData={lastLinked}
     />
 </Node>
 
