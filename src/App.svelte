@@ -1,18 +1,11 @@
 <script lang="ts">
-    //te a new git branch with my current changes and push it to github then push my local changes to that branch
-
-    import { Svelvet, Node, Anchor, Minimap } from 'svelvet'
+    import { Svelvet, Minimap } from 'svelvet'
     import AndGate from './lib/AndGate.svelte'
-    import type { CSSColorString } from 'svelvet'
-    // import the type and the actual object
-    import { readable, type Readable } from 'svelte/store'
-    // const blackColor: Readable<CSSColorString> = Readable<CSSColorString>("red");
-    const blackColor: Readable<CSSColorString> = readable('red')
-    import { circuitStore, type Connector } from './lib/stores/circuitStore'
+    import { circuitStore } from './lib/stores/circuitStore'
 
-    // TODO: this is an annoying type to define
-    let lastLinked_0: any = $state('')
-    let lastLinked_1: any = $state('')
+    // import type { CSSColorString } from 'svelvet'
+    // import { readable, type Readable } from 'svelte/store'
+    // const blackColor: Readable<CSSColorString> = Readable<CSSColorString>("red");
 
     // in order to implement dragging circuits from the side menu into the main window
     // we need app.svelte to maintain an array or a global store of the elements currently on the canvas
@@ -24,6 +17,9 @@
 
     // $inspect(lastLinked_0).with(console.log)
     // $inspect(lastLinked_1).with(console.log)
+    circuitStore.subscribe((value) => {
+        console.log(value.connectors)
+    })
 </script>
 
 <div id="app_bar"></div>
@@ -33,8 +29,8 @@
     <div id="svelvet_canvas">
         <Svelvet theme="LogiCap" fitView={true} edgeStyle="step">
             <Minimap width={100} corner="NE" slot="minimap" />
-            <AndGate bind:lastLinked={lastLinked_0} width={80} height={50} />
-            <AndGate bind:lastLinked={lastLinked_1} width={80} height={50} />
+            <AndGate width={80} height={50} />
+            <AndGate width={80} height={50} />
         </Svelvet>
     </div>
 </main>
@@ -50,9 +46,6 @@
         width: 100vw;
         max-width: 100vw;
         height: 100vw;
-        /* padding-top: 2vh; */
-        /* padding-bottom: 2vh; */
-        /* padding-block: 2vh; */
         height: var(--main-app-flex-height);
         padding-inline: calc(1.5vw);
         justify-content: center;
@@ -90,25 +83,7 @@
     }
     #svelvet_canvas {
         height: calc(100% - 5vh);
-        /* width: max-content; */
         /* Take up the rest of the space in the flex container*/
         flex: 1;
-        /* height: calc(100vh - var(--app-bar-height) - 40px); */
     }
-
-    /* .input-1 { */
-    /*     position: absolute; */
-    /*     top: 14.5%; */
-    /*     left: 7.5%; */
-    /* } */
-    /* .input-2 { */
-    /*     position: absolute; */
-    /*     top: 51.5%; */
-    /*     left: 7.5%; */
-    /* } */
-    /* .output-1 { */
-    /*     position: absolute; */
-    /*     top: 35%; */
-    /*     right: 10%; */
-    /* } */
 </style>

@@ -1,12 +1,10 @@
 <script lang="ts">
-    // import type { Anchor } from 'svelvet'
     import { Anchor, generateInput, generateOutput } from 'svelvet'
-    import CircuitAnchor from './CircuitAnchor.svelte'
     import CustomAnchor from './CustomAnchor.svelte'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
-    type port_names = `input${number}` | 'output' | ''
+    type portNames = `input${number}` | 'output' | ''
     let {
         location = ['left', 'top'],
         id,
@@ -17,9 +15,12 @@
         io: 'input' | 'output'
     } = $props()
 
-    // TODO: this should be done with a map and in a more generic way
+    // TODO: deciding the port name should be done with a map and in a more generic way instead of an if statement.
     // Typescript could do some styff.
-    let portName: port_names = ''
+
+    // I wonder why this gives a ts warning?
+    // svelte-ignore non_reactive_update
+    let portName: portNames = ''
     if (location[0] == 'left') {
         if (location[1] == 'top') {
             portName = 'input1'
@@ -31,14 +32,9 @@
     }
     const anchorId = `${id}_${portName}`
 
-    let link = $state()
-    function updateLinkState(newValue: boolean) {
-        link = newValue
-    }
-
     // get state of linked node from child via closure function
-    // if we could get rid of circuit anchor that might be cool too honestly.
-    // set inputParent at some point during the svelte file execution
+    // I would like to make this and CustomAnchor one file, especially because all of the connection logic is in the child
+    // But I cant get the let:linked into the outtermost scope of this file, Im not quite sure why.
 </script>
 
 <!--

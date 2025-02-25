@@ -8,7 +8,7 @@
     } from './stores/circuitStore'
 
     let {
-        linked,
+        linked = $bindable(),
         hovering,
         connecting,
         portName,
@@ -27,16 +27,6 @@
     // use the function we passed in to update the value from the parent
     // kinda a scope reacharound type thing, I wish it could be different.
     // to figure out how to make it different one must have a very good understanding of the let: directive present in the default anchor component, and possibly some binding rune.
-
-    function createToJson(nodeId: string, port: string) {
-        const connectorJson: ConnectionTo = {
-            to: {
-                id: nodeId,
-                port: port,
-            },
-        }
-        return connectorJson
-    }
 
     function createConnectionJson(
         nodeId: string,
@@ -65,6 +55,7 @@
                 })
             }
         } else if (!linked) {
+            console.log('unlinked node')
             // const newConnection = createConnectionJson(nodeId, portName)
             // // const isSecond: false | Connector =
             // //     handleAnchorConnection(newConnection)
@@ -76,9 +67,6 @@
             // // }
         }
         // $inspect(linked).with(console.log)
-    })
-    circuitStore.subscribe((value) => {
-        console.log(JSON.stringify(value.connectors))
     })
     // TODO, may need to listen to onUnmount
     // I think on disconnect has a default event from svelvet, try that out also this effect may set state to false many times, but honestly nah.
