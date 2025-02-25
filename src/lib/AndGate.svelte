@@ -2,7 +2,7 @@
     import { Node, Anchor, generateOutput } from 'svelvet'
     // export let width: number = 80
     // export let height: number = 50
-    import CustomAnchor from './CustomAnchor.svelte'
+    import CircuitAnchor from './CircuitAnchor.svelte'
     import { circuitStore } from './stores/circuitStore'
     import type { Device } from './stores/circuitStore'
     import image from './svg/andgate.svg'
@@ -35,7 +35,7 @@
         localStorage.setItem('and_node_num', nextNum.toString())
     }
     const nodeId = `And_${nextNum}`
-    localStorage.setItem(`And_Gate_Node_${nextNum}`, nextNum.toString())
+    localStorage.setItem(`And_Gate_${nextNum}`, nextNum.toString())
     // console.log(storedValue)
     // const store = readable(storedValue ? JSON.parse(storedValue) : initialValue)
     const newDevice: Device = {
@@ -124,24 +124,9 @@
 
 <Node let:selected id={nodeId} drop="cursor">
     <img src={image} alt="AND Gate" {width} {height} />
-    <CustomAnchor
-        location={['left', 'bot']}
-        id={nodeId}
-        io="input"
-        bind:linkData={lastLinked}
-    />
-    <CustomAnchor
-        location={['left', 'top']}
-        id={nodeId}
-        io="input"
-        bind:linkData={lastLinked}
-    />
-    <CustomAnchor
-        location={['right', 'mid']}
-        id={nodeId}
-        io="output"
-        bind:linkData={lastLinked}
-    />
+    <CircuitAnchor location={['left', 'bot']} id={nodeId} io="input" />
+    <CircuitAnchor location={['left', 'top']} id={nodeId} io="input" />
+    <CircuitAnchor location={['right', 'mid']} id={nodeId} io="output" />
 </Node>
 
 <style>

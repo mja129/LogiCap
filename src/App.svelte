@@ -22,31 +22,8 @@
     // This pattern is known as a "Factory Pattern" where a component is dynamically instantiated based on parameters or conditions
     // you would probably need a "key'd" each block for one of these options, not sure which tbh
 
-    // define connector on node connection
-    $effect(() => {
-        if (lastLinked_0 !== '' && lastLinked_1 !== '') {
-            circuitStore.update((currentCircuit) => {
-                currentCircuit.connectors.push({
-                    ...lastLinked_0,
-                    ...lastLinked_1,
-                })
-                console.log(JSON.stringify(currentCircuit.connectors))
-                return currentCircuit
-            })
-            lastLinked_0 = ''
-            lastLinked_1 = ''
-            // make the global object
-        }
-        // else if (lastLinked_0 === undefined && lastLinked_1 === undefined) {
-        //     // we have transitioned from full to empty by some means
-        // } else {
-        //     // one is not empty
-        //     // the whole concept of reality has gone to shit.
-        //     // or the state management is trash.
-        // }
-        // $inspect(lastLinked_0).with(console.log)
-        // $inspect(lastLinked_1).with(console.log)
-    })
+    // $inspect(lastLinked_0).with(console.log)
+    // $inspect(lastLinked_1).with(console.log)
 </script>
 
 <div id="app_bar"></div>

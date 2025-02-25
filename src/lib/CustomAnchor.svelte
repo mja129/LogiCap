@@ -1,111 +1,114 @@
 <script lang="ts">
-    // import type { Anchor } from 'svelvet'
-    import { Anchor, generateInput, generateOutput } from 'svelvet'
-    import CircuitAnchor from './CircuitAnchor.svelte'
-    type LocationY = 'top' | 'bot' | 'mid'
-    type LocationX = 'left' | 'right' | 'center'
-    type LocationTuple = [LocationX, LocationY]
-    type port_names = `input${number}` | 'output' | ''
+    import { circuitStore, handleAnchorConnection } from './stores/circuitStore'
+    import type {
+        ConnectionFrom,
+        ConnectionTo,
+        ConnectorPiece,
+        Connector,
+    } from './stores/circuitStore'
+
     let {
-        location = ['left', 'top'],
-        id,
-        io,
-        linkData = $bindable(''),
+        linked,
+        hovering,
+        connecting,
+        portName,
+        nodeId,
     }: {
-        location: LocationTuple
-        id: string
-        io: 'input' | 'output'
-        linkData: `input${number}` | 'output' | '' | Connection
+        linked: boolean
+        hovering: boolean
+        connecting: boolean
+        portName: string
+        nodeId: string
     } = $props()
-    const anchorId = `${id}_${io}_${location[0]}_${location[1]}`
 
-    // TODO: this should be done with a map and in a more generic way
-    // Typescript could do some styff.
-    let connectedPort: port_names = ''
-    if (location[0] == 'left') {
-        if (location[1] == 'top') {
-            connectedPort = 'input1'
-        } else if (location[1] == 'bot') {
-            connectedPort = 'input2'
+    let io = portName.startsWith('input') ? 'input' : 'output'
+
+    // dispatch a message.
+    // use the function we passed in to update the value from the parent
+    // kinda a scope reacharound type thing, I wish it could be different.
+    // to figure out how to make it different one must have a very good understanding of the let: directive present in the default anchor component, and possibly some binding rune.
+
+    function createToJson(nodeId: string, port: string) {
+        const connectorJson: ConnectionTo = {
+            to: {
+                id: nodeId,
+                port: port,
+            },
         }
-    } else if (location[0] == 'right') {
-        connectedPort = 'output'
+        return connectorJson
     }
 
-    let link = $state()
-    function updateLinkState(newValue: boolean) {
-        link = newValue
-    }
+    function createConnectionJson(
+        nodeId: string,
+        port: string
+    ): ConnectorPiece {
+        const connection = {
+            id: nodeId,
+            port: port,
+        }
 
-    // get state of linked node from child via closure function
-    // if we could get rid of circuit anchor that might be cool too honestly.
-    // set inputParent at some point during the svelte file execution
-    $effect(() => {
-        // $inspect(link).with(console.log)
-        // I am 95% sure this is really stupid code, the other 5% is: maybe it does less re-rendering
-        if (link) {
-            linkData = connectedPort
+        if (port.startsWith('input')) {
+            return { to: connection } as ConnectionTo
         } else {
-            // onDisconnectAnchor(connectedPort)
-            // send the one that disconnected instead
+            return { from: connection } as ConnectionFrom
         }
-        // $inspect(hovering)
-        // $inspect(connecting)
+    }
+    $effect(() => {
+        if (linked && (io == 'input' || io == 'output')) {
+            const newConnection = createConnectionJson(nodeId, portName)
+            const isSecond: false | Connector =
+                handleAnchorConnection(newConnection)
+            if (isSecond !== false) {
+                circuitStore.update((currCir) => {
+                    currCir.connectors.push(isSecond)
+                    return currCir
+                })
+            }
+        } else if (!linked) {
+            // const newConnection = createConnectionJson(nodeId, portName)
+            // // const isSecond: false | Connector =
+            // //     handleAnchorConnection(newConnection)
+            // // if (isSecond !== false) {
+            // //     circuitStore.update((currCir) => {
+            // //         currCir.connectors.push(isSecond)
+            // //         return currCir
+            // //     })
+            // // }
+        }
+        // $inspect(linked).with(console.log)
     })
+    circuitStore.subscribe((value) => {
+        console.log(JSON.stringify(value.connectors))
+    })
+    // TODO, may need to listen to onUnmount
+    // I think on disconnect has a default event from svelvet, try that out also this effect may set state to false many times, but honestly nah.
 </script>
 
-<!--
-    class:hovering means -> if the hovering boolean variable is true, apply the class with the same name as the boolean variable
-    class:linked={link} -> means apply the linked class if the "link" variable is true
-    its done this way because I want to capture the elements that the default svelvet anchor provides
-    within the outermost scope of this component
--->
-
-<!-- This property will automatically set the dragged anchor to the first available io that fits on the node you drag your mouse to -->
-<!-- nodeConnect={true} -->
-<div class="{location[0]} {location[1]}">
-    <Anchor
-        let:linked
-        let:hovering
-        let:connecting
-        id={anchorId}
-        direction={location[0] === 'left' ? 'west' : 'east'}
-        input={io === 'input'}
-        output={io === 'output'}
-        multiple={false}
-    >
-        <CircuitAnchor
-            {io}
-            {connecting}
-            {linked}
-            onLinkChanged={updateLinkState}
-            {hovering}
-        />
-    </Anchor>
-</div>
+<div
+    class="custom_anchor {io === 'input' ? 'input' : 'output'}"
+    class:linked
+    class:hovering
+    class:connecting
+></div>
 
 <style>
-    .top {
-        position: absolute;
-        top: 21.5%;
+    .custom_anchor {
+        border-radius: 50%;
+        height: 10px;
+        width: 10px;
     }
-    .bot {
-        position: absolute;
-        top: 58%;
+    .linked {
+        background-color: purple !important;
+        border: 1px solid black;
     }
-    .mid {
-        position: absolute;
-        top: 40%;
+    .hovering {
+        border: 2px solid black;
     }
-    .left {
-        position: absolute;
-        left: 7.5%;
+
+    .input {
+        background-color: red;
     }
-    .right {
-        position: absolute;
-        right: 10%;
-    }
-    .center {
-        left: calc((100% / 2) - 10px);
+    .output {
+        background-color: green;
     }
 </style>
