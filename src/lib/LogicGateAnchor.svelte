@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Anchor, generateInput, generateOutput } from 'svelvet'
+    import { Anchor } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -35,6 +35,7 @@
     // get state of linked node from child via closure function
     // I would like to make this and CustomAnchor one file, especially because all of the connection logic is in the child
     // But I cant get the let:linked into the outtermost scope of this file, Im not quite sure why.
+    // to figure out how to make this one component, I need to figure out how the 'let:' directive works
 </script>
 
 <!--

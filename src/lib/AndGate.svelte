@@ -2,7 +2,7 @@
     import { Node, Anchor, generateOutput } from 'svelvet'
     // export let width: number = 80
     // export let height: number = 50
-    import CircuitAnchor from './CircuitAnchor.svelte'
+    import LogicGateAnchor from './LogicGateAnchor.svelte'
     import { circuitStore } from './stores/circuitStore'
     import type { Device } from './stores/circuitStore'
     import image from './svg/andgate.svg'
@@ -52,7 +52,7 @@
 
 <Node let:selected id={nodeId} drop="cursor">
     <img src={image} alt="AND Gate" {width} {height} />
-    <CircuitAnchor location={['left', 'bot']} id={nodeId} io="input" />
-    <CircuitAnchor location={['left', 'top']} id={nodeId} io="input" />
-    <CircuitAnchor location={['right', 'mid']} id={nodeId} io="output" />
+    <LogicGateAnchor location={['left', 'bot']} id={nodeId} io="input" />
+    <LogicGateAnchor location={['left', 'top']} id={nodeId} io="input" />
+    <LogicGateAnchor location={['right', 'mid']} id={nodeId} io="output" />
 </Node>
