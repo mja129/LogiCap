@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from 'svelte'
     import {
         handleLinkAnchorConnection,
         handleUnlinkAnchorConnection,
@@ -7,11 +8,10 @@
         ConnectorFrom,
         ConnectorTo,
         ConnectorPiece,
-        Connector,
     } from './stores/circuitStore'
 
     let {
-        linked = $bindable(),
+        linked,
         hovering,
         connecting,
         portName,
@@ -41,17 +41,20 @@
             return { from: connection } as ConnectorFrom
         }
     }
+
     // ASSUMPTION: Input can only ever have 1 thing connected to it, but an output can be outputting to multiple inputs
     // I will NOT make this assumption in the handling of unlinking below; but this change is maybe needed.
     $effect(() => {
         if (linked && (io === 'input' || io === 'output')) {
             const triggeredAnchor = createConnectionJson(nodeId, portName)
-            handleLinkAnchorConnection(triggeredAnchor)
+            return handleLinkAnchorConnection(triggeredAnchor)
         } else if (!linked) {
+            console.log(io)
             const triggeredAnchor = createConnectionJson(nodeId, portName)
-            handleUnlinkAnchorConnection(triggeredAnchor)
+            return handleUnlinkAnchorConnection(triggeredAnchor)
         }
     })
+
     // TODO, may need to listen to onUnmount
     // I think on disconnect has a default event from svelvet, try that out also this effect may set state to false many times, but honestly nah.
 </script>

@@ -10,9 +10,11 @@
     let {
         width = 80,
         height = 50,
+        nodeStartPos,
     }: {
         width: number
         height: number
+        nodeStartPos: number
     } = $props()
 
     // Define a new device
@@ -50,7 +52,8 @@
     })
 </script>
 
-<Node let:selected id={nodeId} drop="cursor">
+<!-- cursor = drop -->
+<Node let:selected id={nodeId} position={{ x: 400, y: nodeStartPos }}>
     <img src={image} alt="AND Gate" {width} {height} />
     <LogicGateAnchor location={['left', 'bot']} id={nodeId} io="input" />
     <LogicGateAnchor location={['left', 'top']} id={nodeId} io="input" />

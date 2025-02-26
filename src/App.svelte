@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Svelvet, Minimap } from 'svelvet'
+    import { Svelvet, Minimap, Controls } from 'svelvet'
     import AndGate from './lib/AndGate.svelte'
     import { circuitStore } from './lib/stores/circuitStore'
 
@@ -26,13 +26,19 @@
 <div id=""></div>
 <main>
     <div class="side_menu"></div>
-    <div id="svelvet_canvas">
-        <Svelvet theme="LogiCap" fitView={true} edgeStyle="step">
-            <Minimap width={100} corner="NE" slot="minimap" />
-            <AndGate width={80} height={50} />
-            <AndGate width={80} height={50} />
-        </Svelvet>
-    </div>
+    <Svelvet
+        theme="LogiCap"
+        TD
+        controls
+        edgeStyle="step"
+        editable={false}
+        zoom={2.5}
+        translation={{ x: 0, y: 800 }}
+    >
+        <Minimap width={100} corner="NE" slot="minimap" />
+        <AndGate nodeStartPos={20} width={80} height={50} />
+        <AndGate nodeStartPos={100} width={80} height={50} />
+    </Svelvet>
 </main>
 
 <style>
@@ -61,6 +67,11 @@
         width: auto !important;
         height: auto !important;
     }
+    :global(.svelvet-wrapper) {
+        max-height: calc(100% - 5vh);
+        /* Take up the rest of the space in the flex container*/
+        flex: 1;
+    }
     .side_menu {
         /* width: 30%; */
         flex: 0 0 22.5%;
@@ -80,10 +91,5 @@
         height: var(--app-bar-height);
         width: 100%;
         background-color: cornflowerblue;
-    }
-    #svelvet_canvas {
-        height: calc(100% - 5vh);
-        /* Take up the rest of the space in the flex container*/
-        flex: 1;
     }
 </style>

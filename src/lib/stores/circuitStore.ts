@@ -88,6 +88,10 @@ function handleAnchorConnection(
         pendingConnection = connection
         timeoutManager.start(() => {
             pendingConnection = null
+            // Note: the "Skilled Gamer bug" will land the logic here.
+            // Skilled Gamer bug also happens if the edge sticks to your mouse somehow 
+            // Edge always sticks on doubleclick anchor
+            // Edge stick to mouse when you drop it in itself
             console.warn('Timeout waiting for the second connection')
         }, timeout)
         // meaning the one that gets false will not update the final store.
