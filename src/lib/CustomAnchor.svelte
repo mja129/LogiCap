@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from 'svelte'
     import {
         handleLinkAnchorConnection,
         handleUnlinkAnchorConnection,
@@ -49,7 +48,7 @@
             const triggeredAnchor = createConnectionJson(nodeId, portName)
             return handleLinkAnchorConnection(triggeredAnchor)
         } else if (!linked) {
-            console.log(io)
+            // console.log(io)
             const triggeredAnchor = createConnectionJson(nodeId, portName)
             return handleUnlinkAnchorConnection(triggeredAnchor)
         }
