@@ -28,7 +28,7 @@ type Subcircuit = {
 // Connection manifest
 export type Circuit = {
     devices: Record<string, Device>
-    connectors: Record<string, Connector[]>
+    connectors: Connector[]
     subcircuits: Record<string, Subcircuit>
 }
 // NOTE, I changed connectors to a map of "{ nodeId }" : "Connections[]"
@@ -103,8 +103,8 @@ function handleAnchorConnection(
                 'both parts of connection are the same, ie: 2 inputs or 2 outputs'
             )
         }
-        const from = 'from' in connection ? connection : pendingConnection
-        const to = 'to' in connection ? connection : pendingConnection
+        const from = ('from' in connection ? connection : pendingConnection) as ConnectorFrom
+        const to = ('to' in connection ? connection : pendingConnection) as ConnectorTo
         // from and to are unique types basically this is XOR case
         const connector: Connector = {
             ...from,
