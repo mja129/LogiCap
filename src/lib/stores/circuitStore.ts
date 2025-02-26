@@ -77,7 +77,7 @@ export let circuitStore = writable<Circuit>(initialCircuit)
 function handleAnchorConnection(
     connection: ConnectorPiece,
     updateJsonLinking: (connector: Connector) => void,
-    timeout = 500
+    timeout = 100
 ) {
     // if there are no pending anchor connections to handle
     // either because an input or output timeout before recieving its

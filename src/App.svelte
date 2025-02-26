@@ -26,18 +26,10 @@
 <div id=""></div>
 <main>
     <div class="side_menu"></div>
-    <Svelvet
-        theme="LogiCap"
-        TD
-        controls
-        edgeStyle="step"
-        editable={false}
-        zoom={2.5}
-        translation={{ x: 0, y: 800 }}
-    >
+    <Svelvet theme="LogiCap" TD controls edgeStyle="step" editable={false}>
         <Minimap width={100} corner="NE" slot="minimap" />
         <AndGate nodeStartPos={20} width={80} height={50} />
-        <AndGate nodeStartPos={100} width={80} height={50} />
+        <AndGate nodeStartPos={200} width={80} height={50} />
     </Svelvet>
 </main>
 

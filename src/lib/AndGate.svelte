@@ -53,7 +53,7 @@
 </script>
 
 <!-- cursor = drop -->
-<Node let:selected id={nodeId} position={{ x: 400, y: nodeStartPos }}>
+<Node drop="cursor" id={nodeId} center={true}>
     <img src={image} alt="AND Gate" {width} {height} />
     <LogicGateAnchor location={['left', 'bot']} id={nodeId} io="input" />
     <LogicGateAnchor location={['left', 'top']} id={nodeId} io="input" />
