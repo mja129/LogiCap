@@ -2,7 +2,7 @@
 <script lang="ts">
     import { Svelvet, Minimap, Controls } from 'svelvet'
     import AndGate from './lib/AndGate.svelte'
-    import { circuitStore } from './lib/stores/circuitStore'
+    import { circuitStore, type Circuit } from './lib/stores/circuitStore'
     import SideMenu from './lib/SideMenu.svelte'
     import SketchyLine from './assets/svg/sketchLineSvg/line_8.svg'
     import AppLogo from './assets/LogiCapLogo.png'
