@@ -6,6 +6,7 @@
     import SideMenu from './lib/SideMenu.svelte'
     import SketchyLine from './assets/svg/sketchLineSvg/line_8.svg'
     import AppLogo from './assets/LogiCapLogo.png'
+    import { HeadlessCircuit } from 'custom_digitaljs'
 
     // import type { CSSColorString } from 'svelvet'
     // import { readable, type Readable } from 'svelte/store'
@@ -27,8 +28,20 @@
     // menu design, requirements
     // on dragEnd, if we are dropping onto the canvas
     // add a svelte:component to a list of components
-    circuitStore.subscribe((value) => {
-        console.log(value.connectors)
+
+    let testJson = {
+        devices: {
+            And_864: { celltype: '$and', label: 'And_864', bits: 40 },
+            And_865: { celltype: '$and', label: 'And_865', bits: 0 },
+            And_866: { celltype: '$and', label: 'And_866', bits: 0 },
+        },
+        connectors: [],
+        subcircuits: {},
+    }
+    let currentCircuit = new HeadlessCircuit(testJson)
+    circuitStore.subscribe((value: Circuit) => {
+        // console.log(value.connectors)
+        console.log(JSON.stringify(currentCircuit))
     })
 </script>
 

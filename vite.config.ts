@@ -5,4 +5,18 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 export default defineConfig({
   plugins: [svelte()],
   base: './', // Use relative paths
+  build: {
+    rollupOptions: {
+      external: ['jquery', 'jquery-ui'],
+      output: {
+        globals: {
+          'jquery': 'jQuery'
+        }
+      }
+    },
+    commonjsOptions: {
+      include: [/custom_digitalJS/, /node_modules/],
+      transformMixedEsModules: true
+    },
+  }
 })
