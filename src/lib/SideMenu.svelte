@@ -1,5 +1,8 @@
 <script>
-    import SketchyLine from '../assets/svg/sketchLineSvg/line_9.svg'
+    // import SketchyLine from '../assets/svg/sketchLineSvg/line_15.svg'
+    // import SketchyLine from '../assets/svg/sketchLineSvg/line_23.svg'
+    import SketchyLine from '../assets/svg/sketchLineSvg/line_26.svg'
+    import AppLogo from '../assets/LogiCapLogo.png'
 
     // click on menu item
     // vs
@@ -11,52 +14,71 @@
 
 <nav class="side_menu" aria-label="Side Menu">
     <!-- Use <ul> and <li> for list items -->
+    <div class="side_menu_header">
+        <img src={AppLogo} alt="app logo" />
+        <img
+            class="sketch_bar"
+            src={SketchyLine}
+            alt="sketched line bottom border for main app bar"
+        />
+    </div>
     <ul>
         <!-- Use <li> for each menu item -->
         <li>
             <!-- Use a more descriptive clickable element -->
             <button on:click={handleMenuAction}>Plexers</button>
-            <img
-                class="sketch_bar"
-                src={SketchyLine}
-                alt="sketched line bottom border for main app bar"
-            />
+            <!-- <img -->
+            <!--     class="sketch_bar" -->
+            <!--     src={SketchyLine} -->
+            <!--     alt="sketched line bottom border for main app bar" -->
+            <!-- /> -->
         </li>
         <li>
             <button on:click={handleMenuAction}>Logic Gates</button>
-            <img
-                class="sketch_bar"
-                src={SketchyLine}
-                alt="sketched line bottom border for main app bar"
-            />
+            <!-- <img -->
+            <!--     class="sketch_bar" -->
+            <!--     src={SketchyLine} -->
+            <!--     alt="sketched line bottom border for main app bar" -->
+            <!-- /> -->
         </li>
         <li>
             <button on:click={handleMenuAction}>Logic Gates</button>
-            <img
-                class="sketch_bar"
-                src={SketchyLine}
-                alt="sketched line bottom border for main app bar"
-            />
+            <!-- <img -->
+            <!--     class="sketch_bar" -->
+            <!--     src={SketchyLine} -->
+            <!--     alt="sketched line bottom border for main app bar" -->
+            <!-- /> -->
         </li>
         <li>
             <button on:click={handleMenuAction}>Logic Gates</button>
-            <img
-                class="sketch_bar"
-                src={SketchyLine}
-                alt="sketched line bottom border for main app bar"
-            />
+            <!-- <img -->
+            <!--     class="sketch_bar" -->
+            <!--     src={SketchyLine} -->
+            <!--     alt="sketched line bottom border for main app bar" -->
+            <!-- /> -->
         </li>
         <!-- Add more items as necessary -->
     </ul>
 </nav>
 
 <style>
-    ul {
+    .side_menu_header img:first-child {
+        width: 150px;
     }
+    .side_menu_header img:nth-child(2) {
+        height: 12px;
+        margin-block: -6px;
+        width: 1500px;
+    }
+    .side_menu_header {
+        padding: 10px;
+    }
+    /* ul { */
+    /* } */
     li {
         justify-content: center;
     }
-    img {
+    .side_menu li img {
         /* transform: translateY(-20px); */
         min-width: calc(100% + 5px);
         margin-inline: -4px;
@@ -66,26 +88,32 @@
     li:first-child > button {
         padding-top: 10px;
     }
-    li:first-child::before:hover {
-        background-color: #c971ca;
-    }
-    /* li:not(:first-child) { */
-    /*     margin-top: 10px; */
+    /* li:first-child::before:hover { */
+    /*     background-color: #c971ca; */
     /* } */
+    li:not(:first-child) {
+        /* margin-top: 10px; */
+        /* padding-inline: 2px; */
+    }
+    li {
+        padding-inline: 4px;
+    }
     button {
+        border-radius: 30px;
         padding-block: 8px;
         padding-left: 15px;
         border: unset;
         outline: unset;
         background-color: #9b5de5;
         color: black;
-        font-size: 2ex;
+        font-size: 3ex;
         width: 100%;
         text-align: left;
     }
 
     button:hover {
-        background-color: #c971ca;
+        /* background-color: #7925dc; */
+        background-color: #8a41e1;
     }
     .side_menu {
         /* width: 30%; */

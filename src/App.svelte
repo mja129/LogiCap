@@ -32,21 +32,21 @@
     })
 </script>
 
-<div id="app_bar">
-    <div class="app_bar_items">
-        <img src={AppLogo} alt="app logo" />
-    </div>
-    <img
-        class="sketch_bar"
-        src={SketchyLine}
-        alt="sketched line bottom border for main app bar"
-    />
-</div>
+<!-- <div id="app_bar"> -->
+<!--     <div class="app_bar_items"> -->
+<!--         <img src={AppLogo} alt="app logo" /> -->
+<!--     </div> -->
+<!--     <img -->
+<!--         class="sketch_bar" -->
+<!--         src={SketchyLine} -->
+<!--         alt="sketched line bottom border for main app bar" -->
+<!--     /> -->
+<!-- </div> -->
 
 <main>
     <SideMenu />
     <Svelvet theme="LogiCap" TD controls edgeStyle="step" editable={false}>
-        <Minimap width={100} corner="NW" slot="minimap" />
+        <Minimap width={100} corner="NE" slot="minimap" />
         <AndGate nodeStartPos={20} width={80} height={50} />
         <AndGate nodeStartPos={200} width={80} height={50} />
     </Svelvet>
@@ -62,8 +62,7 @@
         flex-direction: row;
         width: 100vw;
         max-width: 100vw;
-        height: 100vw;
-        height: var(--main-app-flex-height);
+        height: 100vh;
         padding-inline: calc(1.5vw);
         justify-content: center;
         align-items: center;
@@ -79,7 +78,7 @@
         height: auto !important;
     }
     :global(.svelvet-wrapper) {
-        max-height: calc(100% - 5vh);
+        max-height: calc(100% - 3.5vh);
         /* Take up the rest of the space in the flex container*/
         flex: 1;
     }

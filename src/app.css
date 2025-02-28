@@ -3,19 +3,28 @@
 @font-face {
     font-family: 'Mouse';
     src:
-        url('src/assets/fonts/mouse.eot?') format('eot'),
-        url('src/assets/fonts/mouse.woff') format('woff'),
-        url('src/assets/fonts/mouse.ttf') format('truetype'),
-        url('src/assets/fonts/mouse.svg#Mouse') format('svg');
+        url('assets/fonts/mouse.eot?') format('eot'),
+        url('assets/fonts/mouse.woff') format('woff'),
+        url('assets/fonts/mouse.ttf') format('truetype'),
+        url('assets/fonts/mouse.svg#Mouse') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'vcr';
     src:
-        url('src/assets/fonts/vcr_osd_mono_1.001-webfont.woff2') format('woff2'),
-        url('src/assets/fonts/vcr_osd_mono_1.001-webfont.woff') format('woff'),
-        url('src/assets/fonts/VCR_OSD_MONO_1.001.ttf') format('truetype');
+        url('assets/fonts/vcr_osd_mono_1.001-webfont.woff2') format('woff2'),
+        url('assets/fonts/vcr_osd_mono_1.001-webfont.woff') format('woff'),
+        url('assets/fonts/VCR_OSD_MONO_1.001.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Dynamic';
+    src:
+        url('assets/fonts/DynamicSchematicRegular.ttf') format('woff2'),
+        url('assets/fonts/DynamicSchematicRegular.otf') format('oft'),
+        url('assets/fonts/DynamicSchematicRegular.ttf') format('ttf');
     font-weight: normal;
     font-style: normal;
 }
@@ -26,7 +35,7 @@
 
     color-scheme: light dark;
     color: rgba(255, 255, 255, 0.87);
-    background-color: cornflowerblue;
+    background-color: rgba(255, 240, 220, 1);
 
     /* font-synthesis: none; */
     /* text-rendering: optimizeLegibility; */
@@ -90,7 +99,7 @@
 
 * {
     /*  Enhances the readability of text on the page by optimizing the kerning (space between letters)  */
-    font-family: 'Montserrat';
+    font-family: 'Dynamic';
     margin: 0;
     padding: 0;
     /* font: inherit; */
@@ -114,7 +123,6 @@ html {
 
 /* removes default margin around the body element */
 body {
-    font-family: 'Montserrat';
     background-color: rgba(255, 240, 220, 1);
 
     /* 
@@ -124,7 +132,7 @@ body {
     */
     min-height: 100svh;
     /* display: flex; */
-    /* overflow: hidden; */
+    overflow: hidden;
 }
 
 h1,
