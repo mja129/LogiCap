@@ -1,7 +1,11 @@
+<!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
     import { Svelvet, Minimap, Controls } from 'svelvet'
     import AndGate from './lib/AndGate.svelte'
     import { circuitStore } from './lib/stores/circuitStore'
+    import SideMenu from './lib/SideMenu.svelte'
+    import SketchyLine from './assets/svg/sketchLineSvg/line_8.svg'
+    import AppLogo from './assets/LogiCapLogo.png'
 
     // import type { CSSColorString } from 'svelvet'
     // import { readable, type Readable } from 'svelte/store'
@@ -15,19 +19,34 @@
     // This pattern is known as a "Factory Pattern" where a component is dynamically instantiated based on parameters or conditions
     // you would probably need a "key'd" each block for one of these options, not sure which tbh
 
+    // Lets just start with on menu click.
+
     // $inspect(lastLinked_0).with(console.log)
     // $inspect(lastLinked_1).with(console.log)
+
+    // menu design, requirements
+    // on dragEnd, if we are dropping onto the canvas
+    // add a svelte:component to a list of components
     circuitStore.subscribe((value) => {
         console.log(value.connectors)
     })
 </script>
 
-<div id="app_bar"></div>
-<div id=""></div>
+<div id="app_bar">
+    <div class="app_bar_items">
+        <img src={AppLogo} alt="app logo" />
+    </div>
+    <img
+        class="sketch_bar"
+        src={SketchyLine}
+        alt="sketched line bottom border for main app bar"
+    />
+</div>
+
 <main>
-    <div class="side_menu"></div>
+    <SideMenu />
     <Svelvet theme="LogiCap" TD controls edgeStyle="step" editable={false}>
-        <Minimap width={100} corner="NE" slot="minimap" />
+        <Minimap width={100} corner="NW" slot="minimap" />
         <AndGate nodeStartPos={20} width={80} height={50} />
         <AndGate nodeStartPos={200} width={80} height={50} />
     </Svelvet>
@@ -64,24 +83,29 @@
         /* Take up the rest of the space in the flex container*/
         flex: 1;
     }
-    .side_menu {
-        /* width: 30%; */
-        flex: 0 0 22.5%;
-        height: 100%;
-        background-color: plum;
-        margin-right: 1.5vw;
-        /* In order for the main canvas to render centered when the menu goes
-         * away, the main container must have a padding-inline property set
-         * when you set this, the padding will cause the side menu to render
-         * 1.5vw units away from the left edge of the screen, this offests that
-         Probably the only other alternative would be to use javascript to take
-         away some css after the menu goes away
-         */
-        margin-left: -1.5vw;
-    }
+
     #app_bar {
         height: var(--app-bar-height);
         width: 100%;
-        background-color: cornflowerblue;
+        background-color: #00bbf9;
+    }
+
+    .sketch_bar {
+        position: absolute;
+
+        transform: translateY(-7px);
+        height: 10px;
+        margin-left: 0px;
+        min-width: 100%;
+    }
+    .app_bar_items {
+        display: flex;
+        flex-direction: row;
+    }
+    .app_bar_items img {
+        margin-left: auto;
+        margin-right: 1.2vw;
+        margin-top: 2px;
+        width: 150px;
     }
 </style>

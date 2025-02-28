@@ -1,3 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.cdnfonts.com/css/vcr-osd-mono');
+@font-face {
+    font-family: 'Mouse';
+    src:
+        url('src/assets/fonts/mouse.eot?') format('eot'),
+        url('src/assets/fonts/mouse.woff') format('woff'),
+        url('src/assets/fonts/mouse.ttf') format('truetype'),
+        url('src/assets/fonts/mouse.svg#Mouse') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'vcr';
+    src:
+        url('src/assets/fonts/vcr_osd_mono_1.001-webfont.woff2') format('woff2'),
+        url('src/assets/fonts/vcr_osd_mono_1.001-webfont.woff') format('woff'),
+        url('src/assets/fonts/VCR_OSD_MONO_1.001.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+:root {
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: cornflowerblue;
+
+    /* font-synthesis: none; */
+    /* text-rendering: optimizeLegibility; */
+    /* -webkit-font-smoothing: antialiased; */
+    /* -moz-osx-font-smoothing: grayscale; */
+}
+
 :root[svelvet-theme='LogiCap'] {
     --node-color: hsl(225, 30%, 50%);
     --node-border-color: hsl(225, 20%, 40%);
@@ -24,40 +60,25 @@
     --anchor-hovering: hsl(225, 20%, 46%);
     --anchor-hovering-border: hsl(0, 0%, 0%);
 
-    --minimap-background-color: hsl(225, 20%, 27%);
+    --minimap-background-color: hsl(225, 90%, 84%);
 
-    --minimap-node-color: hsl(225, 30%, 20%);
+    --minimap-node-color: hsl(0, 0%, 0%);
 
-    --controls-background-color: hsl(225, 20%, 27%);
-    --controls-text-color: hsl(0, 0%, 100%);
+    --controls-background-color: hsl(225, 90%, 84%);
+    --controls-text-color: hsl(0, 0%, 0%);
 
     --theme-toggle-text-color: hsl(0, 0%, 100%);
     --theme-toggle-color: hsl(225, 20%, 27%);
 
     .svelvet-wrapper {
-        border-radius: 38px;
+        border-radius: 20px;
         outline: 10px solid rgb(100, 100, 100);
     }
 
     .svelvet-wrapper:focus-visible {
-        border-radius: 38px;
+        border-radius: 20px;
         outline: 10px solid black;
     }
-}
-
-:root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
-
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
-
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 * *,
@@ -69,6 +90,7 @@
 
 * {
     /*  Enhances the readability of text on the page by optimizing the kerning (space between letters)  */
+    font-family: 'Montserrat';
     margin: 0;
     padding: 0;
     /* font: inherit; */
@@ -80,6 +102,10 @@
     font-kerning: auto;
 }
 
+button {
+    /* font-family: 'Montserrat'; */
+    font-weight: bold;
+}
 html {
     color-scheme: dark light;
     /* By using `100%` for this property, it prevents mobile browsers from automatically resizing font sizes, maintaining consistency across different devices. */
@@ -88,7 +114,9 @@ html {
 
 /* removes default margin around the body element */
 body {
+    font-family: 'Montserrat';
     background-color: rgba(255, 240, 220, 1);
+
     /* 
       small viewport height (svh),
       height of the viewport excluding the mobile default browser address bar.

@@ -5,7 +5,7 @@
     import LogicGateAnchor from './LogicGateAnchor.svelte'
     import { circuitStore } from './stores/circuitStore'
     import type { Device } from './stores/circuitStore'
-    import image from './svg/andgate.svg'
+    import image from '../assets/svg/andgate.svg'
 
     let {
         width = 80,
