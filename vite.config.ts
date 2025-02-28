@@ -5,6 +5,9 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 export default defineConfig({
   plugins: [svelte()],
   base: './', // Use relative paths
+  optimizeDeps: {
+    include: ['custom_digitaljs'],
+  },
   build: {
     rollupOptions: {
       external: ['jquery', 'jquery-ui'],
@@ -15,7 +18,7 @@ export default defineConfig({
       }
     },
     commonjsOptions: {
-      include: [/custom_digitalJS/, /node_modules/],
+      include: [/custom_digitaljs/, /node_modules/],
       transformMixedEsModules: true
     },
   }
