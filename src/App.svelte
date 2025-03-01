@@ -32,23 +32,18 @@
     // on dragEnd, if we are dropping onto the canvas
     // add a svelte:component to a list of components
 
-    let testJson = {
-        devices: {
-            And_864: { celltype: '$and', label: 'And_864', bits: 40 },
-            And_865: { celltype: '$and', label: 'And_865', bits: 0 },
-            And_866: { celltype: '$and', label: 'And_866', bits: 0 },
-        },
-        connectors: [],
-        subcircuits: {},
-    }
+    // current error is coming from here /Users/shmul/LogSim-Project/custom_digitaljs/node_modules/3vl/dist/index.d.ts
+
     // custom_digitaljs/src/engines/synch.mjs
-    let engine = new Engines.SynchEngine([], { cells: '' })
+    // let engine = new Engines.SynchEngine([], { cells: '' })
     let currentCircuit = new HeadlessCircuit(sampleCircuit)
     // console.log(currentCircuit.start())
+    // this happens on every connection
     circuitStore.subscribe((value: Circuit) => {
         // console.log(value.connectors)
-        console.log(JSON.stringify(currentCircuit))
-        // @ts-ignore
+
+        // for some reason updateGatesNext() throws an error but, updateGates() works
+        console.log(currentCircuit.updateGates())
         console.log(currentCircuit.getLabelIndex())
     })
 </script>

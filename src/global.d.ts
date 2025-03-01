@@ -91,9 +91,12 @@ declare module "custom_digitaljs" {
 
     type CircuitOptions = {
         cellsNamespace?: Record<string, any> | null;
-        engine?: SyncEngine; // Engine is of type SyncEngine constructor
-        engineOptions?: Record<string, any>; // Engine options as a key-value object
-    };
+        engine?: SynchEngine; // Engine is of type SyncEngine constructor
+
+        // its probably more options for the different engines
+        // (graph, { cells }) for SynchEngine, just graph for BaseEngine
+        engineOptions?: any,
+    }; // Engine options as a key-value object
 
     // i think Path is some kind of flat representation of the graph
     type Path = any;
@@ -122,18 +125,26 @@ declare module "custom_digitaljs" {
         addDisplay(display: Display3vl);
         shutdown(): void;
         hasWarnings(): boolean;
-        // not sure what this returns sync engine
-        updateGatesNext(opts: any): Promise<number>;
-        updateGates(opts: any): Promise<number>;
+
+
+        // these are recursive functions?
+        // opts are the same opts for SyncEngine, so graph and cells
+        updateGatesNext(opts?: any): Promise<number>;
+        updateGates(opts?: any): Promise<number>;
+
+        // probably syncronize is pretty important
         synchronize(): Promise<void>;
         get hasPendingEvents(): any[];
         get tick(): number;
+        get running(): boolean;
         startFast(): void;
         start(): void;
         stop(): Promise<any>;
-        // I dont this this is implemented in sync engine
+
+        // I don't think this is implemented in sync engine
         startFast(): any;
-        // probably number but could be range?
+
+        // probably number but could be range tuple/map?
         get interval(): any;
         set interval(ms: number);
         getInputCells(): any[];
