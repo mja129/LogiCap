@@ -2,37 +2,10 @@ import { writable } from 'svelte/store'
 
 // Explains the json representation
 // https://github.com/tilk/digitaljs
-export type Device = {
-    type: string
-    label: string
-}
 
-export type LinkData = {
-    id: string
-    port: string
-}
-
-export type ConnectorFrom = Record<'from', LinkData>
-export type ConnectorTo = Record<'to', LinkData>
-export type ConnectorPiece = ConnectorTo | ConnectorFrom
-
-
-export type Connector = ConnectorFrom & ConnectorTo
-
-type Subcircuit = {
-    devices: Record<string, Device>
-    connectors: Connector[]
-}
-
-// Device manifest
-// Connection manifest
-export type Circuit = {
-    devices: Record<string, Device>
-    connectors: Connector[]
-    subcircuits: Record<string, Subcircuit>
-}
 // NOTE, I changed connectors to a map of "{ nodeId }" : "Connections[]"
 // In order to fi
+
 
 
 const initialCircuit: Circuit = {

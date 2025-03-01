@@ -6,6 +6,10 @@
     import SideMenu from './lib/SideMenu.svelte'
     import SketchyLine from './assets/svg/sketchLineSvg/line_8.svg'
     import AppLogo from './assets/LogiCapLogo.png'
+    // engines as just to call it with uppercase 'Engines'
+    import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
+
+    import sampleCircuit from './assets/CircuitJsonSampleData/arithconst.json'
 
     // import type { CSSColorString } from 'svelvet'
     // import { readable, type Readable } from 'svelte/store'
@@ -27,8 +31,20 @@
     // menu design, requirements
     // on dragEnd, if we are dropping onto the canvas
     // add a svelte:component to a list of components
-    circuitStore.subscribe((value) => {
-        console.log(value.connectors)
+
+    // current error is coming from here /Users/shmul/LogSim-Project/custom_digitaljs/node_modules/3vl/dist/index.d.ts
+
+    // custom_digitaljs/src/engines/synch.mjs
+    // let engine = new Engines.SynchEngine([], { cells: '' })
+    let currentCircuit = new HeadlessCircuit(sampleCircuit)
+    // console.log(currentCircuit.start())
+    // this happens on every connection
+    circuitStore.subscribe((value: Circuit) => {
+        // console.log(value.connectors)
+
+        // for some reason updateGatesNext() throws an error but, updateGates() works
+        console.log(currentCircuit.updateGates())
+        console.log(currentCircuit.getLabelIndex())
     })
 </script>
 

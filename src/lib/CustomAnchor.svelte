@@ -3,11 +3,6 @@
         handleLinkAnchorConnection,
         handleUnlinkAnchorConnection,
     } from './stores/circuitStore'
-    import type {
-        ConnectorFrom,
-        ConnectorTo,
-        ConnectorPiece,
-    } from './stores/circuitStore'
 
     let {
         linked,
