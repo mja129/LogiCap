@@ -3,7 +3,6 @@
     // import SketchyLine from '../assets/svg/sketchLineSvg/line_15.svg'
     // import SketchyLine from '../assets/svg/sketchLineSvg/line_23.svg'
     import SketchyLine from '../assets/svg/sketchLineSvg/line_26.svg'
-    import AppLogo from '../assets/LogiCapLogo.png'
 
     let showSubMenu = false
     // click on menu item
