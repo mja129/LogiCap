@@ -8,7 +8,6 @@
     import AppLogo from './assets/LogiCapLogo.png'
     // engines as just to call it with uppercase 'Engines'
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
-    import { SynchEngine } from 'custom_digitaljs'
 
     import sampleCircuit from './assets/CircuitJsonSampleData/arithconst.json'
 
@@ -43,6 +42,7 @@
         subcircuits: {},
     }
     // custom_digitaljs/src/engines/synch.mjs
+    let engine = new Engines.SynchEngine([], { cells: '' })
     let currentCircuit = new HeadlessCircuit(sampleCircuit)
     // console.log(currentCircuit.start())
     circuitStore.subscribe((value: Circuit) => {

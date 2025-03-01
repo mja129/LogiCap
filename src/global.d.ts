@@ -108,7 +108,8 @@ declare module "custom_digitaljs" {
         export { SynchEngine, BrowserSynchEngine, WorkerEngine };
     }
     export class SynchEngine implements SynchEngine {
-        constructor();
+        // constructor();
+        constructor(graph: any, { cells: any });
         // No need to redeclare methods here since they're in the interface
     }
     export class HeadlessCircuit {
