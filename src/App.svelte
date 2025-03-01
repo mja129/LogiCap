@@ -2,11 +2,15 @@
 <script lang="ts">
     import { Svelvet, Minimap, Controls } from 'svelvet'
     import AndGate from './lib/AndGate.svelte'
-    import { circuitStore, type Circuit } from './lib/stores/circuitStore'
+    import { circuitStore } from './lib/stores/circuitStore'
     import SideMenu from './lib/SideMenu.svelte'
     import SketchyLine from './assets/svg/sketchLineSvg/line_8.svg'
     import AppLogo from './assets/LogiCapLogo.png'
-    import { HeadlessCircuit } from 'custom_digitaljs'
+    // engines as just to call it with uppercase 'Engines'
+    import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
+    import { SynchEngine } from 'custom_digitaljs'
+
+    import sampleCircuit from './assets/CircuitJsonSampleData/arithconst.json'
 
     // import type { CSSColorString } from 'svelvet'
     // import { readable, type Readable } from 'svelte/store'
@@ -38,10 +42,14 @@
         connectors: [],
         subcircuits: {},
     }
-    let currentCircuit = new HeadlessCircuit(testJson)
+    // custom_digitaljs/src/engines/synch.mjs
+    let currentCircuit = new HeadlessCircuit(sampleCircuit)
+    // console.log(currentCircuit.start())
     circuitStore.subscribe((value: Circuit) => {
         // console.log(value.connectors)
         console.log(JSON.stringify(currentCircuit))
+        // @ts-ignore
+        console.log(currentCircuit.getLabelIndex())
     })
 </script>
 

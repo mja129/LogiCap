@@ -12,7 +12,7 @@ import * as transform from './transform.mjs';
 import { SynchEngine } from './engines/synch.mjs';
 
 export { cells, tools, engines, transform };
-    
+
 export function getCellType(tp) {
     const types = {
         '$not': cells.Not,
@@ -70,9 +70,9 @@ export function getCellType(tp) {
     if (tp in types) return types[tp];
     else return cells.Subcircuit;
 }
-        
+
 export class HeadlessCircuit {
-    constructor(data, {cellsNamespace = {}, engine = SynchEngine, engineOptions = {}} = {}) {
+    constructor(data, { cellsNamespace = {}, engine = SynchEngine, engineOptions = {} } = {}) {
         this._cells = Object.assign(cells, cellsNamespace);
         this._display3vl = new Display3vl();
         this._display3vl.addDisplay(new help.Display3vlASCII());
@@ -110,7 +110,7 @@ export class HeadlessCircuit {
             //todo: better handling for stopping simulation
             if (graph._warnings > 0 && this.running)
                 this.stop();
-            
+
             // bubble warning up in case of subcircuit
             const subcir = graph.get('subcircuit');
             if (subcir == null || subcir == true) return;
@@ -168,8 +168,8 @@ export class HeadlessCircuit {
         }
         for (const conn of data.connectors) {
             graph.addCell(new this._cells.Wire({
-                source: {id: conn.from.id, port: conn.from.port, magnet: 'port' },
-                target: {id: conn.to.id, port: conn.to.port, magnet: 'port'},
+                source: { id: conn.from.id, port: conn.from.port, magnet: 'port' },
+                target: { id: conn.to.id, port: conn.to.port, magnet: 'port' },
                 netname: conn.name,
                 vertices: conn.vertices || [],
                 source_positions: conn.source_positions || []
@@ -270,7 +270,7 @@ export class HeadlessCircuit {
                 return i;
             } else {
                 const s = i.subcircuits[path[p]];
-                if (s) return f(p+1, s);
+                if (s) return f(p + 1, s);
             }
         };
         return f(0, this.makeLabelIndex());
@@ -315,7 +315,7 @@ export class HeadlessCircuit {
         if (trigger instanceof Vector3vl)
             trigger = [trigger];
         return new Promise(resolve => {
-            this.monitorWire(wire, (tick, sig) => { resolve(tick) }, 
+            this.monitorWire(wire, (tick, sig) => { resolve(tick) },
                 { synchronous: true, oneShot: true, stopOnTrigger: true, triggerValues: trigger });
         });
     }
@@ -323,7 +323,7 @@ export class HeadlessCircuit {
         if (trigger instanceof Vector3vl)
             trigger = [trigger];
         return new Promise(resolve => {
-            this.monitor(cell, port, (tick, sig) => { resolve(tick) }, 
+            this.monitor(cell, port, (tick, sig) => { resolve(tick) },
                 { synchronous: true, oneShot: true, stopOnTrigger: true, triggerValues: trigger });
         });
     }

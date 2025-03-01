@@ -5,7 +5,7 @@ import * as help from '../help.mjs';
 import { BaseEngine } from './base.mjs';
 
 export class SynchEngine extends BaseEngine {
-    constructor(graph, {cells}) {
+    constructor(graph, { cells }) {
         super(graph);
         this._queue = new Map();
         this._pq = new FastPriorityQueue();
@@ -143,10 +143,10 @@ export class SynchEngine extends BaseEngine {
     }
     unobserveGraph(graph) {
     }
-    monitor(gate, port, callback, {triggerValues, stopOnTrigger, oneShot}) {
+    monitor(gate, port, callback, { triggerValues, stopOnTrigger, oneShot }) {
         const cb = (gate, sigs) => {
             const sig = sigs[port];
-            this._monitorChecks.set(cb, {gate, sig, cb, callback, triggerValues, stopOnTrigger, oneShot});
+            this._monitorChecks.set(cb, { gate, sig, cb, callback, triggerValues, stopOnTrigger, oneShot });
         };
         gate.on('change:outputSignals', cb);
         if (triggerValues == undefined)
@@ -156,7 +156,7 @@ export class SynchEngine extends BaseEngine {
     unmonitor(monitorId) {
         monitorId.gate.off('change:outputSignals', monitorId.callback);
     }
-    alarm(tick, callback, {stopOnAlarm}) {
+    alarm(tick, callback, { stopOnAlarm }) {
         console.assert(tick > this._tick);
         const cb = () => {
             this.unalarm(cb);
@@ -166,9 +166,9 @@ export class SynchEngine extends BaseEngine {
         if (!this._alarmQueue.has(tick))
             this._alarmQueue.set(tick, new Set());
         this._alarmQueue.get(tick).add(cb);
-        this._pq.add(tick-1);
-        if (!this._queue.has(tick-1))
-            this._queue.set(tick-1, new Map());
+        this._pq.add(tick - 1);
+        if (!this._queue.has(tick - 1))
+            this._queue.set(tick - 1, new Map());
         return cb;
     }
     unalarm(alarmId) {
@@ -179,7 +179,7 @@ export class SynchEngine extends BaseEngine {
         this._alarms.delete(alarmId);
     }
     _checkMonitors() {
-        for (const {gate, sig, cb, callback, triggerValues, stopOnTrigger, oneShot} of this._monitorChecks.values()) {
+        for (const { gate, sig, cb, callback, triggerValues, stopOnTrigger, oneShot } of this._monitorChecks.values()) {
             let triggered = true;
             if (triggerValues != undefined)
                 triggered = triggerValues.some((triggerValue) => sig.eq(triggerValue));
