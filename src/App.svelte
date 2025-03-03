@@ -3,9 +3,8 @@
     import { Svelvet, Minimap, Controls } from 'svelvet'
     import AndGate from './lib/AndGate.svelte'
     import { circuitStore } from './lib/stores/circuitStore'
-    import SideMenu from './lib/SideMenu.svelte'
+    import SideMenu from './lib/SideMenu/SideMenu.svelte'
     import SketchyLine from './assets/svg/sketchLineSvg/line_8.svg'
-    import AppLogo from './assets/LogiCapLogo.png'
     // engines as just to call it with uppercase 'Engines'
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
 

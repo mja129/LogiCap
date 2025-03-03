@@ -34,13 +34,13 @@
     font-weight: 400;
 
     color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: rgba(255, 240, 220, 1);
+    /* background-color: var(--pastel-pink); */
 
-    /* font-synthesis: none; */
-    /* text-rendering: optimizeLegibility; */
-    /* -webkit-font-smoothing: antialiased; */
-    /* -moz-osx-font-smoothing: grayscale; */
+    /* Wow that stuff makes the font look SUPER nice */
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 :root[svelvet-theme='LogiCap'] {
@@ -123,7 +123,7 @@ html {
 
 /* removes default margin around the body element */
 body {
-    background-color: rgba(255, 240, 220, 1);
+    background-color: var(--pastel-blue);
 
     /* 
       small viewport height (svh),
