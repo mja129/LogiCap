@@ -1,16 +1,23 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
     import { onMount } from 'svelte'
-    import SketchyLine_wiggle from '../../assets/svg/sketchLineSvg/line_26.svg'
+    import SketchyLineWiggle from '../../assets/svg/sketchLineSvg/line_26.svg'
+    // import SketchyLineWiggle from '../SketchLines/line_26.svelte'
+    // import SketchyLineStandard from '../SketchLines/line_29.svelte'
+
     // import CollapseIcon from '../assets/icons/collapse.webp'
 
     import SideMenuHeader from './SideMenuHeader.svelte'
     import SideMenuGroupItems from './SideMenuGroupItems.svelte'
+    import { menuJsonData } from './menu.ts'
 
     // just a selection of ones I want for the random line under the menu items.
-    const randomLineSelectionGroup = [15, 23, 24, 25, 27, 17, 19, 21, 29]
 
-    type MenuGroupNames =
+    let svgContainer: HTMLDivElement | null = null
+    let pathA: SVGPathElement | null = null
+    let pathB: SVGPathElement | null = null
+
+    type MenuGroupName =
         | 'Gates'
         | 'Arithmetic'
         | 'Multiplexers'
@@ -18,220 +25,106 @@
         | 'Utils'
 
     type MenuItemData = { svg: string | undefined; groupElements: string[] }
-    type MenuItem = Record<MenuGroupNames, MenuItemData>
-    type MenuItemJson = MenuItem & MenuItem
+    type MenuItem = Record<MenuGroupName, MenuItemData>
+    type MenuJson = MenuItem & MenuItem
+
+    const menuJson: MenuJson = menuJsonData as MenuJson
+    const menuGroupNames = Object.keys(menuJson)
+
+    const randomLineSelectionGroup = [15, 23, 24, 25, 27, 17, 19, 21, 29]
 
     // svg shouldn't be here.
-    const menuJson: MenuItemJson = {
-        Gates: {
-            svg: undefined,
-            groupElements: [
-                'And',
-                'Or',
-                'Nor',
-                'Not',
-                'Xor',
-                'Nand',
-                'Repeater',
-                'Xnor',
-            ],
-        },
-        Arithmetic: {
-            svg: undefined,
-            groupElements: [
-                'And',
-                'Or',
-                'Nor',
-                'Not',
-                'Xor',
-                'Nand',
-                'Repeater',
-                'Xnor',
-            ],
-        },
-
-        Multiplexers: {
-            svg: undefined,
-            groupElements: [
-                'And',
-                'Or',
-                'Nor',
-                'Not',
-                'Xor',
-                'Nand',
-                'Repeater',
-                'Xnor',
-            ],
-        },
-        Memory: {
-            svg: undefined,
-            groupElements: [
-                'And',
-                'Or',
-                'Nor',
-                'Not',
-                'Xor',
-                'Nand',
-                'Repeater',
-                'Xnor',
-            ],
-        },
-        Utils: {
-            svg: undefined,
-            groupElements: [
-                'And',
-                'Or',
-                'Nor',
-                'Not',
-                'Xor',
-                'Nand',
-                'Repeater',
-                'Xnor',
-            ],
-        },
-    }
-
     function rng(maxInt: number): number {
         return Math.floor(Math.random() * maxInt) + 1
     }
-    // this function is overengineered, it could/should be 2, this is more efficient tho, besides splice, but the array is quite small also
-    // Assigns a random line to the menu. lol
     let randomLineSelectionStore = localStorage.getItem(
         'randomLineSelectionStore'
     )
 
-    if (randomLineSelectionStore === null) {
-        const selections = new Array<number>()
-        Object.keys(menuJson).map(async (groupName: string) => {
-            const randNum = rng(randomLineSelectionGroup.length - 1)
-            const selection = randomLineSelectionGroup[randNum]
-            const svgImport = `/src/assets/svg/sketchLineSvg/line_${selection}.svg`
-            menuJson[groupName as MenuGroupNames]['svg'] = svgImport
-            randomLineSelectionGroup.splice(randNum, 1)
+    function getSvgLineFileName(selection: number): string {
+        return `/src/assets/svg/sketchLineSvg/line_${selection}.svg`
+    }
 
+    // IGNORE THIS CODE, if you want. its very useless.
+    if (randomLineSelectionStore === null) {
+        const selections: number[] = menuGroupNames.map((groupName: string) => {
+            // index of possible lines to select
+            const randNum = rng(randomLineSelectionGroup.length - 1)
+            // number of the svg in the assets/sketchLineSvg folder.
+            const selection: number = randomLineSelectionGroup[randNum]
+
+            const svgImport = getSvgLineFileName(selection)
+            menuJson[groupName as MenuGroupName]['svg'] = svgImport
+
+            // remove this number from the selection list.
+            // Don't pick any duplicates.
+            randomLineSelectionGroup.splice(randNum, 1)
             // add to localStorageCache
-            selections.push(selection)
-            console.log(menuJson)
-            // return { groupName, svgImport }
+            return selection
         })
         localStorage.setItem(
             'randomLineSelectionStore',
             JSON.stringify(selections)
         )
     } else {
+        // set lines from local storage
         const chosenLinesJson: string[] = JSON.parse(randomLineSelectionStore)
-        const menuJsonKeys = Object.keys(menuJson)
         chosenLinesJson.forEach((selection: string, index: number) => {
-            const currentMenuGroup: MenuGroupNames = menuJsonKeys[
-                index
-            ] as MenuGroupNames
-            const svgImport = `/src/assets/svg/sketchLineSvg/line_${selection}.svg`
+            const currentMenuGroup = menuGroupNames[index] as MenuGroupName
+            const svgImport = getSvgLineFileName(parseInt(selection, 10))
             menuJson[currentMenuGroup]['svg'] = svgImport
         })
     }
 
     // this could also be "instance" data but this is simpler
-    let showSubMenu: boolean[] = $state([true, true, true])
+    // SHOULD ONLY ONE BE OPEN AT A TIME?
+    let showSubMenu: boolean[] = Array(menuGroupNames.length).fill(true)
+    console.log(showSubMenu)
     // click on menu item
     // vs
     // drag menu item and drop on svelvet canvas
-    function handleMenuAction() {
-        console.log('menuActionHande')
-    }
 </script>
 
 <nav class="side_menu" aria-label="Side Menu">
     <!-- Use <ul> and <li> for list items -->
-    <SideMenuHeader />
+    <div style="position: relative;z-index:40;background-color: var(--cream);">
+        <SideMenuHeader />
 
-    <!-- style="height:19px;width:90%;margin-left:2.5%" -->
-    <img
-        class="wiggle_bar"
-        src={SketchyLine_wiggle}
-        style=""
-        alt="sketched line bottom border for main app bar"
-    />
+        <!-- style="height:19px;width:90%;margin-left:2.5%" -->
+        <img
+            class="wiggle_bar"
+            src={SketchyLineWiggle}
+            alt="sketched line bottom border for main app bar"
+        />
+    </div>
     <ul>
         <!-- Use <li> for each menu item -->
-        <li>
-            <!-- Use a more descriptive clickable element -->
-            <button
-                onmousedown={() => {
-                    showSubMenu[0] = !showSubMenu[0]
-                }}>Gates</button
-            >
-            <!-- <img -->
-            <!--     class="sketch_bar" -->
-            <!--     src={SketchyLine} -->
-            <!--     alt="sketched line bottom border for main app bar" -->
-            <!-- /> -->
-            <!-- style={showSubMenu ? 'display:none' : 'display:block'} -->
+        {#each menuGroupNames as groupName, index}
+            <li id="menu_group_{index}">
+                <!-- Use a more descriptive clickable element -->
+                <div class="menu_group_section">
+                    <button
+                        onmousedown={() => {
+                            showSubMenu[index] = !showSubMenu[index]
+                        }}
+                        ><span style="margin-left:5%;">{groupName}</span
+                        ></button
+                    >
+                    <!-- style={showSubMenu ? 'display:none' : 'display:block'} -->
 
-            <img
-                class="sketch_bar"
-                src={menuJson['Gates'].svg}
-                alt="sketched line bottom border for main app bar"
-            />
-            <SideMenuGroupItems showSubMenu={showSubMenu[0]} />
-        </li>
-        <li>
-            <button
-                onmousedown={() => {
-                    showSubMenu[1] = !showSubMenu[1]
-                }}>Arithmetic</button
-            >
-            <!-- <img -->
-            <!--     class="sketch_bar" -->
-            <!--     src={SketchyLine} -->
-            <!--     alt="sketched line bottom border for main app bar" -->
-            <!-- /> -->
+                    <img
+                        class="sketch_bar"
+                        src={menuJson[groupName as MenuGroupName].svg}
+                        alt="sketched line bottom border for main app bar section {groupName}"
+                    />
+                </div>
+                <SideMenuGroupItems
+                    zIndex={menuGroupNames.length - index}
+                    showSubMenu={showSubMenu[index]}
+                />
+            </li>
+        {/each}
 
-            <img
-                class="sketch_bar"
-                src={menuJson['Arithmetic'].svg}
-                alt="sketched line bottom border for main app bar"
-            />
-            <SideMenuGroupItems showSubMenu={showSubMenu[1]} />
-        </li>
-        <li>
-            <button
-                onmousedown={() => {
-                    showSubMenu[1] = !showSubMenu[1]
-                }}>Multiplexers</button
-            >
-            <img
-                class="sketch_bar"
-                src={menuJson['Multiplexers'].svg}
-                alt="sketched line bottom border for main app bar"
-            />
-        </li>
-        <li>
-            <button
-                onmousedown={() => {
-                    showSubMenu[1] = !showSubMenu[1]
-                }}>Memory</button
-            >
-            <img
-                class="sketch_bar"
-                src={menuJson['Memory'].svg}
-                alt="sketched line bottom border for main app bar"
-            />
-        </li>
-        <li>
-            <button
-                onmousedown={() => {
-                    showSubMenu[0] = !showSubMenu[0]
-                }}>Utils</button
-            >
-            <img
-                class="sketch_bar"
-                src={menuJson['Utils'].svg}
-                alt="sketched line bottom border for main app bar"
-            />
-        </li>
-        <li>
-            <!-- <button on:click={handleMenuAction}>Bus</button> -->
-        </li>
         <!-- Add more items as necessary -->
     </ul>
 </nav>
@@ -262,7 +155,10 @@
             - The lines are the main element which creates spacing
             - when the submenu is open, the bottom of the submenu must have 'margin-bottom; var(--side-menu-spacing)'
         */
-        --side-menu-spacing: 25px;
+        /* Update, this is an absolute BANGER, try updating it, see how well the menu responds changing this varaible!*/
+        --side-menu-spacing: 20px;
+        --side-menu-first-child-extra-space: 0px;
+        transition: padding-bottom 5s ease;
         /* --side-menu-header-spacing: 20px; */
     }
 
@@ -288,6 +184,7 @@
         border: 3px solid 3px;
         box-shadow: 0px 4px 0px 4px #000000;
         border-radius: 3px;
+        /* translate: height 5s; */
     }
 
     /* All list element decedents of .side_menu class */
@@ -301,7 +198,8 @@
         /* transform: translateY(-20px); */
         min-width: calc(100% + 5px);
         margin-inline: -4px;
-        margin-block: var(--side-menu-spacing);
+        background-color: var(--cream);
+        /* margin-block: var(--side-menu-spacing); */
         height: 8px;
     }
 
@@ -314,20 +212,26 @@
     }
 
     nav.side_menu button {
-        border-radius: 30px;
-        padding-block: 10px;
+        /* border-radius: 30px; */
+        padding-block: calc(var(--side-menu-spacing) + 10px);
+        /* margin-block: var(--side-menu-spacing); */
         padding-left: 15px;
         border: unset;
         outline: unset;
         background-color: var(--cream);
         color: black;
         font-size: 3ex;
-        width: 95%;
+        width: 100%;
         text-align: left;
         /* margin-top: 5px; */
         /* padding-top: 10px; */
     }
-
+    .menu_group_section {
+        position: relative;
+        z-index: 40;
+    }
+    nav.side_menu .menu_group_section:hover,
+    nav.side_menu .menu_group_section:hover img,
     nav.side_menu button:hover {
         /* background-color: #7925dc; */
         background-color: var(--dark-cream);
@@ -336,26 +240,20 @@
     /* nav.side_menu li:first-child > button { */
     /*     padding-top: 10px; */
     /* } */
-    @keyframes slide-in {
-        from {
-            height: 300px;
-        }
-
-        to {
-            max-height: 0px;
-        }
-    }
     /* li:first-child::before:hover { */
     /*     background-color: #c971ca; */
     /* } */
     /* and the spacing on the lines to the first child of the menu group list of items */
-    ul > li:first-child {
-        /* padding-inline: 2px; */
-        margin-top: var(--side-menu-spacing);
-    }
+    /* nav.side_menu ul > li:first-child { */
+    /*     /* padding-inline: 2px; */
+    /*     margin-top: calc( */
+    /*         var(--side-menu-spacing) + var(--side-menu-first-child-extra-space) */
+    /*     ); */
+    /* } */
 
-    ul > li {
-        padding-inline: 4px;
+    nav.side_menu ul > li {
+        /* padding-inline: 4px; */
+        /* Lowkey weird the centering that the preforms, try toggling it.*/
         text-align: center;
     }
 

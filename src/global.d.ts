@@ -181,8 +181,6 @@ declare module "custom_digitaljs" {
         unobserveGraph(path?: Path): void;
         alarm(tick: number, callback: Function, options?: any);
         unalarm(alarmId: any); // probably string or int
-
-
     }
 }
 

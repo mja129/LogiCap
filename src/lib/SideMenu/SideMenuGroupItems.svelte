@@ -8,15 +8,49 @@
     import XnorIcon from '../../assets/icons/circuits/Xnor.webp'
     import NandIcon from '../../assets/icons/circuits/Nand.webp'
     import NotIcon from '../../assets/icons/circuits/Not.webp'
+    import { onMount } from 'svelte'
 
     // this will be a required prop but it is optional right now.
-    let { showSubMenu }: { showSubMenu?: boolean } = $props()
+    let { showSubMenu, zIndex = 0 }: { showSubMenu?: boolean; zIndex: number } =
+        $props()
+
+    let sectionHeight: number = $state(0)
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const head: HTMLElement | null = document.querySelector(
+            `#section_${zIndex}`
+        )
+        if (head) {
+            sectionHeight = head.offsetHeight
+            // sectionHeight = head.clientHeight
+            console.log(sectionHeight)
+        }
+    })
 
     // This component really shouldn't be an ordered list that's so stupid
+
+    // animations which are kinda trash right now.
+    // style={showSubMenu
+    //     ? `transition: opacity 0.3s ease, margin-top 0.8s ease,max-height 0.8s ease;
+    //        z-index:${zIndex};
+    //        opacity:1;
+    //        margin-top:var(--side-menu-spacing);`
+    //     : `transition: opacity 0.6s ease, margin-top .8s ease, max-height 0.8s ease;
+    //        z-index:${zIndex};
+    //        opacity:0;
+    //        padding-bottom:0px;
+    //        margin-top:-140px;
+    //
+    //       `}
 </script>
 
-<ol class="dark-cream-bg" style={showSubMenu ? 'display:none' : 'display:grid'}>
+<ol
+    style={showSubMenu ? 'display: none' : 'display: grid'}
+    class="cream-bg noselect"
+    id="section_{zIndex}"
+>
     <li>
+        <!--Should be figure and figcaption html elements I think -->
         <img
             style="width: 82px;margin-top: 3px;"
             src={NotIcon}
@@ -83,8 +117,29 @@
 </ol>
 
 <style>
+    .menu-item {
+        opacity: 1;
+        transform: translateY(0); /* Initially in place */
+        margin-bottom: 10px;
+        max-height: 50px; /* Set an initial height */
+        overflow: hidden; /* Hide overflow content during transition */
+        transition:
+            opacity 0.3s ease,
+            transform 0.3s ease,
+            max-height 0.3s ease,
+            margin-bottom 0.3s ease;
+    }
+
+    .hidden {
+        opacity: 0; /* Fade out */
+        transform: translateY(-100%); /* Slide up (out of view) */
+        max-height: 0; /* Collapse height */
+        margin-bottom: 0; /* Collapse margin */
+    }
     ol {
+        position: relative;
         list-style-type: none;
+        /* transform: translateY(-300px); */
         /* margin-left: 40px; */
 
         /* Grid Fallback */
@@ -97,21 +152,33 @@
         /* grid-auto-rows: minmax(100px, auto); */
         grid-gap: 10px;
         padding-inline: 10px;
-        margin-top: calc(var(--side-menu-spacing) * 1.5);
-        /* Roughly centered relative to the next title */
-        margin-bottom: calc(var(--side-menu-spacing) / 1.1);
+        margin-top: calc(var(--side-menu-spacing));
+        /* margin-top: -10px; */
+        /* Roughly centered relative to the next title same as * .9 right?*/
+        /* needs to account for the outline's on hover, because outline does not take up space, so it will overlap. */
+        padding-bottom: 4px;
         /* margin-block: var(--side-menu-spacing); */
+        /* transform: translateY(-40px); */
+    }
+    .slide_out {
+        animation-name: slide-out;
+        animation-duration: 1s;
+    }
+
+    .slide_in {
+        animation-name: slide-out;
+        animation-duration: 1s;
+        animation-direction: reverse;
     }
 
     ol li {
-        z-index: 2;
+        /* z-index: -2; */
         background-color: var(--blue);
         color: black;
         display: flex;
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        /* height: 30px; */
         background-color: var(--cream);
 
         border-radius: 20px;
@@ -125,4 +192,8 @@
     }
     /* ol li > img { */
     /* } */
+
+    .cream-bg {
+        background-color: var(--cream);
+    }
 </style>
