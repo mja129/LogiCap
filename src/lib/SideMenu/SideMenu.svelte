@@ -101,8 +101,8 @@
             <li
                 id="menu_group_{index}"
                 style={showSubMenu[index]
-                    ? 'transition: max-height .6s ease-out; max-height:75px'
-                    : 'transition: max-height .6s ease-in; max-height:500px'}
+                    ? 'transition: max-height .4s ease-out; max-height:75px'
+                    : 'transition: max-height .4s ease-in; max-height:800px'}
             >
                 <!-- Use a more descriptive clickable element -->
                 <div class="menu_group_section">

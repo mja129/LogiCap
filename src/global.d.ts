@@ -89,15 +89,6 @@ declare module "custom_digitaljs" {
     };
 
 
-    type CircuitOptions = {
-        cellsNamespace?: Record<string, any> | null;
-        engine?: SynchEngine; // Engine is of type SyncEngine constructor
-
-        // its probably more options for the different engines
-        // (graph, { cells }) for SynchEngine, just graph for BaseEngine
-        engineOptions?: any,
-    }; // Engine options as a key-value object
-
     // i think Path is some kind of flat representation of the graph
     type Path = any;
     type JsonCircuit = any;
@@ -115,6 +106,15 @@ declare module "custom_digitaljs" {
         constructor(graph: any, { cells: any });
         // No need to redeclare methods here since they're in the interface
     }
+
+    type CircuitOptions = {
+        cellsNamespace?: Record<string, any> | null;
+        engine?: SynchEngine; // Engine is of type SyncEngine constructor
+
+        // its probably more options for the different engines
+        // (graph, { cells }) for SynchEngine, just graph for BaseEngine
+        engineOptions?: any,
+    }; // Engine options as a key-value object
     export class HeadlessCircuit {
         constructor(data: JsonCircuit, options?: CircuitOptions);
         // Add method and property signatures here

@@ -13,6 +13,7 @@
     import sampleCircuit from './assets/CircuitJsonSampleData/arithconst.json'
     import { on } from 'svelte/events'
 
+    // localStorage.clear()
     // import type { CSSColorString } from 'svelvet'
     // import { readable, type Readable } from 'svelte/store'
     // const blackColor: Readable<CSSColorString> = Readable<CSSColorString>("red");
@@ -63,9 +64,10 @@
 
 <main>
     <SideMenu />
-    <Svelvet theme="LogiCap" TD controls edgeStyle="step" editable={false}>
+    <Svelvet theme="LogiCap" TD controls editable={false}>
         <Minimap width={100} corner="NE" slot="minimap" />
         <AndGate nodeStartPos={20} width={80} height={50} />
+        <AndGate nodeStartPos={200} width={80} height={50} />
         <AndGate nodeStartPos={200} width={80} height={50} />
     </Svelvet>
 </main>
