@@ -13,10 +13,6 @@
 
     // just a selection of ones I want for the random line under the menu items.
 
-    let svgContainer: HTMLDivElement | null = null
-    let pathA: SVGPathElement | null = null
-    let pathB: SVGPathElement | null = null
-
     type MenuGroupName =
         | 'Gates'
         | 'Arithmetic'
@@ -25,6 +21,7 @@
         | 'Utils'
 
     type MenuItemData = { svg: string | undefined; groupElements: string[] }
+    // Record = one key pair, type shit
     type MenuItem = Record<MenuGroupName, MenuItemData>
     type MenuJson = MenuItem & MenuItem
 
@@ -79,10 +76,11 @@
     // this could also be "instance" data but this is simpler
     // SHOULD ONLY ONE BE OPEN AT A TIME?
     let showSubMenu: boolean[] = Array(menuGroupNames.length).fill(true)
-    console.log(showSubMenu)
+    // console.log(showSubMenu)
     // click on menu item
     // vs
     // drag menu item and drop on svelvet canvas
+    // showAnimation = 'transition: min-height 1s ease'
 </script>
 
 <nav class="side_menu" aria-label="Side Menu">
@@ -100,7 +98,12 @@
     <ul>
         <!-- Use <li> for each menu item -->
         {#each menuGroupNames as groupName, index}
-            <li id="menu_group_{index}">
+            <li
+                id="menu_group_{index}"
+                style={showSubMenu[index]
+                    ? 'transition: max-height .6s ease-out; max-height:75px'
+                    : 'transition: max-height .6s ease-in; max-height:500px'}
+            >
                 <!-- Use a more descriptive clickable element -->
                 <div class="menu_group_section">
                     <button
@@ -119,7 +122,7 @@
                     />
                 </div>
                 <SideMenuGroupItems
-                    zIndex={menuGroupNames.length - index}
+                    zIndex={index}
                     showSubMenu={showSubMenu[index]}
                 />
             </li>
@@ -156,9 +159,8 @@
             - when the submenu is open, the bottom of the submenu must have 'margin-bottom; var(--side-menu-spacing)'
         */
         /* Update, this is an absolute BANGER, try updating it, see how well the menu responds changing this varaible!*/
-        --side-menu-spacing: 20px;
+        --side-menu-spacing: 10px;
         --side-menu-first-child-extra-space: 0px;
-        transition: padding-bottom 5s ease;
         /* --side-menu-header-spacing: 20px; */
     }
 
@@ -166,6 +168,10 @@
         I added it because I thought the css was a too much in this file. and its a bit easier to understand.
     */
 
+    /*   Hide scrollbar but still scroll safari   */
+    nav.side_menu::-webkit-scrollbar {
+        display: none;
+    }
     nav.side_menu {
         /* width: 30%; */
         flex: 0 0 22.5%;
@@ -185,13 +191,17 @@
         box-shadow: 0px 4px 0px 4px #000000;
         border-radius: 3px;
         /* translate: height 5s; */
+
+        /* Hide scrollbar but still scroll crome+firefox   */
+        overflow: scroll;
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
     }
 
     /* All list element decedents of .side_menu class */
     nav.side_menu li {
         justify-content: center;
     }
-
     /* Direct child image decendant of li*/
     /* The sketched line*/
     .sketch_bar {

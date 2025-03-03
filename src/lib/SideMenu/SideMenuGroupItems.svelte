@@ -10,22 +10,32 @@
     import NotIcon from '../../assets/icons/circuits/Not.webp'
     import { onMount } from 'svelte'
 
+    // Add A drag / mousedown listener to here.
+    // make a mouseup listener inside of the mousedown listener and see which
+    // html element you dropped the element on
+    // Maybe svelte drag drop actions, has something for this.
+    // Tell the global store like it is in AndGate.svelte right now
+    // Don't worry about actually rendering them in the canvas for now. just
+    // make them here after dropping a menu item.
+    // Don't let this confuse you but we will probably need
+    // <svelte:component this={globalStore.circuitList}> to do this in app.svelte
+
     // this will be a required prop but it is optional right now.
     let { showSubMenu, zIndex = 0 }: { showSubMenu?: boolean; zIndex: number } =
         $props()
 
     let sectionHeight: number = $state(0)
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const head: HTMLElement | null = document.querySelector(
-            `#section_${zIndex}`
-        )
-        if (head) {
-            sectionHeight = head.offsetHeight
-            // sectionHeight = head.clientHeight
-            console.log(sectionHeight)
-        }
-    })
+    // document.addEventListener('DOMContentLoaded', () => {
+    //     const head: HTMLElement | null = document.querySelector(
+    //         `#section_${zIndex}`
+    //     )
+    //     if (head) {
+    //         sectionHeight = head.offsetHeight
+    //         // sectionHeight = head.clientHeight
+    //         // console.log(sectionHeight)
+    //     }
+    // })
 
     // This component really shouldn't be an ordered list that's so stupid
 
@@ -42,13 +52,13 @@
     //        margin-top:-140px;
     //
     //       `}
+
+    // Group items should be in an each block, images need to be passed from an
+    // array or json object
+    // style={showSubMenu ? 'display: none' : 'display: grid'}
 </script>
 
-<ol
-    style={showSubMenu ? 'display: none' : 'display: grid'}
-    class="cream-bg noselect"
-    id="section_{zIndex}"
->
+<ol class="cream-bg noselect" id="section_{zIndex}">
     <li>
         <!--Should be figure and figcaption html elements I think -->
         <img
@@ -152,15 +162,15 @@
         /* grid-auto-rows: minmax(100px, auto); */
         grid-gap: 10px;
         padding-inline: 10px;
-        margin-top: calc(var(--side-menu-spacing));
+        padding-top: calc(var(--side-menu-spacing));
         /* margin-top: -10px; */
         /* Roughly centered relative to the next title same as * .9 right?*/
         /* needs to account for the outline's on hover, because outline does not take up space, so it will overlap. */
         padding-bottom: 4px;
-        /* margin-block: var(--side-menu-spacing); */
-        /* transform: translateY(-40px); */
+
+        /*    hide scrollbars     */
     }
-    .slide_out {
+    /* .slide_out {
         animation-name: slide-out;
         animation-duration: 1s;
     }
@@ -169,7 +179,7 @@
         animation-name: slide-out;
         animation-duration: 1s;
         animation-direction: reverse;
-    }
+    } */
 
     ol li {
         /* z-index: -2; */

@@ -1,14 +1,17 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
-    import { Svelvet, Minimap, Controls } from 'svelvet'
+    import { Svelvet, Minimap } from 'svelvet'
+
     import AndGate from './lib/AndGate.svelte'
+
     import { circuitStore } from './lib/stores/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
-    import SketchyLine from './assets/svg/sketchLineSvg/line_8.svg'
     // engines as just to call it with uppercase 'Engines'
+
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
 
     import sampleCircuit from './assets/CircuitJsonSampleData/arithconst.json'
+    import { on } from 'svelte/events'
 
     // import type { CSSColorString } from 'svelvet'
     // import { readable, type Readable } from 'svelte/store'
@@ -38,12 +41,12 @@
     let currentCircuit = new HeadlessCircuit(sampleCircuit)
     // console.log(currentCircuit.start())
     // this happens on every connection
+    // ON change of global JSON circuit DATA, Run this.
     circuitStore.subscribe((value: Circuit) => {
         // console.log(value.connectors)
-
         // for some reason updateGatesNext() throws an error but, updateGates() works
-        console.log(currentCircuit.updateGates())
-        console.log(currentCircuit.getLabelIndex())
+        // console.log(currentCircuit.updateGates())
+        // console.log(currentCircuit.getLabelIndex())
     })
 </script>
 
