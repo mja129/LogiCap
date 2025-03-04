@@ -35,13 +35,12 @@
         justify-content: space-between;
         /* margin-bottom: var(--side-menu-spacing); */
     }
-    .side_menu_header img {
+    /* .side_menu_header img {
         width: 65px;
         height: 55px;
-        /* transform: rotate(90deg); */
         margin-right: -11px;
         margin-top: 4px;
-    }
+    } */
 
     h2 span:nth-child(6n) {
         color: var(--blue);
@@ -59,7 +58,7 @@
     /*     color: var(--blue); */
     /* } */
     h2 {
-        -webkit-text-stroke: 2px navy;
+        -webkit-text-stroke: 2px var(--side-menu-text-color);
         font-size: 3.8rem;
         text-align: left;
         padding: 0;

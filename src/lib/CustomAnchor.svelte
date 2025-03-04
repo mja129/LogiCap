@@ -63,16 +63,23 @@
 
 <style>
     .custom_anchor {
+        border: 2px solid black;
         border-radius: 50%;
         height: 10px;
         width: 10px;
     }
     .linked {
-        background-color: purple !important;
-        border: 1px solid black;
+        background-color: black !important;
     }
-    .hovering {
+    .input.connecting {
+        background-color: rgb(255, 255, 73) !important;
         border: 2px solid black;
+    }
+    .input.linked {
+        border: 1px solid red;
+    }
+    .output.linked {
+        border: 1px solid green;
     }
 
     .input {

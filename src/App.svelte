@@ -102,29 +102,4 @@
         /* Take up the rest of the space in the flex container*/
         flex: 1;
     }
-
-    #app_bar {
-        height: var(--app-bar-height);
-        width: 100%;
-        background-color: #00bbf9;
-    }
-
-    .sketch_bar {
-        position: absolute;
-
-        transform: translateY(-7px);
-        height: 10px;
-        margin-left: 0px;
-        min-width: 100%;
-    }
-    .app_bar_items {
-        display: flex;
-        flex-direction: row;
-    }
-    .app_bar_items img {
-        margin-left: auto;
-        margin-right: 1.2vw;
-        margin-top: 2px;
-        width: 150px;
-    }
 </style>

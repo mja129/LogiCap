@@ -127,25 +127,6 @@
 </ol>
 
 <style>
-    .menu-item {
-        opacity: 1;
-        transform: translateY(0); /* Initially in place */
-        margin-bottom: 10px;
-        max-height: 50px; /* Set an initial height */
-        overflow: hidden; /* Hide overflow content during transition */
-        transition:
-            opacity 0.3s ease,
-            transform 0.3s ease,
-            max-height 0.3s ease,
-            margin-bottom 0.3s ease;
-    }
-
-    .hidden {
-        opacity: 0; /* Fade out */
-        transform: translateY(-100%); /* Slide up (out of view) */
-        max-height: 0; /* Collapse height */
-        margin-bottom: 0; /* Collapse margin */
-    }
     ol {
         position: relative;
         list-style-type: none;
@@ -181,18 +162,25 @@
         animation-direction: reverse;
     } */
 
+    /* @media (prefers-color-scheme: light) {
+    } */
+    @media (prefers-color-scheme: dark) {
+        img {
+            filter: brightness(0) invert(1);
+        }
+    }
+
     ol li {
         /* z-index: -2; */
         background-color: var(--blue);
-        color: black;
         display: flex;
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        background-color: var(--cream);
+        background-color: var(--side-menu-bg);
 
         border-radius: 20px;
-        border: 2px solid navy;
+        border: 2px solid black;
         /* box-shadow: 4px 4px 0px 0px #000000; */
     }
 
@@ -204,6 +192,6 @@
     /* } */
 
     .cream-bg {
-        background-color: var(--cream);
+        background-color: var(--side-menu-bg);
     }
 </style>

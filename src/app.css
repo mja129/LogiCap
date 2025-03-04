@@ -44,36 +44,31 @@
 }
 
 :root[svelvet-theme='LogiCap'] {
-    --node-color: hsl(225, 30%, 50%);
-    --node-border-color: hsl(225, 20%, 40%);
-    --node-selection-color: hsl(45, 90%, 60%);
     --text-color: hsl(0, 0%, 100%);
 
-    --background-color: white;
+    --background-color: var(--svelvet-bg);
     --dot-color: black;
 
-    --accent-color: hsl(45, 90%, 60%);
-    --primary-color: hsl(225, 30%, 66%);
+    /* --accent-color: hsl(45, 90%, 60%);
+    --primary-color: hsl(225, 30%, 66%); */
 
     --edge-color: black;
-    --target-edge-color: hsl(225, 20%, 40%);
+    /* --target-edge-color: hsl(225, 20%, 40%); */
 
     --anchor-color: hsl(45, 90%, 67%);
     --anchor-border-color: hsl(45, 90%, 87%);
     --anchor-connected: hsl(45, 90%, 100%);
     --anchor-connected-border: hsl(225, 20%, 20%);
 
-    --anchor-connecting: hsl(225, 30%, 40%);
-    --anchor-connecting-border: hsl(0, 0%, 100%);
-
     --anchor-hovering: hsl(225, 20%, 46%);
     --anchor-hovering-border: hsl(0, 0%, 0%);
 
-    --minimap-background-color: hsl(225, 90%, 84%);
-
+    /* --minimap-background-color: hsl(225, 90%, 84%); */
+    /*   FEATURE: Different nodes should be different colors in the menu and in the map.   */
     --minimap-node-color: hsl(0, 0%, 0%);
+    --minimap-background-color: lightblue;
 
-    --controls-background-color: hsl(225, 90%, 84%);
+    --controls-background-color: lightblue;
     --controls-text-color: hsl(0, 0%, 0%);
 
     --theme-toggle-text-color: hsl(0, 0%, 100%);
@@ -123,7 +118,7 @@ html {
 
 /* removes default margin around the body element */
 body {
-    background-color: var(--pastel-blue);
+    /* background-color: var(--pastel-blue); */
 
     /* 
       small viewport height (svh),
@@ -183,22 +178,34 @@ h1 {
 }
 
 .noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 
 @media (prefers-color-scheme: light) {
     :root {
-        color: #213547;
-        background-color: #ffffff;
+        --svelvet-bg: white;
+        /* same as var(--cream) */
+    }
+    body {
+        background-color: lightblue;
     }
     a:hover {
         color: #747bff;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --svelvet-bg: hsl(225, 20%, 40%);
+        body {
+            background-color: #747bff;
+        }
     }
 }
 

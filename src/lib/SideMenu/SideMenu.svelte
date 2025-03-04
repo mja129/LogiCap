@@ -75,7 +75,7 @@
 
     // this could also be "instance" data but this is simpler
     // SHOULD ONLY ONE BE OPEN AT A TIME?
-    let showSubMenu: boolean[] = Array(menuGroupNames.length).fill(true)
+    let showSubMenu: boolean[] = Array(menuGroupNames.length).fill(false)
     // console.log(showSubMenu)
     // click on menu item
     // vs
@@ -85,7 +85,9 @@
 
 <nav class="side_menu" aria-label="Side Menu">
     <!-- Use <ul> and <li> for list items -->
-    <div style="position: relative;z-index:40;background-color: var(--cream);">
+    <div
+        style="position: relative;z-index:40;background-color: var(--side-menu-bg);"
+    >
         <SideMenuHeader />
 
         <!-- style="height:19px;width:90%;margin-left:2.5%" -->
@@ -100,9 +102,9 @@
         {#each menuGroupNames as groupName, index}
             <li
                 id="menu_group_{index}"
-                style={showSubMenu[index]
+                style={!showSubMenu[index]
                     ? 'transition: max-height .4s ease-out; max-height:75px'
-                    : 'transition: max-height .4s ease-in; max-height:800px'}
+                    : 'transition: max-height .4s ease-in; max-height:405px'}
             >
                 <!-- Use a more descriptive clickable element -->
                 <div class="menu_group_section">
@@ -138,6 +140,7 @@
         --purple: #9b5de5;
         --lilac: #b0b5ed;
         --dark-purple: #8a41e1;
+        --neon-purple: #747bff;
         --cyan: #00f5d4;
         --pink: #f15bb5;
         --pastel-pink: #fce6f3;
@@ -149,7 +152,7 @@
         --yellow: #fee440;
         --blue: #00bbf9;
         /*    The dark blue is hella out of place      */
-        --dark-blue: #007095;
+        --dark-blue: #242652;
         --cream: #fff0dc;
         --dark-cream: #ffdbac;
 
@@ -160,8 +163,30 @@
         */
         /* Update, this is an absolute BANGER, try updating it, see how well the menu responds changing this varaible!*/
         --side-menu-spacing: 10px;
-        --side-menu-first-child-extra-space: 0px;
         /* --side-menu-header-spacing: 20px; */
+    }
+    @media (prefers-color-scheme: light) {
+        .side-menu {
+        }
+        :root {
+            --side-menu-bg: var(--cream);
+            --side-menu-text-color: black;
+            --side-menu-hover-bg: var(--dark-cream);
+        }
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --side-menu-bg: #242652;
+            --side-menu-text-color: white;
+            --side-menu-hover-bg: var(--neon-purple);
+        }
+        .sketch_bar {
+            background-color: white !important;
+            filter: invert(100%);
+        }
+        .wiggle_bar {
+            filter: invert(100%);
+        }
     }
 
     /* NOTE: 'nav.side_menu' is not needed because the css is component scoped anyways
@@ -176,8 +201,9 @@
         /* width: 30%; */
         flex: 0 0 22.5%;
         height: 100%;
-        background-color: var(--cream);
+        background-color: var(--side-menu-bg);
         margin-right: 1.5vw;
+        color: var(--side-menu-text-color);
         /* In order for the main canvas to render centered when the menu goes
          * away, the main container must have a padding-inline property set
          * when you set this, the padding will cause the side menu to render
@@ -208,7 +234,7 @@
         /* transform: translateY(-20px); */
         min-width: calc(100% + 5px);
         margin-inline: -4px;
-        background-color: var(--cream);
+        background-color: var(--side-menu-bg);
         /* margin-block: var(--side-menu-spacing); */
         height: 8px;
     }
@@ -228,8 +254,7 @@
         padding-left: 15px;
         border: unset;
         outline: unset;
-        background-color: var(--cream);
-        color: black;
+        background-color: var(--side-menu-bg);
         font-size: 3ex;
         width: 100%;
         text-align: left;
@@ -240,11 +265,9 @@
         position: relative;
         z-index: 40;
     }
-    nav.side_menu .menu_group_section:hover,
-    nav.side_menu .menu_group_section:hover img,
     nav.side_menu button:hover {
         /* background-color: #7925dc; */
-        background-color: var(--dark-cream);
+        background-color: var(--side-menu-hover-bg);
     }
 
     /* nav.side_menu li:first-child > button { */
