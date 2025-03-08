@@ -39,26 +39,12 @@
 
     // This component really shouldn't be an ordered list that's so stupid
 
-    // animations which are kinda trash right now.
-    // style={showSubMenu
-    //     ? `transition: opacity 0.3s ease, margin-top 0.8s ease,max-height 0.8s ease;
-    //        z-index:${zIndex};
-    //        opacity:1;
-    //        margin-top:var(--side-menu-spacing);`
-    //     : `transition: opacity 0.6s ease, margin-top .8s ease, max-height 0.8s ease;
-    //        z-index:${zIndex};
-    //        opacity:0;
-    //        padding-bottom:0px;
-    //        margin-top:-140px;
-    //
-    //       `}
-
     // Group items should be in an each block, images need to be passed from an
     // array or json object
     // style={showSubMenu ? 'display: none' : 'display: grid'}
 </script>
 
-<ol class="cream-bg noselect" id="section_{zIndex}">
+<ol style={`z-index:${zIndex};`} class="side_menu_group" id="section_{zIndex}">
     <li>
         <!--Should be figure and figcaption html elements I think -->
         <img
@@ -127,7 +113,7 @@
 </ol>
 
 <style>
-    ol {
+    .side_menu_group {
         position: relative;
         list-style-type: none;
         /* transform: translateY(-300px); */
@@ -151,47 +137,34 @@
 
         /*    hide scrollbars     */
     }
-    /* .slide_out {
-        animation-name: slide-out;
-        animation-duration: 1s;
+    :global(.light .side_menu_group, .light .side_menu_group li) {
+        background-color: var(--side-menu-bg);
+        color: black;
+    }
+    :global(.dark .side_menu_group, .dark .side_menu_group li) {
+        background-color: var(--side-menu-bg-dark);
+        color: white;
     }
 
-    .slide_in {
-        animation-name: slide-out;
-        animation-duration: 1s;
-        animation-direction: reverse;
-    } */
-
-    /* @media (prefers-color-scheme: light) {
-    } */
-    @media (prefers-color-scheme: dark) {
-        img {
-            filter: brightness(0) invert(1);
-        }
+    :global(.dark .side_menu_group li img) {
+        filter: invert(100%);
     }
 
-    ol li {
+    .side_menu_group li {
         /* z-index: -2; */
-        background-color: var(--blue);
+        /* background-color: var(--blue); */
         display: flex;
         align-items: center;
         flex-direction: column;
         justify-content: center;
-        background-color: var(--side-menu-bg);
 
         border-radius: 20px;
         border: 2px solid black;
         /* box-shadow: 4px 4px 0px 0px #000000; */
     }
 
-    ol li:hover {
+    .side_menu_group li:hover {
         border: 2px solid transparent;
         outline: 4px solid red;
-    }
-    /* ol li > img { */
-    /* } */
-
-    .cream-bg {
-        background-color: var(--side-menu-bg);
     }
 </style>

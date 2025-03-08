@@ -72,11 +72,15 @@
         background-color: black !important;
     }
     .input.connecting {
-        background-color: rgb(255, 255, 73) !important;
+        background-color: var(--light-yellow) !important;
+        border: 2px solid black;
+    }
+    .output.connecting {
+        background-color: var(--lime-green);
         border: 2px solid black;
     }
     .input.linked {
-        border: 1px solid red;
+        border: 1px solid var(--red);
     }
     .output.linked {
         border: 1px solid green;
@@ -84,6 +88,7 @@
 
     .input {
         background-color: red;
+        background-color: var(--red);
     }
     .output {
         background-color: green;

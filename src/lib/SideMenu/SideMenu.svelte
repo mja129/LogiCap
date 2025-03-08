@@ -83,11 +83,9 @@
     // showAnimation = 'transition: min-height 1s ease'
 </script>
 
-<nav class="side_menu" aria-label="Side Menu">
+<nav class="side_menu noselect" aria-label="Side Menu">
     <!-- Use <ul> and <li> for list items -->
-    <div
-        style="position: relative;z-index:40;background-color: var(--side-menu-bg);"
-    >
+    <div class="side_menu_header">
         <SideMenuHeader />
 
         <!-- style="height:19px;width:90%;margin-left:2.5%" -->
@@ -136,6 +134,7 @@
 
 <style>
     /* <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 --> */
+    /* https://colors.artyclick.com/color-names-dictionary/color-names/bright-lime-green-color */
     :root {
         --purple: #9b5de5;
         --lilac: #b0b5ed;
@@ -150,11 +149,16 @@
         --pastel-blue: #d7f5ff;
         --pastel-green: #d5f0c1;
         --yellow: #fee440;
+        --light-yellow: rgb(255, 255, 73);
         --blue: #00bbf9;
         /*    The dark blue is hella out of place      */
         --dark-blue: #242652;
         --cream: #fff0dc;
         --dark-cream: #ffdbac;
+
+        --lime-green: #aaff75;
+        --lime-red: #ff5f63;
+        --red: #ff073a;
 
         /* --side-menu-spacing is important, I reasoned through it, and there are a lot of places here to add spacing and a lot of states
             the css variable is very good/useful here.
@@ -164,34 +168,49 @@
         /* Update, this is an absolute BANGER, try updating it, see how well the menu responds changing this varaible!*/
         --side-menu-spacing: 10px;
         /* --side-menu-header-spacing: 20px; */
+
+        --side-menu-bg-dark: #242652;
+        --side-menu-bg: var(--cream);
+        /* Light mode defaults */
     }
-    @media (prefers-color-scheme: light) {
-        .side-menu {
-        }
-        :root {
-            --side-menu-bg: var(--cream);
-            --side-menu-text-color: black;
-            --side-menu-hover-bg: var(--dark-cream);
-        }
+    :global(.light .side_menu) {
+        background-color: var(--side-menu-bg);
+        /* color: black; */
     }
-    @media (prefers-color-scheme: dark) {
-        :root {
-            --side-menu-bg: #242652;
-            --side-menu-text-color: white;
-            --side-menu-hover-bg: var(--neon-purple);
-        }
-        .sketch_bar {
-            background-color: white !important;
-            filter: invert(100%);
-        }
-        .wiggle_bar {
-            filter: invert(100%);
-        }
+    :global(.dark .side_menu) {
+        background-color: var(--side-menu-bg-dark);
+        /* color: white; */
     }
 
-    /* NOTE: 'nav.side_menu' is not needed because the css is component scoped anyways
-        I added it because I thought the css was a too much in this file. and its a bit easier to understand.
-    */
+    :global(.dark .side_menu button) {
+        background-color: var(--side-menu-bg-dark);
+        color: white;
+    }
+    :global(.light .side_menu button) {
+        background-color: var(--side-menu-bg);
+        color: black;
+    }
+    :global(.dark .side_menu .sketch_bar) {
+        background-color: white !important;
+        filter: invert(100%);
+    }
+    :global(.dark .side_menu .wiggle_bar) {
+        filter: invert(100%);
+    }
+    :global(.light .side_menu button:hover) {
+        background-color: var(--dark-cream);
+    }
+    :global(.dark .side_menu button:hover) {
+        background-color: var(--neon-purple);
+    }
+
+    /* Header including line, vs the "SideMenuHeader Component which does not
+     * include the line for some reason" */
+    .side_menu_header {
+        position: relative;
+        z-index: 40;
+        background-color: inherit;
+    }
 
     /*   Hide scrollbar but still scroll safari   */
     nav.side_menu::-webkit-scrollbar {
@@ -201,9 +220,7 @@
         /* width: 30%; */
         flex: 0 0 22.5%;
         height: 100%;
-        background-color: var(--side-menu-bg);
         margin-right: 1.5vw;
-        color: var(--side-menu-text-color);
         /* In order for the main canvas to render centered when the menu goes
          * away, the main container must have a padding-inline property set
          * when you set this, the padding will cause the side menu to render
@@ -254,43 +271,18 @@
         padding-left: 15px;
         border: unset;
         outline: unset;
-        background-color: var(--side-menu-bg);
         font-size: 3ex;
         width: 100%;
         text-align: left;
-        /* margin-top: 5px; */
-        /* padding-top: 10px; */
     }
     .menu_group_section {
         position: relative;
         z-index: 40;
     }
-    nav.side_menu button:hover {
-        /* background-color: #7925dc; */
-        background-color: var(--side-menu-hover-bg);
-    }
-
-    /* nav.side_menu li:first-child > button { */
-    /*     padding-top: 10px; */
-    /* } */
-    /* li:first-child::before:hover { */
-    /*     background-color: #c971ca; */
-    /* } */
-    /* and the spacing on the lines to the first child of the menu group list of items */
-    /* nav.side_menu ul > li:first-child { */
-    /*     /* padding-inline: 2px; */
-    /*     margin-top: calc( */
-    /*         var(--side-menu-spacing) + var(--side-menu-first-child-extra-space) */
-    /*     ); */
-    /* } */
 
     nav.side_menu ul > li {
         /* padding-inline: 4px; */
         /* Lowkey weird the centering that the preforms, try toggling it.*/
         text-align: center;
     }
-
-    /* @keyframes subMenuToggle { */
-    /*     height: 0px; */
-    /* } */
 </style>
