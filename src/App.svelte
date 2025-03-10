@@ -1,6 +1,7 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
     import { Svelvet, Minimap } from 'svelvet'
+    import type { Component } from 'svelte'
 
     import AndGate from './lib/AndGate.svelte'
 
@@ -40,15 +41,53 @@
     // custom_digitaljs/src/engines/synch.mjs
     // let engine = new Engines.SynchEngine([], { cells: '' })
     let currentCircuit = new HeadlessCircuit(sampleCircuit)
+    let newDevice: Device
     // console.log(currentCircuit.start())
     // this happens on every connection
     // ON change of global JSON circuit DATA, Run this.
+    function generateNonce(length: number = 16): string {
+        const charset =
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        const values = crypto.getRandomValues(new Uint8Array(length))
+        return Array.from(
+            values,
+            (byte) => charset[byte % charset.length]
+        ).join('')
+    }
+    const newGateCircuitStore = () => {
+        const nodeId = `And_${generateNonce()}`
+        circuitStore.update((currentCircuit) => {
+            // Add the new device with a unique ID, e.g., 'newDeviceId'
+            newDevice = {
+                type: 'And',
+                label: nodeId,
+            }
+            currentCircuit.devices[nodeId] = newDevice
+            // Add the new connector
+            // currentCircuit.connectors.push(newConnector)
+            console.log(currentCircuit)
+
+            // Return the updated circuit
+            return currentCircuit
+        })
+        return nodeId
+    }
     circuitStore.subscribe((value: Circuit) => {
         // console.log(value.connectors)
         // for some reason updateGatesNext() throws an error but, updateGates() works
         // console.log(currentCircuit.updateGates())
         console.log(currentCircuit.getLabelIndex())
     })
+
+    const nodeList: { name: string }[] = $state([])
+
+    function createGateOnCanvas(e: any) {
+        const newNodeId = newGateCircuitStore()
+        const gateType = e.gateType
+
+        nodeList.push({ name: newNodeId })
+        // add the node from the global store.
+    }
 </script>
 
 <!-- <div id="app_bar"> -->
@@ -63,12 +102,23 @@
 <!-- </div> -->
 
 <main>
-    <SideMenu />
+    <SideMenu createCanvasNode={createGateOnCanvas} />
     <Svelvet theme="LogiCap" TD controls editable={false}>
         <Minimap width={100} corner="NE" slot="minimap" />
-        <AndGate nodeStartPos={20} width={80} height={50} />
+        {#each nodeList as svelvetNode}
+            <!-- svelte-ignore svelte_component_deprecated -->
+            <svelte:component
+                this={AndGate}
+                width={80}
+                nodeId={svelvetNode.name}
+                height={50}
+                nodeStartPos={20}
+            />
+            <!-- content here -->
+        {/each}
+        <!-- <AndGate nodeStartPos={20} width={80} height={50} />
         <AndGate nodeStartPos={200} width={80} height={50} />
-        <AndGate nodeStartPos={200} width={80} height={50} />
+        <AndGate nodeStartPos={200} width={80} height={50} /> -->
     </Svelvet>
     <TestEngine></TestEngine>
 </main>
@@ -103,6 +153,10 @@
         outline: 10px solid black;
     }
     :global(.svelvet-wrapper:focus-visible) {
+        border-radius: 20px !important;
+        outline: 10px solid black !important;
+    }
+    :global(.svelvet-wrapper:focus) {
         border-radius: 20px !important;
         outline: 10px solid black !important;
     }

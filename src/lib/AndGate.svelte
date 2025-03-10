@@ -10,10 +10,12 @@
         width = 80,
         height = 50,
         nodeStartPos,
+        nodeId,
     }: {
         width: number
         height: number
         nodeStartPos: number
+        nodeId: string
     } = $props()
 
     // Define a new device
@@ -23,36 +25,36 @@
     // So this code will be important but not in this current format I think
     // Probably should sync with a svelte global store as well.
     // this code is temporary and also tweaking
-    const lastID_num: string | null = localStorage.getItem('and_node_num')
-    let nextNum: number = 0
-    if (lastID_num === null) {
-        localStorage.setItem('and_node_num', '1')
-    } else {
-        nextNum = parseInt(lastID_num, 10) + 1
-        localStorage.setItem('and_node_num', nextNum.toString())
-    }
-    const nodeId = `And_${nextNum}`
-    localStorage.setItem(`And_Gate_${nextNum}`, nextNum.toString())
-    // console.log(storedValue)
-    // const store = readable(storedValue ? JSON.parse(storedValue) : initialValue)
-    const newDevice: Device = {
-        type: 'And',
-        label: nodeId,
-    }
-    // Update the store when this circuit is generated.
-    circuitStore.update((currentCircuit) => {
-        // Add the new device with a unique ID, e.g., 'newDeviceId'
-        currentCircuit.devices[nodeId] = newDevice
-        // Add the new connector
-        // currentCircuit.connectors.push(newConnector)
+    // const lastID_num: string | null = localStorage.getItem('and_node_num')
+    // let nextNum: number = 0
+    // if (lastID_num === null) {
+    //     localStorage.setItem('and_node_num', '1')
+    // } else {
+    //     nextNum = parseInt(lastID_num, 10) + 1
+    //     localStorage.setItem('and_node_num', nextNum.toString())
+    // }
+    // const nodeId = `And_${nextNum}`
+    // localStorage.setItem(`And_Gate_${nextNum}`, nextNum.toString())
+    // // console.log(storedValue)
+    // // const store = readable(storedValue ? JSON.parse(storedValue) : initialValue)
+    // const newDevice: Device = {
+    //     type: 'And',
+    //     label: nodeId,
+    // }
+    // // Update the store when this circuit is generated.
+    // circuitStore.update((currentCircuit) => {
+    //     // Add the new device with a unique ID, e.g., 'newDeviceId'
+    //     currentCircuit.devices[nodeId] = newDevice
+    //     // Add the new connector
+    //     // currentCircuit.connectors.push(newConnector)
 
-        // Return the updated circuit
-        return currentCircuit
-    })
+    //     // Return the updated circuit
+    //     return currentCircuit
+    // })
 </script>
 
 <!-- cursor = drop -->
-<Node drop="cursor" id={nodeId} center={true}>
+<Node drop="cursor" id={nodeId}>
     <img src={image} alt="AND Gate" {width} {height} />
     <LogicGateAnchor location={['left', 'bot']} id={nodeId} io="input" />
     <LogicGateAnchor location={['left', 'top']} id={nodeId} io="input" />

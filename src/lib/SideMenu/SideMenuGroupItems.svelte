@@ -8,7 +8,8 @@
     import XnorIcon from '../../assets/icons/circuits/Xnor.webp'
     import NandIcon from '../../assets/icons/circuits/Nand.webp'
     import NotIcon from '../../assets/icons/circuits/Not.webp'
-    import { onMount } from 'svelte'
+    import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+    import { circuitStore } from '../stores/circuitStore'
 
     // Add A drag / mousedown listener to here.
     // make a mouseup listener inside of the mousedown listener and see which
@@ -21,8 +22,15 @@
     // <svelte:component this={globalStore.circuitList}> to do this in app.svelte
 
     // this will be a required prop but it is optional right now.
-    let { showSubMenu, zIndex = 0 }: { showSubMenu?: boolean; zIndex: number } =
-        $props()
+    let {
+        showSubMenu,
+        zIndex = 0,
+        createCanvasNode,
+    }: {
+        showSubMenu?: boolean
+        zIndex: number
+        createCanvasNode: (e: any) => void
+    } = $props()
 
     let sectionHeight: number = $state(0)
 
@@ -37,6 +45,114 @@
     //     }
     // })
 
+    const dispatch = createEventDispatcher()
+
+    interface GateItem {
+        gateType: string
+        label: string
+        image: string
+    }
+
+    // why this?
+    const gateItems: GateItem[] = [
+        { gateType: 'Not', label: 'Not', image: NotIcon },
+        { gateType: 'Buffer', label: 'Buffer', image: BufferIcon },
+        { gateType: 'And', label: 'And', image: AndIcon },
+        { gateType: 'Nand', label: 'Nand', image: NandIcon },
+        { gateType: 'Or', label: 'Or', image: OrIcon },
+        { gateType: 'Nor', label: 'Nor', image: NorIcon },
+        { gateType: 'Xor', label: 'Xor', image: XorIcon },
+        { gateType: 'Xnor', label: 'Xnor', image: XnorIcon },
+    ]
+
+    let draggingItem: GateItem | null = null
+    let ghostElement: HTMLElement | null = null
+
+    function createGhost(item: GateItem, pageX: number, pageY: number): void {
+        ghostElement = document.createElement('div')
+        ghostElement.className = 'drag-ghost'
+        ghostElement.style.position = 'fixed'
+        ghostElement.style.pointerEvents = 'none'
+        ghostElement.style.left = pageX + 'px'
+        ghostElement.style.top = pageY + 'px'
+        ghostElement.style.zIndex = '200'
+        ghostElement.style.transform = 'translate(-50%, -50%)'
+
+        const img = document.createElement('img')
+        img.src = item.image
+        img.alt = item.gateType + ' ghost'
+        img.style.width = '82px'
+        img.style.opacity = '0.7'
+        ghostElement.appendChild(img)
+
+        document.body.appendChild(ghostElement)
+    }
+
+    function updateGhostPosition(pageX: number, pageY: number): void {
+        if (ghostElement) {
+            ghostElement.style.left = pageX + 'px'
+            ghostElement.style.top = pageY + 'px'
+        }
+    }
+
+    function removeGhost(): void {
+        if (ghostElement) {
+            ghostElement.remove()
+            ghostElement = null
+        }
+    }
+
+    function handleMouseDown(item: GateItem, event: MouseEvent): void {
+        event.preventDefault()
+        draggingItem = item
+        createGhost(item, event.pageX, event.pageY)
+    }
+
+    function handleMouseMove(event: MouseEvent): void {
+        if (ghostElement) {
+            updateGhostPosition(event.pageX, event.pageY)
+        }
+    }
+
+    function handleGlobalClick(event: MouseEvent): void {
+        if (draggingItem && ghostElement) {
+            const dropTarget = document.elementFromPoint(
+                event.clientX,
+                event.clientY
+            )
+            updateGhostPosition(event.pageX, event.pageY)
+
+            const droppedOnCanvas =
+                dropTarget?.classList.contains('svelvet-wrapper')
+
+            if (droppedOnCanvas) {
+                // console.log(event.screenX)
+                // console.log(event.offsetX)
+                let e: any = {
+                    gateType: draggingItem.gateType,
+                    image: draggingItem.image,
+                    x: event.clientX,
+                    y: event.clientY,
+                }
+                createCanvasNode(e)
+            }
+
+            draggingItem = null
+            removeGhost()
+            event.stopPropagation()
+        }
+    }
+
+    onMount(() => {
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('click', handleGlobalClick)
+    })
+
+    onDestroy(() => {
+        window.removeEventListener('mousemove', handleMouseMove)
+        window.removeEventListener('click', handleGlobalClick)
+        removeGhost()
+    })
     // This component really shouldn't be an ordered list that's so stupid
 
     // Group items should be in an each block, images need to be passed from an
@@ -45,71 +161,21 @@
 </script>
 
 <ol style={`z-index:${zIndex};`} class="side_menu_group" id="section_{zIndex}">
-    <li>
-        <!--Should be figure and figcaption html elements I think -->
-        <img
-            style="width: 82px;margin-top: 3px;"
-            src={NotIcon}
-            alt="And logic gate, hand-drawn"
-        />
-        Not
-    </li>
-    <li>
-        <img
-            style="width: 82px;margin-bottom:-6px;margin-top: 3px;"
-            src={BufferIcon}
-            alt="And logic gate, hand-drawn"
-        />
-        Repeater
-    </li>
-    <li>
-        <img
-            style="width: 82px;margin-bottom:-6px;margin-top: 3px;"
-            src={AndIcon}
-            alt="And logic gate, hand-drawn"
-        />
-        And
-    </li>
-    <li>
-        <img
-            style="width: 82px;margin-bottom:-6px;margin-top: 3px;"
-            src={NandIcon}
-            alt="And logic gate, hand-drawn"
-        />
-        Nand
-    </li>
-    <li>
-        <img
-            style="width: 82px;margin-bottom:-6px;margin-top: 3px;"
-            src={OrIcon}
-            alt="And logic gate, hand-drawn"
-        />
-        Or
-    </li>
-    <li>
-        <img
-            style="width: 82px;margin-bottom:-6px;margin-top: 3px;"
-            src={NorIcon}
-            alt="And logic gate, hand-drawn"
-        />
-        Nor
-    </li>
-    <li>
-        <img
-            style="width: 82px;margin-bottom:-6px;margin-top: 3px;"
-            src={XorIcon}
-            alt="And logic gate, hand-drawn"
-        />
-        Xor
-    </li>
-    <li>
-        <img
-            style="width: 82px;margin-bottom:-6px;margin-top: 3px;"
-            src={XnorIcon}
-            alt="And logic gate, hand-drawn"
-        />
-        Xnor
-    </li>
+    {#each gateItems as item}
+        <li>
+            <button
+                class="gate-button"
+                onmousedown={(event) => handleMouseDown(item, event)}
+                style="background:none; border:none; padding:0; cursor:pointer;"
+            >
+                <img
+                    src={item.image}
+                    alt="{item.label} logic gate, hand-drawn"
+                />
+                {item.label}
+            </button>
+        </li>
+    {/each}
 </ol>
 
 <style>
@@ -125,7 +191,7 @@
 
         /* Supports Grid */
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
         /* grid-auto-rows: minmax(100px, auto); */
         grid-gap: 10px;
         padding-inline: 10px;
@@ -136,6 +202,11 @@
         padding-bottom: 4px;
 
         /*    hide scrollbars     */
+    }
+    img {
+        width: 82px;
+        margin-bottom: -6px;
+        margin-top: 3px;
     }
     :global(.light .side_menu_group, .light .side_menu_group li) {
         background-color: var(--side-menu-bg);

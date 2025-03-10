@@ -15,6 +15,12 @@
     import SketchyLine_21 from '../../assets/svg/sketchLineSvg/line_21.svg'
     import SketchyLine_29 from '../../assets/svg/sketchLineSvg/line_29.svg'
 
+    let {
+        createCanvasNode,
+    }: {
+        createCanvasNode: (e: any) => void
+    } = $props()
+
     // import CollapseIcon from '../assets/icons/collapse.webp'
     const sketchyLinesMap: any = {
         line_15: SketchyLine_15,
@@ -143,6 +149,7 @@
                     />
                 </div>
                 <SideMenuGroupItems
+                    {createCanvasNode}
                     zIndex={index}
                     showSubMenu={showSubMenu[index]}
                 />
