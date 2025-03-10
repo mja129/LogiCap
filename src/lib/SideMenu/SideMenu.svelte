@@ -2,10 +2,31 @@
 <script lang="ts">
     import { onMount } from 'svelte'
     import SketchyLineWiggle from '../../assets/svg/sketchLineSvg/line_26.svg'
-    // import SketchyLineWiggle from '../SketchLines/line_26.svelte'
-    // import SketchyLineStandard from '../SketchLines/line_29.svelte'
+
+    // Need to import these somehow
+
+    import SketchyLine_15 from '../../assets/svg/sketchLineSvg/line_15.svg'
+    import SketchyLine_23 from '../../assets/svg/sketchLineSvg/line_23.svg'
+    import SketchyLine_24 from '../../assets/svg/sketchLineSvg/line_24.svg'
+    import SketchyLine_25 from '../../assets/svg/sketchLineSvg/line_25.svg'
+    import SketchyLine_27 from '../../assets/svg/sketchLineSvg/line_27.svg'
+    import SketchyLine_17 from '../../assets/svg/sketchLineSvg/line_17.svg'
+    import SketchyLine_19 from '../../assets/svg/sketchLineSvg/line_19.svg'
+    import SketchyLine_21 from '../../assets/svg/sketchLineSvg/line_21.svg'
+    import SketchyLine_29 from '../../assets/svg/sketchLineSvg/line_29.svg'
 
     // import CollapseIcon from '../assets/icons/collapse.webp'
+    const sketchyLinesMap: any = {
+        line_15: SketchyLine_15,
+        line_23: SketchyLine_23,
+        line_24: SketchyLine_24,
+        line_25: SketchyLine_25,
+        line_27: SketchyLine_27,
+        line_17: SketchyLine_17,
+        line_19: SketchyLine_19,
+        line_21: SketchyLine_21,
+        line_29: SketchyLine_29,
+    }
 
     import SideMenuHeader from './SideMenuHeader.svelte'
     import SideMenuGroupItems from './SideMenuGroupItems.svelte'
@@ -39,7 +60,7 @@
     )
 
     function getSvgLineFileName(selection: number): string {
-        return `/src/assets/svg/sketchLineSvg/line_${selection}.svg`
+        return sketchyLinesMap[`line_${selection}`]
     }
 
     // IGNORE THIS CODE, if you want. its very useless.
