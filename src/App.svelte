@@ -9,9 +9,9 @@
     // engines as just to call it with uppercase 'Engines'
 
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
-
-    import sampleCircuit from './assets/CircuitJsonSampleData/arithconst.json'
+    import sampleCircuit from './assets/CircuitJsonSampleData/testcircuit.json'
     import { on } from 'svelte/events'
+    import TestEngine from './lib/TestEngine.svelte'
 
     // localStorage.clear()
     // import type { CSSColorString } from 'svelvet'
@@ -46,9 +46,7 @@
     circuitStore.subscribe((value: Circuit) => {
         // console.log(value.connectors)
         // for some reason updateGatesNext() throws an error but, updateGates() works
-        // console.log(currentCircuit.updateGates())
-        // console.log(currentCircuit.getLabelIndex())
-    })
+    });
 </script>
 
 <!-- <div id="app_bar"> -->
@@ -70,6 +68,8 @@
         <AndGate nodeStartPos={200} width={80} height={50} />
         <AndGate nodeStartPos={200} width={80} height={50} />
     </Svelvet>
+    <TestEngine>
+    </TestEngine>
 </main>
 
 <style>
