@@ -21,6 +21,13 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Install digitaljs dependencies
+      run: |
+        cd custom_digitaljs
+        npm install
+        npm run build
+      shell: bash
+
     - name: Build
       run: npm run build
       env:
