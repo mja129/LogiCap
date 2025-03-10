@@ -22,9 +22,9 @@
         "vite": "^6.1.0"
     },
     "dependencies": {
-        "mode-watcher": "^0.5.1",
         "svelte-drag-and-drop-actions": "^1.0.2",
         "svelte-drag-drop-touch": "^0.1.9",
-        "svelvet": "^11.0.5"
+        "svelvet": "^11.0.5",
+        "custom_digitaljs": "./custom_digitaljs"
     }
 }

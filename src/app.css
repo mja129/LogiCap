@@ -87,11 +87,6 @@
 
     --theme-toggle-text-color: hsl(0, 0%, 100%);
     --theme-toggle-color: hsl(225, 20%, 27%);
-    .svelvet-wrapper,
-    .svelvet-wrapper:focus-visible {
-        border-radius: 20px;
-        outline: 10px solid black;
-    }
 }
 
 * *,

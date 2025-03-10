@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import Icons from 'unplugin-icons/vite'
+// external: ['jquery', 'jquery-ui', 'custom_digitaljs'],
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -16,7 +17,6 @@ export default defineConfig({
     },
     build: {
         rollupOptions: {
-            external: ['jquery', 'jquery-ui', 'custom_digitaljs'],
             output: {
                 globals: {
                     jquery: 'jQuery',

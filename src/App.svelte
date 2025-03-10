@@ -46,7 +46,9 @@
     circuitStore.subscribe((value: Circuit) => {
         // console.log(value.connectors)
         // for some reason updateGatesNext() throws an error but, updateGates() works
-    });
+        // console.log(currentCircuit.updateGates())
+        console.log(currentCircuit.getLabelIndex())
+    })
 </script>
 
 <!-- <div id="app_bar"> -->
@@ -68,8 +70,7 @@
         <AndGate nodeStartPos={200} width={80} height={50} />
         <AndGate nodeStartPos={200} width={80} height={50} />
     </Svelvet>
-    <TestEngine>
-    </TestEngine>
+    <TestEngine></TestEngine>
 </main>
 
 <style>
@@ -96,6 +97,14 @@
         padding: 0 !important;
         width: auto !important;
         height: auto !important;
+    }
+    :global(.svelvet-wrapper) {
+        border-radius: 20px;
+        outline: 10px solid black;
+    }
+    :global(.svelvet-wrapper:focus-visible) {
+        border-radius: 20px !important;
+        outline: 10px solid black !important;
     }
     :global(.svelvet-wrapper) {
         max-height: calc(100% - 3.5vh);
