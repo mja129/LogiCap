@@ -25,7 +25,6 @@ jobs:
       run: |
         cd custom_digitaljs
         npm install
-        npm run build
       shell: bash
 
     - name: Build
