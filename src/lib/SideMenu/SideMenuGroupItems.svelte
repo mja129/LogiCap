@@ -134,6 +134,16 @@
                     x: event.clientX,
                     y: event.clientY,
                 }
+                // const svelvetCanvas: HTMLElement | null =
+                //     document.querySelector('.svelvet-wrapper')
+
+                // const bgWrapper: HTMLElement | null = document.querySelector(
+                //     '.background-wrapper'
+                // )
+                // const graphWrapper: HTMLElement | null = document.querySelector(
+                //     '.svelvet-graph-wrapper'
+                // )
+
                 createCanvasNode(e)
             }
 

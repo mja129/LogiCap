@@ -9,10 +9,12 @@
         location = ['left', 'top'],
         id,
         io,
+        offset = [],
     }: {
         location: LocationTuple
         id: string
         io: 'input' | 'output'
+        offset?: [number, number] | []
     } = $props()
 
     // TODO: deciding the port name should be done with a map and in a more generic way instead of an if statement.
@@ -47,7 +49,7 @@
 
 <!-- This property will automatically set the dragged anchor to the first available io that fits on the node you drag your mouse to -->
 <!-- nodeConnect={true} -->
-<div class="{location[0]} {location[1]}">
+<div style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}>
     <Anchor
         let:linked
         let:hovering
@@ -81,7 +83,7 @@
     }
     .right {
         position: absolute;
-        right: 10%;
+        left: 78%;
     }
     .center {
         left: calc((100% / 2) - 10px);

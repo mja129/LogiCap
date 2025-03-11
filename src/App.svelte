@@ -13,6 +13,9 @@
     import sampleCircuit from './assets/CircuitJsonSampleData/testcircuit.json'
     import { on } from 'svelte/events'
     import TestEngine from './lib/TestEngine.svelte'
+    import ButtonNodeSignal from './lib/ButtonNodeSignal.svelte'
+
+    let element: HTMLElement | null = null
 
     // localStorage.clear()
     // import type { CSSColorString } from 'svelvet'
@@ -103,16 +106,20 @@
 
 <main>
     <SideMenu createCanvasNode={createGateOnCanvas} />
-    <Svelvet theme="LogiCap" TD controls editable={false}>
+    <!-- svelte-ignore svelte_component_deprecated -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- svelte-ignore event_directive_deprecated -->
+    <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         {#each nodeList as svelvetNode}
+            <!-- isFirstNode={nodeList.length === 1} -->
             <!-- svelte-ignore svelte_component_deprecated -->
             <svelte:component
-                this={AndGate}
+                this={ButtonNodeSignal}
                 width={80}
                 nodeId={svelvetNode.name}
                 height={50}
-                nodeStartPos={20}
+                nodeStartPos={200}
             />
             <!-- content here -->
         {/each}
@@ -148,7 +155,7 @@
         width: auto !important;
         height: auto !important;
     }
-    :global(.svelvet-wrapper) {
+    /* :global(.svelvet-wrapper) {
         border-radius: 20px;
         outline: 10px solid black;
     }
@@ -159,10 +166,10 @@
     :global(.svelvet-wrapper:focus) {
         border-radius: 20px !important;
         outline: 10px solid black !important;
-    }
-    :global(.svelvet-wrapper) {
+    } */
+    /* Take up the rest of the space in the flex container*/
+    /* :global(.svelvet-wrapper) {
         max-height: calc(100% - 3.5vh);
-        /* Take up the rest of the space in the flex container*/
         flex: 1;
-    }
+    } */
 </style>
