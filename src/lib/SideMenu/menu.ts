@@ -11,7 +11,7 @@ import notIcon from '../../assets/icons/circuits/Not.webp'
 export type menuJsonElement = { name: string, icon: string }
 type menuJsonGroupElements = Record<"groupElements", Array<menuJsonElement>>
 type menuJsonItem = Record<"svg", string | undefined> & menuJsonGroupElements
-type menuJsonType = Record<string, menuJsonItem>
+export type menuJsonType = Record<string, menuJsonItem>
 // This maybe should be just a json file but I want it to be in this folder and that is maybe problematic
 export const menuJsonData: menuJsonType = {
     "Logic Gates": {

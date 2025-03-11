@@ -36,23 +36,11 @@
 
     import SideMenuHeader from './SideMenuHeader.svelte'
     import SideMenuGroupItems from './SideMenuGroupItems.svelte'
-    import { menuJsonData } from './menu.ts'
+    import { menuJsonData, type menuJsonType } from './menu.ts'
 
     // just a selection of ones I want for the random line under the menu items.
 
-    type MenuGroupName =
-        | 'Gates'
-        | 'Arithmetic'
-        | 'Multiplexers'
-        | 'Memory'
-        | 'Utils'
-
-    type MenuItemData = { svg: string | undefined; groupElements: string[] }
-    // Record = one key pair, type shit
-    type MenuItem = Record<MenuGroupName, MenuItemData>
-    type MenuJson = MenuItem & MenuItem
-
-    const menuJson: MenuJson = menuJsonData as MenuJson
+    const menuJson: menuJsonType = menuJsonData
     const menuGroupNames = Object.keys(menuJson)
 
     const randomLineSelectionGroup = [15, 23, 24, 25, 27, 17, 19, 21, 29]
@@ -78,7 +66,7 @@
             const selection: number = randomLineSelectionGroup[randNum]
 
             const svgImport = getSvgLineFileName(selection)
-            menuJson[groupName as MenuGroupName]['svg'] = svgImport
+            menuJson[groupName]['svg'] = svgImport
 
             // remove this number from the selection list.
             // Don't pick any duplicates.
