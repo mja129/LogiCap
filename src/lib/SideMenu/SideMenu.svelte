@@ -82,7 +82,7 @@
         // set lines from local storage
         const chosenLinesJson: string[] = JSON.parse(randomLineSelectionStore)
         chosenLinesJson.forEach((selection: string, index: number) => {
-            const currentMenuGroup = menuGroupNames[index] as MenuGroupName
+            const currentMenuGroup = menuGroupNames[index]
             const svgImport = getSvgLineFileName(parseInt(selection, 10))
             menuJson[currentMenuGroup]['svg'] = svgImport
         })
@@ -134,7 +134,7 @@
 
                     <img
                         class="sketch_bar"
-                        src={menuJson[groupName as MenuGroupName].svg}
+                        src={menuJson[groupName].svg}
                         alt="sketched line bottom border for main app bar section {groupName}"
                     />
                 </div>
