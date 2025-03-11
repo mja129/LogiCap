@@ -1,16 +1,8 @@
 <script lang="ts">
-    import AndIcon from '../../assets/icons/circuits/And.webp'
-    import BufferIcon from '../../assets/icons/circuits/Buffer.webp'
-    import OrIcon from '../../assets/icons/circuits/Or.webp'
-    import NorIcon from '../../assets/icons/circuits/Nor.webp'
-
-    import XorIcon from '../../assets/icons/circuits/Xor.webp'
-    import XnorIcon from '../../assets/icons/circuits/Xnor.webp'
-    import NandIcon from '../../assets/icons/circuits/Nand.webp'
-    import NotIcon from '../../assets/icons/circuits/Not.webp'
     import { onDestroy, onMount } from 'svelte'
-    import { menuJsonData } from './menu.ts'
-    import type { menuJsonElement } from './menu.ts'
+    import { menuJsonData } from '../nodeModal.ts'
+    import type { NodeMenuGroups } from '../nodeModal.ts'
+    import type { menuJsonElement } from '../nodeModal.ts'
     import { circuitStore } from '../stores/circuitStore'
 
     // Add A drag / mousedown listener to here.
@@ -37,17 +29,6 @@
 
     let sectionHeight: number = $state(0)
 
-    // document.addEventListener('DOMContentLoaded', () => {
-    //     const head: HTMLElement | null = document.querySelector(
-    //         `#section_${zIndex}`
-    //     )
-    //     if (head) {
-    //         sectionHeight = head.offsetHeight
-    //         // sectionHeight = head.clientHeight
-    //         // console.log(sectionHeight)
-    //     }
-    // })
-
     interface GateItem {
         gateType: string
         label: string
@@ -58,7 +39,7 @@
     // yeah this should be replaced with the menu.ts
     // depending in the title prop passed in, use that json representation
     const menuItems: Array<menuJsonElement> =
-        menuJsonData[subMenuHeader]['groupElements']
+        menuJsonData[subMenuHeader as NodeMenuGroups]['groupElements']
 
     let draggingItem: menuJsonElement | null = null
     let ghostElement: HTMLElement | null = null
@@ -79,7 +60,7 @@
 
         const img = document.createElement('img')
         img.src = item.icon
-        img.alt = item.name.toLowerCase() + 'drag gate ghost'
+        img.alt = item.nodeType + 'drag gate ghost'
         img.style.width = '82px'
         img.style.opacity = '0.7'
         ghostElement.appendChild(img)
@@ -126,18 +107,8 @@
 
             if (droppedOnCanvas) {
                 let e: any = {
-                    gateType: draggingItem.name.toLowerCase(),
+                    gateType: draggingItem.nodeType,
                 }
-                // const svelvetCanvas: HTMLElement | null =
-                //     document.querySelector('.svelvet-wrapper')
-
-                // const bgWrapper: HTMLElement | null = document.querySelector(
-                //     '.background-wrapper'
-                // )
-                // const graphWrapper: HTMLElement | null = document.querySelector(
-                //     '.svelvet-graph-wrapper'
-                // )
-
                 createCanvasNode(e)
             }
 
@@ -173,8 +144,8 @@
                 style="background:none; border:none; padding:0; cursor:pointer;"
             >
                 <img src={item.icon} alt="{item.name} logic gate, hand-drawn" />
-                {item.name}
             </button>
+            {item.name}
         </li>
     {/each}
 </ol>
@@ -213,6 +184,22 @@
         background-color: var(--side-menu-bg);
         color: black;
     }
+    :global(.side_menu_group:last-child::after) {
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 100%); /* Extends to the bottom of the screen */
+        z-index: -1;
+    }
+
+    :global(.dark .side_menu_group:last-child::after) {
+        background-color: var(--side-menu-bg-dark);
+    }
+
+    :global(.light .side_menu_group:last-child::after) {
+        background-color: var(--side-menu-bg);
+    }
 
     :global(.dark .drag-ghost img) {
         filter: invert(100%);
@@ -232,7 +219,8 @@
         display: flex;
         align-items: center;
         flex-direction: column;
-        justify-content: center;
+        justify-content: space-around;
+        min-height: 65px;
 
         border-radius: 20px;
         border: 2px solid black;

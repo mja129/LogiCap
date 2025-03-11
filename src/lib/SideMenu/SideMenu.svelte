@@ -1,6 +1,5 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
-    import { onMount } from 'svelte'
     import SketchyLineWiggle from '../../assets/svg/sketchLineSvg/line_26.svg'
 
     // Need to import these somehow
@@ -14,6 +13,14 @@
     import SketchyLine_19 from '../../assets/svg/sketchLineSvg/line_19.svg'
     import SketchyLine_21 from '../../assets/svg/sketchLineSvg/line_21.svg'
     import SketchyLine_29 from '../../assets/svg/sketchLineSvg/line_29.svg'
+
+    import SideMenuHeader from './SideMenuHeader.svelte'
+    import SideMenuGroupItems from './SideMenuGroupItems.svelte'
+    import {
+        menuJsonData,
+        type menuJsonType,
+        type NodeMenuGroups,
+    } from '../nodeModal.ts'
 
     let {
         createCanvasNode,
@@ -34,14 +41,11 @@
         line_29: SketchyLine_29,
     }
 
-    import SideMenuHeader from './SideMenuHeader.svelte'
-    import SideMenuGroupItems from './SideMenuGroupItems.svelte'
-    import { menuJsonData, type menuJsonType } from './menu.ts'
-
     // just a selection of ones I want for the random line under the menu items.
 
     const menuJson: menuJsonType = menuJsonData
     const menuGroupNames = Object.keys(menuJson)
+    console.log(menuGroupNames)
 
     const randomLineSelectionGroup = [15, 23, 24, 25, 27, 17, 19, 21, 29]
 
@@ -66,7 +70,7 @@
             const selection: number = randomLineSelectionGroup[randNum]
 
             const svgImport = getSvgLineFileName(selection)
-            menuJson[groupName]['svg'] = svgImport
+            menuJson[groupName as NodeMenuGroups]['svg'] = svgImport
 
             // remove this number from the selection list.
             // Don't pick any duplicates.
@@ -84,7 +88,10 @@
         chosenLinesJson.forEach((selection: string, index: number) => {
             const currentMenuGroup = menuGroupNames[index]
             const svgImport = getSvgLineFileName(parseInt(selection, 10))
-            menuJson[currentMenuGroup]['svg'] = svgImport
+            console.log(currentMenuGroup)
+            if (currentMenuGroup !== undefined) {
+                menuJson[currentMenuGroup as NodeMenuGroups]['svg'] = svgImport
+            }
         })
     }
 
@@ -134,13 +141,14 @@
 
                     <img
                         class="sketch_bar"
-                        src={menuJson[groupName].svg}
+                        src={menuJson[groupName as NodeMenuGroups].svg}
                         alt="sketched line bottom border for main app bar section {groupName}"
                     />
                 </div>
                 <SideMenuGroupItems
                     {createCanvasNode}
                     zIndex={index}
+                    subMenuHeader={groupName}
                     showSubMenu={showSubMenu[index]}
                 />
             </li>

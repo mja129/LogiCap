@@ -2,7 +2,7 @@
     import {
         handleLinkAnchorConnection,
         handleUnlinkAnchorConnection,
-    } from './stores/circuitStore'
+    } from '../stores/circuitStore'
 
     let {
         linked,

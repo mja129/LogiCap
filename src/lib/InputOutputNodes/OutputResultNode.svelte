@@ -1,9 +1,6 @@
 <script lang="ts">
-    import { Node, Anchor, generateOutput } from 'svelvet'
-    // export let width: number = 80
-    // export let height: number = 50
-    import LogicGateAnchor from './LogicGateAnchor.svelte'
-    import image from '../assets/svg/andgate.svg'
+    import { Node } from 'svelvet'
+    import LogicGateAnchor from '../SvelvetUtils/LogicGateAnchor.svelte'
 
     let {
         width = 80,
