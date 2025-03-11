@@ -14,6 +14,8 @@ type ConnectorFrom = Record<'from', LinkData>
 type ConnectorTo = Record<'to', LinkData>
 type ConnectorPiece = ConnectorTo | ConnectorFrom
 
+type logicGateTypes = 'and' | 'nand' | 'not' | 'repeater' | 'or' | 'nor' | 'xor' | 'xnor'
+
 
 type Connector = ConnectorFrom & ConnectorTo
 

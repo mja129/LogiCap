@@ -8,7 +8,9 @@
     import XnorIcon from '../../assets/icons/circuits/Xnor.webp'
     import NandIcon from '../../assets/icons/circuits/Nand.webp'
     import NotIcon from '../../assets/icons/circuits/Not.webp'
-    import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+    import { onDestroy, onMount } from 'svelte'
+    import { menuJsonData } from './menu.ts'
+    import type { menuJsonElement } from './menu.ts'
     import { circuitStore } from '../stores/circuitStore'
 
     // Add A drag / mousedown listener to here.
@@ -23,13 +25,14 @@
 
     // this will be a required prop but it is optional right now.
     let {
-        showSubMenu,
         zIndex = 0,
         createCanvasNode,
+        subMenuHeader = 'Logic Gates',
     }: {
         showSubMenu?: boolean
         zIndex: number
         createCanvasNode: (e: any) => void
+        subMenuHeader?: string
     } = $props()
 
     let sectionHeight: number = $state(0)
@@ -45,8 +48,6 @@
     //     }
     // })
 
-    const dispatch = createEventDispatcher()
-
     interface GateItem {
         gateType: string
         label: string
@@ -54,21 +55,19 @@
     }
 
     // why this?
-    const gateItems: GateItem[] = [
-        { gateType: 'Not', label: 'Not', image: NotIcon },
-        { gateType: 'Buffer', label: 'Buffer', image: BufferIcon },
-        { gateType: 'And', label: 'And', image: AndIcon },
-        { gateType: 'Nand', label: 'Nand', image: NandIcon },
-        { gateType: 'Or', label: 'Or', image: OrIcon },
-        { gateType: 'Nor', label: 'Nor', image: NorIcon },
-        { gateType: 'Xor', label: 'Xor', image: XorIcon },
-        { gateType: 'Xnor', label: 'Xnor', image: XnorIcon },
-    ]
+    // yeah this should be replaced with the menu.ts
+    // depending in the title prop passed in, use that json representation
+    const menuItems: Array<menuJsonElement> =
+        menuJsonData[subMenuHeader]['groupElements']
 
-    let draggingItem: GateItem | null = null
+    let draggingItem: menuJsonElement | null = null
     let ghostElement: HTMLElement | null = null
 
-    function createGhost(item: GateItem, pageX: number, pageY: number): void {
+    function createGhost(
+        item: menuJsonElement,
+        pageX: number,
+        pageY: number
+    ): void {
         ghostElement = document.createElement('div')
         ghostElement.className = 'drag-ghost'
         ghostElement.style.position = 'fixed'
@@ -79,8 +78,8 @@
         ghostElement.style.transform = 'translate(-50%, -50%)'
 
         const img = document.createElement('img')
-        img.src = item.image
-        img.alt = item.gateType + ' ghost'
+        img.src = item.icon
+        img.alt = item.name.toLowerCase() + 'drag gate ghost'
         img.style.width = '82px'
         img.style.opacity = '0.7'
         ghostElement.appendChild(img)
@@ -102,7 +101,7 @@
         }
     }
 
-    function handleMouseDown(item: GateItem, event: MouseEvent): void {
+    function handleMouseDown(item: menuJsonElement, event: MouseEvent): void {
         event.preventDefault()
         draggingItem = item
         createGhost(item, event.pageX, event.pageY)
@@ -126,13 +125,8 @@
                 dropTarget?.classList.contains('svelvet-wrapper')
 
             if (droppedOnCanvas) {
-                // console.log(event.screenX)
-                // console.log(event.offsetX)
                 let e: any = {
-                    gateType: draggingItem.gateType,
-                    image: draggingItem.image,
-                    x: event.clientX,
-                    y: event.clientY,
+                    gateType: draggingItem.name.toLowerCase(),
                 }
                 // const svelvetCanvas: HTMLElement | null =
                 //     document.querySelector('.svelvet-wrapper')
@@ -171,18 +165,15 @@
 </script>
 
 <ol style={`z-index:${zIndex};`} class="side_menu_group" id="section_{zIndex}">
-    {#each gateItems as item}
+    {#each menuItems as item}
         <li>
             <button
                 class="gate-button"
                 onmousedown={(event) => handleMouseDown(item, event)}
                 style="background:none; border:none; padding:0; cursor:pointer;"
             >
-                <img
-                    src={item.image}
-                    alt="{item.label} logic gate, hand-drawn"
-                />
-                {item.label}
+                <img src={item.icon} alt="{item.name} logic gate, hand-drawn" />
+                {item.name}
             </button>
         </li>
     {/each}
@@ -221,6 +212,10 @@
     :global(.light .side_menu_group, .light .side_menu_group li) {
         background-color: var(--side-menu-bg);
         color: black;
+    }
+
+    :global(.dark .drag-ghost img) {
+        filter: invert(100%);
     }
     :global(.dark .side_menu_group, .dark .side_menu_group li) {
         background-color: var(--side-menu-bg-dark);

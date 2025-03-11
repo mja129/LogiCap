@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="100" height="60" viewBox="60 0 512 512"
+    xmlns="http://www.w3.org/2000/svg">
+    <!-- NOT Gate Body (Triangle) -->
+    <path d="
+        M 120,100 
+        L 420,256 
+        L 120,412 
+        Z" fill="black"/>
+
+    <!-- Input Line -->
+    <rect x="-20" y="248" width="115" height="18" fill="black"/>
+
+    <!-- Output Line -->
+    <rect x="400" y="248" width="150" height="18" fill="black"/>
+</svg>

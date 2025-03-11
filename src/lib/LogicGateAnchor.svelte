@@ -60,7 +60,14 @@
         output={io === 'output'}
         multiple={false}
     >
-        <CustomAnchor {connecting} {linked} {portName} nodeId={id} {hovering} />
+        <CustomAnchor
+            {io}
+            {connecting}
+            {linked}
+            {portName}
+            nodeId={id}
+            {hovering}
+        />
     </Anchor>
 </div>
 

@@ -1,29 +1,54 @@
 <script lang="ts">
-    import { Node, Anchor, generateOutput } from 'svelvet'
+    import { Node } from 'svelvet'
     // export let width: number = 80
     // export let height: number = 50
     import LogicGateAnchor from './LogicGateAnchor.svelte'
-    import image from '../assets/svg/andgate.svg'
+    import andGate from '../assets/svg/andgate.svg'
+    import nandGate from '../assets/svg/nandgate.svg'
+    import orGate from '../assets/svg/orgate.svg'
+    import norGate from '../assets/svg/norgate.svg'
+    import xorGate from '../assets/svg/xorgate.svg'
+    import xnorGate from '../assets/svg/xnorgate.svg'
+
+    // these are different
+    import notGate from '../assets/svg/notgate.svg'
+    import repeaterGate from '../assets/svg/repeater.svg'
+
+    const circuitSvgs: Record<logicGateTypes, string> = {
+        and: andGate,
+        nand: nandGate,
+        or: orGate,
+        nor: norGate,
+        xor: xorGate,
+        xnor: xnorGate,
+        not: notGate,
+        repeater: repeaterGate,
+    }
 
     let {
         width = 80,
         height = 50,
         nodeStartPos,
+        gateType = 'and',
         nodeId,
-        isFirstNode,
     }: {
         width: number
         height: number
         nodeStartPos: number
+        gateType?: logicGateTypes
         nodeId: string
-        isFirstNode: boolean
     } = $props()
 
     // Define a new device
 </script>
 
-<Node drop={isFirstNode ? 'center' : 'cursor'} id={nodeId}>
-    <img src={image} alt="AND Gate" {width} {height} />
+<Node drop={'cursor'} id={nodeId}>
+    <img
+        src={circuitSvgs[gateType]}
+        alt={`${gateType} logic gate`}
+        {width}
+        {height}
+    />
     <LogicGateAnchor
         location={['left', 'bot']}
         id={nodeId}

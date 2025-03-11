@@ -10,15 +10,17 @@
         connecting,
         portName,
         nodeId,
+        io = 'input',
     }: {
         linked: boolean
         hovering: boolean
         connecting: boolean
         portName: string
         nodeId: string
+        io?: string
     } = $props()
 
-    let io = portName.startsWith('input') ? 'input' : 'output'
+    console.log(portName)
 
     function createConnectionJson(
         nodeId: string,
@@ -72,7 +74,7 @@
         background-color: black !important;
     }
     .input.connecting {
-        background-color: var(--light-yellow) !important;
+        background-color: var(--lime-red) !important;
         border: 2px solid black;
     }
     .output.connecting {

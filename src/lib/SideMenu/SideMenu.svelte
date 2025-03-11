@@ -250,7 +250,7 @@
         /* width: 30%; */
         flex: 0 0 22.5%;
         height: 100%;
-        margin-right: 1.5vw;
+        margin-right: 6px;
         /* In order for the main canvas to render centered when the menu goes
          * away, the main container must have a padding-inline property set
          * when you set this, the padding will cause the side menu to render
@@ -261,8 +261,7 @@
         margin-left: -1.5vw;
 
         border: 3px solid 3px;
-        box-shadow: 0px 4px 0px 4px #000000;
-        border-radius: 3px;
+        box-shadow: 0px 6px 0px 6px #000000;
         /* translate: height 5s; */
 
         /* Hide scrollbar but still scroll crome+firefox   */

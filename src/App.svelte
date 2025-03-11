@@ -13,7 +13,8 @@
     import sampleCircuit from './assets/CircuitJsonSampleData/testcircuit.json'
     import { on } from 'svelte/events'
     import TestEngine from './lib/TestEngine.svelte'
-    import ButtonNodeSignal from './lib/ButtonNodeSignal.svelte'
+    import ButtonNodeSignal from './lib/ButtonInputNode.svelte'
+    import ButtonNodeOutput from './lib/OutputResultNode.svelte'
 
     let element: HTMLElement | null = null
 
@@ -82,13 +83,13 @@
         console.log(currentCircuit.getLabelIndex())
     })
 
-    const nodeList: { name: string }[] = $state([])
+    const nodeList: { name: string; gateType: logicGateTypes }[] = $state([])
 
     function createGateOnCanvas(e: any) {
         const newNodeId = newGateCircuitStore()
-        const gateType = e.gateType
+        const gateType: logicGateTypes = e.gateType as logicGateTypes
 
-        nodeList.push({ name: newNodeId })
+        nodeList.push({ name: newNodeId, gateType: gateType })
         // add the node from the global store.
     }
 </script>
@@ -115,9 +116,10 @@
             <!-- isFirstNode={nodeList.length === 1} -->
             <!-- svelte-ignore svelte_component_deprecated -->
             <svelte:component
-                this={ButtonNodeSignal}
+                this={AndGate}
                 width={80}
                 nodeId={svelvetNode.name}
+                gateType={svelvetNode.gateType}
                 height={50}
                 nodeStartPos={200}
             />
@@ -141,7 +143,7 @@
         width: 100vw;
         max-width: 100vw;
         height: 100vh;
-        padding-inline: calc(1.5vw);
+        padding-left: calc(1.5vw);
         justify-content: center;
         align-items: center;
         /* max-height: 100vh; */
@@ -155,21 +157,19 @@
         width: auto !important;
         height: auto !important;
     }
-    /* :global(.svelvet-wrapper) {
-        border-radius: 20px;
-        outline: 10px solid black;
+    :global(
+        .svelvet-wrapper,
+        .svelvet-wrapper:focus-visible,
+        .svelvet-wrapper:active,
+        .svelvet-wrapper:focus
+    ) {
+        /* border-radius: 20px; */
+        outline: none !important;
+        border: none !important;
+        box-shadow: unset !important;
     }
-    :global(.svelvet-wrapper:focus-visible) {
-        border-radius: 20px !important;
-        outline: 10px solid black !important;
-    }
-    :global(.svelvet-wrapper:focus) {
-        border-radius: 20px !important;
-        outline: 10px solid black !important;
-    } */
-    /* Take up the rest of the space in the flex container*/
-    /* :global(.svelvet-wrapper) {
-        max-height: calc(100% - 3.5vh);
+    :global(.svelvet-wrapper) {
+        /* max-height: calc(100% - 3.5vh); */
         flex: 1;
-    } */
+    }
 </style>

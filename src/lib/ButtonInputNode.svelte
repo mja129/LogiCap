@@ -20,16 +20,18 @@
     let signalOn: boolean = $state(false)
 
     let buttonColor = $derived(signalOn ? 'green' : 'red')
+    let buttonCircleOutlineColor = $derived(
+        signalOn ? 'var(--lime-green)' : 'var(--lime-red)'
+    )
 
     // Define a new device
 </script>
 
-<!-- cursor = drop -->
 <Node drop="cursor" id={nodeId}>
     <svg
         width="75"
         height="75"
-        viewBox="0 0 100 200"
+        viewBox="10 00 100 190"
         xmlns="http://www.w3.org/2000/svg"
     >
         <rect
@@ -37,16 +39,16 @@
             y="0"
             width="100"
             height="100"
-            fill="lightgray"
-            stroke="black"
+            fill="black"
+            stroke={buttonCircleOutlineColor}
             stroke-width="2"
         />
         <line
-            x1="50"
-            x2="200"
+            x1="100"
+            x2="190"
             y1="50"
             y2="50"
-            stroke="black"
+            stroke={buttonCircleOutlineColor}
             stroke-width="8"
         />
 
@@ -64,13 +66,13 @@
             r="30"
             aria-label="input button node toggle"
             fill={buttonColor}
-            stroke="black"
-            stroke-width="2"
+            stroke={buttonCircleOutlineColor}
+            stroke-width="7"
         />
     </svg>
 
     <LogicGateAnchor
-        offset={[95, 18]}
+        offset={[95, 19.63]}
         location={['right', 'mid']}
         id={nodeId}
         io="output"

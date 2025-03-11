@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="100" height="60" viewBox="0 0 552 512"
+    xmlns="http://www.w3.org/2000/svg">
+    <!-- Adjusted Back Curve to Intersect Input Lines -->
+    <path d="
+        M 80,120 
+        Q 140,180 140,256 
+        Q 140,332 80,392" fill="none" stroke="black" stroke-width="14"/>
+
+    <!-- XNOR Gate Body -->
+    <path d="
+        M 120,120 
+        L 220,120 
+        Q 360,120 420,256 
+        Q 360,392 220,392 
+        L 120,392 
+        Q 180,336 180,256 
+        Q 180,176 120,120 
+        Z" fill="black"/>
+
+    <!-- Input Lines -->
+    <rect x="16" y="160" width="130" height="18" fill="black"/>
+    <rect x="16" y="340" width="130" height="18" fill="black"/>
+
+    <!-- Inverter (NOT Circle) -->
+    <circle cx="440" cy="256" r="25" fill="transparent" stroke="black" stroke-width="12"/>
+
+    <!-- Output Line -->
+    <rect x="465" y="248" width="80" height="18" fill="black"/>
+</svg>
