@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Node, Anchor, generateOutput } from 'svelvet'
-    import LogicGateAnchor from '../SvelvetUtils/LogicGateAnchor.svelte'
+    import { Node } from 'svelvet'
+    import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
 
     let {
         width = 80,
@@ -68,7 +68,7 @@
         />
     </svg>
 
-    <LogicGateAnchor
+    <SimulationNodeAnchor
         offset={[95, 19.63]}
         location={['right', 'mid']}
         id={nodeId}

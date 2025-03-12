@@ -2,7 +2,7 @@
     import { Node } from 'svelvet'
     // export let width: number = 80
     // export let height: number = 50
-    import LogicGateAnchor from '../SvelvetUtils/LogicGateAnchor.svelte'
+    import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
 
     // these are different
     import notGate from '../../assets/svg/notgate.svg'
@@ -38,13 +38,13 @@
         {width}
         {height}
     />
-    <LogicGateAnchor
+    <SimulationNodeAnchor
         location={['left', 'mid']}
         id={nodeId}
         io="input"
         offset={[0, 40]}
     />
-    <LogicGateAnchor
+    <SimulationNodeAnchor
         location={['right', 'mid']}
         id={nodeId}
         io="output"

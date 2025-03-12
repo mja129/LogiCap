@@ -72,29 +72,3 @@
         />
     </Anchor>
 </div>
-
-<style>
-    .top {
-        position: absolute;
-        top: 21.5%;
-    }
-    .bot {
-        position: absolute;
-        top: 58%;
-    }
-    .mid {
-        position: absolute;
-        top: 40%;
-    }
-    .left {
-        position: absolute;
-        left: 7.5%;
-    }
-    .right {
-        position: absolute;
-        left: 78%;
-    }
-    .center {
-        left: calc((100% / 2) - 10px);
-    }
-</style>

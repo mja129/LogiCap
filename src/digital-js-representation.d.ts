@@ -29,7 +29,12 @@ type LogicGate = {
 }
 
 type Device = Button | Lamp | LogicGate
+type DeviceRecord = Record<string, Device>
 
+// DIGITALJS link node connection types
+
+// id coorisponds to the device uuid/nodeName/nodeId. This is also the key in the DeviceRecord type
+// port, I do not fully understand, but it's working via a bit of logic in SimulationNodeAnchor
 type LinkData = {
     id: string
     port: string
@@ -40,13 +45,16 @@ type ConnectorTo = Record<'to', LinkData>
 type ConnectorPiece = ConnectorTo | ConnectorFrom
 
 type Connector = ConnectorFrom & ConnectorTo
-type DeviceRecord = Record<string, Device>
 
+
+// DIGITALJS Subcircuit Type
 type Subcircuit = {
     devices: DeviceRecord
     connectors: Connector[]
 }
 
+
+// DIGITAL JS Circuit Input Json Type
 // Device manifest
 // Connection manifest
 type Circuit = {

@@ -54,8 +54,10 @@
         // add the node from the global store.
     }
 
+    let currCircuit: any = $state(null)
     circuitStore.subscribe((currentCircuit) => {
         console.log(currentCircuit)
+        currCircuit = currentCircuit
     })
 </script>
 

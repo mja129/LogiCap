@@ -1,6 +1,5 @@
 <script lang="ts">
     import {
-        circuitStore,
         handleLinkAnchorConnection,
         handleUnlinkAnchorConnection,
         toggleMouseClickHack,
@@ -53,6 +52,15 @@
         return handleUnlinkAnchorConnection(triggeredAnchor)
     }
     $effect(() => {
+        // if (connecting && io === 'input') {
+        //     // create event listener
+        //     const handleMouseUp = (e: any) => {
+        //         const droppedOnCanvas =
+        //             e?.target.classList.contains('svelvet-wrapper')
+        //         console.log(droppedOnCanvas)
+        //     }
+        //     document.addEventListener('mouseup', handleMouseUp)
+        // }
         if (linked && (io === 'input' || io === 'output')) {
             link(nodeId, portName)
         } else if (!linked) {
@@ -65,13 +73,21 @@
     // I think on disconnect has a default event from svelvet, try that out also this effect may set state to false many times, but honestly nah.
 </script>
 
+<!-- onmousedown={(e: MouseEvent) => {
+        console.log(e)
+        const handleMouseUp = (event: any) => {
+            console.log(event)
+            document.removeEventListener('mouseup', handleMouseUp)
+        }
+        document.addEventListener('mouseup', handleMouseUp)
+    }} -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
     class="custom_anchor {io === 'input' ? 'input' : 'output'}"
     class:linked
     class:hovering
     class:connecting
-    onmousedown={toggleMouseClickHack}
 ></div>
 
 <style>

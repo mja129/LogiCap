@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Node } from 'svelvet'
-    import LogicGateAnchor from '../SvelvetUtils/LogicGateAnchor.svelte'
+    import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
 
     let {
         width = 80,
@@ -52,7 +52,7 @@
     </svg>
 
     <!-- FEATURE: Make the line draggable around the whole circle  -->
-    <LogicGateAnchor
+    <SimulationNodeAnchor
         offset={[-5, 41.8]}
         location={['left', 'mid']}
         id={nodeId}
