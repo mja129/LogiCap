@@ -54,10 +54,8 @@
         // add the node from the global store.
     }
 
-    let currCircuit: any = $state(null)
     circuitStore.subscribe((currentCircuit) => {
         console.log(currentCircuit)
-        currCircuit = currentCircuit
     })
 </script>
 
@@ -69,7 +67,6 @@
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         {#each nodeList as svelvetNode}
-            <!-- isFirstNode={nodeList.length === 1} -->
             <!-- svelte-ignore svelte_component_deprecated -->
             <SimNode
                 gateType={svelvetNode.gateType}

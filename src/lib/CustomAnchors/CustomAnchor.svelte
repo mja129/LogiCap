@@ -73,16 +73,6 @@
     // I think on disconnect has a default event from svelvet, try that out also this effect may set state to false many times, but honestly nah.
 </script>
 
-<!-- onmousedown={(e: MouseEvent) => {
-        console.log(e)
-        const handleMouseUp = (event: any) => {
-            console.log(event)
-            document.removeEventListener('mouseup', handleMouseUp)
-        }
-        document.addEventListener('mouseup', handleMouseUp)
-    }} -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
     class="custom_anchor {io === 'input' ? 'input' : 'output'}"
     class:linked

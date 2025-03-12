@@ -43,8 +43,9 @@ type LinkData = {
 type ConnectorFrom = Record<'from', LinkData>
 type ConnectorTo = Record<'to', LinkData>
 type ConnectorPiece = ConnectorTo | ConnectorFrom
+type ConnectorName = Record<'name', string>
 
-type Connector = ConnectorFrom & ConnectorTo
+type Connector = ConnectorFrom & ConnectorTo & ConnectorName
 
 
 // DIGITALJS Subcircuit Type

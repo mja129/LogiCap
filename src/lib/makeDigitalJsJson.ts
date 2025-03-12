@@ -1,5 +1,12 @@
 // export a function map from this function, then depending on the type, create this json in app.svelte
-function makeLamp(nodeName: string, options?: { bits: number, net: string, label: string, order: number, inputs: number, outputs: number }): Lamp {
+function makeLamp(nodeName: string, options?: {
+    bits: number,
+    net: string,
+    label: string,
+    order: number,
+    inputs: number,
+    outputs: number
+}): Lamp {
     return {
 
         type: "Lamp",
@@ -47,6 +54,7 @@ export const deviceFactoryMap: Record<string, (nodeName: string, options?: any) 
     Xor: (nodeName) => makeLogicNode("Xor", nodeName),
     Xnor: (nodeName) => makeLogicNode("Xnor", nodeName),
     Not: (nodeName) => makeLogicNode("Not", nodeName),
+    Repeater: (nodeName) => makeLogicNode("Repeater", nodeName),
 };
 
 
