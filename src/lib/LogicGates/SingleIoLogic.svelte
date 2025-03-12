@@ -10,15 +10,15 @@
     import type { logicGateTypes, singleIoLogicTypes } from '../nodeModal'
 
     const circuitSvgs: Record<singleIoLogicTypes, string> = {
-        not: notGate,
-        repeater: repeaterGate,
+        Not: notGate,
+        Repeater: repeaterGate,
     }
 
     let {
         width = 80,
         height = 50,
         nodeStartPos,
-        gateType = 'not',
+        gateType = 'Not',
         nodeId,
     }: {
         width: number
