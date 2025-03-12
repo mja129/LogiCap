@@ -43,10 +43,13 @@
 
     const nodeList: { name: string; gateType: logicGateTypes }[] = $state([])
 
+    // called on "drop"
     function createGateOnCanvas(e: any) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         const newNodeId = newGateCircuitStore(gateType)
 
+        // create the node on the canvas
+        // make sure to delete when node is deleted.
         nodeList.push({ name: newNodeId, gateType: gateType })
         // add the node from the global store.
     }

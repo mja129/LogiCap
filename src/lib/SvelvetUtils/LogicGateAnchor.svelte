@@ -4,7 +4,7 @@
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
-    type portNames = `input${number}` | 'output' | ''
+    type portNames = `in${number}` | 'out' | 'in' | ''
     let {
         location = ['left', 'top'],
         id,
@@ -25,12 +25,14 @@
     let portName: portNames = ''
     if (location[0] == 'left') {
         if (location[1] == 'top') {
-            portName = 'input1'
+            portName = 'in1'
         } else if (location[1] == 'bot') {
-            portName = 'input2'
+            portName = 'in2'
+        } else if (location[1] == 'mid') {
+            portName = 'in'
         }
     } else if (location[0] == 'right') {
-        portName = 'output'
+        portName = 'out'
     }
     const anchorId = `${id}_${portName}`
 
