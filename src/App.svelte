@@ -3,17 +3,15 @@
     import { Svelvet, Minimap } from 'svelvet'
     import type { Component } from 'svelte'
 
-    import AndGate from './lib/LogicGates/LogicGate.svelte'
-
-    import { circuitStore } from './lib/stores/circuitStore'
+    import { circuitStore } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
     import TestEngine from './lib/TestEngine.svelte'
     import SimNode from './lib/SimNode.svelte'
     import type { dualInputLogicTypes, logicGateTypes } from './lib/nodeModal'
+    import { deviceFactoryMap } from './lib/makeDigitalJsJson'
 
-    let newDevice: Device
     // console.log(currentCircuit.start())
     // this happens on every connection
     // ON change of global JSON circuit DATA, Run this.
@@ -26,34 +24,36 @@
             (byte) => charset[byte % charset.length]
         ).join('')
     }
-    const newGateCircuitStore = () => {
-        const nodeId = `And_${generateNonce()}`
+    // create new node in the global store for circuitStore digital js backend.
+    const newGateCircuitStore = (gateType: string) => {
+        const nodeName: string = `${gateType}_${generateNonce()}`
         circuitStore.update((currentCircuit) => {
             // Add the new device with a unique ID, e.g., 'newDeviceId'
-            newDevice = {
-                type: 'And',
-                label: nodeId,
-            }
-            currentCircuit.devices[nodeId] = newDevice
+            // get function from map
+            const newDevice: Device = deviceFactoryMap[gateType](nodeName)
+            currentCircuit.devices[nodeName] = newDevice
             // Add the new connector
             // currentCircuit.connectors.push(newConnector)
-            console.log(currentCircuit)
 
             // Return the updated circuit
             return currentCircuit
         })
-        return nodeId
+        return nodeName
     }
 
     const nodeList: { name: string; gateType: logicGateTypes }[] = $state([])
 
     function createGateOnCanvas(e: any) {
-        const newNodeId = newGateCircuitStore()
         const gateType: logicGateTypes = e.gateType as logicGateTypes
+        const newNodeId = newGateCircuitStore(gateType)
 
         nodeList.push({ name: newNodeId, gateType: gateType })
         // add the node from the global store.
     }
+
+    circuitStore.subscribe((currentCircuit) => {
+        console.log(currentCircuit)
+    })
 </script>
 
 <main>

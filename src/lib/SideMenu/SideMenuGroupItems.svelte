@@ -3,17 +3,6 @@
     import { menuJsonData } from '../nodeModal.ts'
     import type { NodeMenuGroups } from '../nodeModal.ts'
     import type { menuJsonElement } from '../nodeModal.ts'
-    import { circuitStore } from '../stores/circuitStore'
-
-    // Add A drag / mousedown listener to here.
-    // make a mouseup listener inside of the mousedown listener and see which
-    // html element you dropped the element on
-    // Maybe svelte drag drop actions, has something for this.
-    // Tell the global store like it is in AndGate.svelte right now
-    // Don't worry about actually rendering them in the canvas for now. just
-    // make them here after dropping a menu item.
-    // Don't let this confuse you but we will probably need
-    // <svelte:component this={globalStore.circuitList}> to do this in app.svelte
 
     // this will be a required prop but it is optional right now.
     let {

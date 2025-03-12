@@ -10,10 +10,10 @@ import notIcon from '../assets/icons/circuits/Not.webp'
 import outputIcon from '../assets/icons/circuits/outputIcon.png'
 import inputIcon from '../assets/icons/circuits/inputIcon.png'
 
-import AndGate from './LogicGates/LogicGate.svelte'
+import LogicGate from './LogicGates/LogicGate.svelte'
 import SingleIoLogic from './LogicGates/SingleIoLogic.svelte'
-import OutputResultNode from './InputOutputNodes/OutputResultNode.svelte'
-import ButtonInputNode from './InputOutputNodes/ButtonInputNode.svelte'
+import Lamp from './InputOutputNodes/Lamp.svelte'
+import ButtonNode from './InputOutputNodes/ButtonNode.svelte'
 
 import { type ComponentProps } from 'svelte'
 
@@ -22,11 +22,11 @@ import { type ComponentProps } from 'svelte'
 // or their grouping in the menu
 export type NodeMenuGroups = "Logic Gates" | "Input/Output"
 
-export type dualInputLogicTypes = 'and' | 'nand' | 'or' | 'nor' | 'xor' | 'xnor'
-export type singleIoLogicTypes = 'repeater' | 'not'
+export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
+export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes
 
-export type ioNodeTypes = "input" | "output"
+export type ioNodeTypes = "Button" | "Lamp"
 export type allNodeTypes = logicGateTypes | ioNodeTypes
 
 // types for the structure of the menu
@@ -38,36 +38,38 @@ export type menuJsonType = Record<NodeMenuGroups, menuJsonItem>
 
 // all possible props for all component groups.
 // a component group probably has different logic/ a different json for digitalJS
-type AndGateProps = ComponentProps<typeof AndGate>
-type OutputResultNodeProps = ComponentProps<typeof OutputResultNode>
-type ButtonInputNodeProps = ComponentProps<typeof ButtonInputNode>
+type LogicGateProps = ComponentProps<typeof LogicGate>
+type OutputResultNodeProps = ComponentProps<typeof Lamp>
+type ButtonInputNodeProps = ComponentProps<typeof ButtonNode>
 
 // needed in SimNode.svelte
+// So far we don't need to worry about initializing SimNode, with specific props.
+// when we do we will get them from SideMenuGroupItems.svelte and then spread them in App.svelte
 export type AllNodeProps =
-    | AndGateProps
-    | OutputResultNodeProps
-    | ButtonInputNodeProps
+    | LogicGateProps // this one needs gateType.
+    | OutputResultNodeProps // signalOn, default should be okay always on init
+    | ButtonInputNodeProps // this one outputs a signal, it doesn't need any special inputs.
 
 // This maybe should be just a json file but I want it to be in this folder and that is maybe problematic
 export const menuJsonData: menuJsonType = {
     "Logic Gates": {
         "svg": undefined,
         "groupElements": [
-            { name: "And", nodeType: "and", icon: andIcon },
-            { name: "Nand", nodeType: "nand", icon: nandIcon },
-            { name: "Or", nodeType: "or", icon: orIcon },
-            { name: "Nor", nodeType: "nor", icon: norIcon },
-            { name: "Xor", nodeType: "xor", icon: xorIcon },
-            { name: "Xnor", nodeType: "xnor", icon: xnorIcon },
-            { name: "Not", nodeType: "not", icon: notIcon },
-            { name: "Repeater", nodeType: "repeater", icon: bufferIcon }
+            { name: "And", nodeType: "And", icon: andIcon },
+            { name: "Nand", nodeType: "Nand", icon: nandIcon },
+            { name: "Or", nodeType: "Or", icon: orIcon },
+            { name: "Nor", nodeType: "Nor", icon: norIcon },
+            { name: "Xor", nodeType: "Xor", icon: xorIcon },
+            { name: "Xnor", nodeType: "Xnor", icon: xnorIcon },
+            { name: "Not", nodeType: "Not", icon: notIcon },
+            { name: "Repeater", nodeType: "Repeater", icon: bufferIcon }
         ]
     },
     "Input/Output": {
         "svg": undefined,
         "groupElements": [
-            { name: "Output", nodeType: "output", icon: outputIcon },
-            { name: "Input", nodeType: "input", icon: inputIcon },
+            { name: "Lamp", nodeType: "Lamp", icon: outputIcon },
+            { name: "Button", nodeType: "Button", icon: inputIcon },
         ]
     }
 }
@@ -80,23 +82,24 @@ export const menuJsonData: menuJsonType = {
 // 3. create the component
 // 4. add the component prop type to AllNodeProps
 // 5. add it to the switch statement below.
+// If your component has specific required props: this may be an issue, lmk.
 // this function is used to getComponent when dropping and create the correct component.
 export function getComponent(type: allNodeTypes) {
     switch (type) {
-        case 'and':
-        case 'nor':
-        case 'xor':
-        case 'xnor':
-        case 'or':
-        case 'nand':
-            return AndGate
-        case 'repeater':
-        case 'not':
+        case 'And':
+        case 'Nor':
+        case 'Xor':
+        case 'Xnor':
+        case 'Or':
+        case 'Nand':
+            return LogicGate
+        case 'Repeater':
+        case 'Not':
             return SingleIoLogic
-        case 'input':
-            return ButtonInputNode
-        case 'output':
-            return OutputResultNode
+        case 'Button':
+            return ButtonNode
+        case 'Lamp':
+            return Lamp
         default:
             return null
     }

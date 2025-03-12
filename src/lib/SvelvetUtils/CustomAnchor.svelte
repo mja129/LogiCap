@@ -1,8 +1,10 @@
 <script lang="ts">
     import {
+        circuitStore,
         handleLinkAnchorConnection,
         handleUnlinkAnchorConnection,
-    } from '../stores/circuitStore'
+        toggleMouseClickHack,
+    } from '../circuitStore'
 
     let {
         linked,
@@ -41,14 +43,20 @@
     // ASSUMPTION: Input can only ever have 1 thing connected to it, but an output can be outputting to multiple inputs
     // I will NOT make this assumption in the handling of unlinking below; but this change is maybe needed.
     // using derived here would be great if that worked. $derived.by()
+    function link(nodeId: string, portName: string) {
+        const triggeredAnchor = createConnectionJson(nodeId, portName)
+        return handleLinkAnchorConnection(triggeredAnchor)
+    }
+    function unlink(nodeId: string, portName: string) {
+        const triggeredAnchor = createConnectionJson(nodeId, portName)
+        return handleUnlinkAnchorConnection(triggeredAnchor)
+    }
     $effect(() => {
         if (linked && (io === 'input' || io === 'output')) {
-            const triggeredAnchor = createConnectionJson(nodeId, portName)
-            return handleLinkAnchorConnection(triggeredAnchor)
+            link(nodeId, portName)
         } else if (!linked) {
+            unlink(nodeId, portName)
             // console.log(io)
-            const triggeredAnchor = createConnectionJson(nodeId, portName)
-            return handleUnlinkAnchorConnection(triggeredAnchor)
         }
     })
 
@@ -56,11 +64,13 @@
     // I think on disconnect has a default event from svelvet, try that out also this effect may set state to false many times, but honestly nah.
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
     class="custom_anchor {io === 'input' ? 'input' : 'output'}"
     class:linked
     class:hovering
     class:connecting
+    onmousedown={toggleMouseClickHack}
 ></div>
 
 <style>

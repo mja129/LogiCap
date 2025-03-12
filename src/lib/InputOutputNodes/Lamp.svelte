@@ -16,11 +16,10 @@
         nodeId: string
     } = $props()
 
-    let buttonColor = $derived(signalOn ? 'green' : 'red')
-    let buttonCircleOutlineColor = $derived(
-        signalOn ? 'var(--lime-green)' : 'var(--lime-red)'
-    )
-
+    let buttonColor = $derived({
+        color: signalOn ? 'green' : 'red',
+        outlineColor: signalOn ? 'var(--lime-green)' : 'var(--lime-red)',
+    })
     // Define a new device
 </script>
 
@@ -37,7 +36,7 @@
             x2="5"
             y1="45"
             y2="45"
-            stroke={buttonCircleOutlineColor}
+            stroke={buttonColor.outlineColor}
             stroke-width="8"
         />
 
@@ -46,8 +45,8 @@
             cx="50"
             cy="50"
             r="45"
-            fill={buttonColor}
-            stroke={buttonCircleOutlineColor}
+            fill={buttonColor.color}
+            stroke={buttonColor.outlineColor}
             stroke-width="7"
         />
     </svg>

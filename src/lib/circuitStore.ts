@@ -40,6 +40,11 @@ function createGlobalTimeoutManager() {
 
 const timeoutManager = createGlobalTimeoutManager()
 export let circuitStore = writable<Circuit>(initialCircuit)
+let mouseClickHack = true
+
+export function toggleMouseClickHack() {
+    mouseClickHack = false
+}
 
 // potential problem, if 2 connections are received before timeout ends
 // (fixed by canceling timer) there is another implementation where you wait
@@ -52,6 +57,10 @@ function handleAnchorConnection(
     updateJsonLinking: (connector: Connector) => void,
     timeout = 100
 ) {
+    if (mouseClickHack) {
+        console.log("here")
+        return false
+    }
     // if there are no pending anchor connections to handle
     // either because an input or output timeout before recieving its
     // counterpart because you recieved 2 inputs our outputs in a connection

@@ -16,10 +16,10 @@
 
     let signalOn: boolean = $state(false)
 
-    let buttonColor = $derived(signalOn ? 'green' : 'red')
-    let buttonCircleOutlineColor = $derived(
-        signalOn ? 'var(--lime-green)' : 'var(--lime-red)'
-    )
+    let buttonColor = $derived({
+        color: signalOn ? 'green' : 'red',
+        outlineColor: signalOn ? 'var(--lime-green)' : 'var(--lime-red)',
+    })
 
     // Define a new device
 </script>
@@ -37,7 +37,7 @@
             width="100"
             height="100"
             fill="black"
-            stroke={buttonCircleOutlineColor}
+            stroke={buttonColor.outlineColor}
             stroke-width="2"
         />
         <line
@@ -45,7 +45,7 @@
             x2="190"
             y1="50"
             y2="50"
-            stroke={buttonCircleOutlineColor}
+            stroke={buttonColor.outlineColor}
             stroke-width="8"
         />
 
@@ -62,8 +62,8 @@
             cy="50"
             r="30"
             aria-label="input button node toggle"
-            fill={buttonColor}
-            stroke={buttonCircleOutlineColor}
+            fill={buttonColor.color}
+            stroke={buttonColor.outlineColor}
             stroke-width="7"
         />
     </svg>

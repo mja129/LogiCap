@@ -12,19 +12,19 @@
     import type { dualInputLogicTypes, logicGateTypes } from '../nodeModal'
 
     const circuitSvgs: Record<dualInputLogicTypes, string> = {
-        and: andGate,
-        nand: nandGate,
-        or: orGate,
-        nor: norGate,
-        xor: xorGate,
-        xnor: xnorGate,
+        And: andGate,
+        Nand: nandGate,
+        Or: orGate,
+        Nor: norGate,
+        Xor: xorGate,
+        Xnor: xnorGate,
     }
 
     let {
         width = 80,
         height = 50,
         nodeStartPos,
-        gateType = 'and',
+        gateType = 'And',
         nodeId,
     }: {
         width: number

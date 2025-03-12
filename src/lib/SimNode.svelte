@@ -15,6 +15,7 @@
     // Create a function to get the component based on type
 
     // Use $derived for reactive value
+    // do I even need this?
     let nodeComponent = $derived(getComponent(gateType))
 </script>
 
