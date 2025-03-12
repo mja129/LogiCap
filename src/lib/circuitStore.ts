@@ -57,10 +57,6 @@ function handleAnchorConnection(
     updateJsonLinking: (connector: Connector) => void,
     timeout = 100
 ) {
-    if (mouseClickHack) {
-        console.log("here")
-        return false
-    }
     // if there are no pending anchor connections to handle
     // either because an input or output timeout before recieving its
     // counterpart because you recieved 2 inputs our outputs in a connection
@@ -96,6 +92,7 @@ function handleAnchorConnection(
             ...from,
             ...to,
         }
+        console.log(connector);
         updateJsonLinking(connector)
         pendingConnection = null
     }

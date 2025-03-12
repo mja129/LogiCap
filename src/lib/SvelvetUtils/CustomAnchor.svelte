@@ -33,7 +33,8 @@
             port: port,
         }
 
-        if (port.startsWith('input')) {
+        // IMPORTANT part of the code for creating the connection.
+        if (port.startsWith('in')) {
             return { to: connection } as ConnectorTo
         } else {
             return { from: connection } as ConnectorFrom

@@ -183,10 +183,3 @@ declare module "custom_digitaljs" {
         unalarm(alarmId: any); // probably string or int
     }
 }
-
-declare module "svelte-drag-and-drop-actions" {
-    export function asDraggable(node: HTMLElement, options?: any): {
-        destroy(): void;
-        update(options?: any): void;
-    };
-}
