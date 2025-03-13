@@ -87,9 +87,9 @@ function handleAnchorConnection(
         }
         const from = ('from' in connection ? connection : pendingConnection) as ConnectorFrom
         const to = ('to' in connection ? connection : pendingConnection) as ConnectorTo
-        const nodeFromId: string = from.from.id
-        const nodeToId: string = to.to.id
-        // potentially create a separate store of wires.
+        const nodeFromId: string = from?.from?.id || "Empty-err-from"
+        const nodeToId: string = to?.to?.id || "Empty-err-to"
+
         const wireId = nodeFromId + '-' + nodeToId
         // from and to are unique types basically this is XOR case
         const connector: Connector = {
@@ -98,6 +98,7 @@ function handleAnchorConnection(
             name: `${wireId}`
         }
         updateJsonLinking(connector)
+        // potentially create a separate store of wires.
         pendingConnection = null
     }
 }

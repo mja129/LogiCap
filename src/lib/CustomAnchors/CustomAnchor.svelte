@@ -21,8 +21,6 @@
         io?: string
     } = $props()
 
-    console.log(portName)
-
     function createConnectionJson(
         nodeId: string,
         port: string

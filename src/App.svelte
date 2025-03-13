@@ -24,6 +24,12 @@
             (byte) => charset[byte % charset.length]
         ).join('')
     }
+    let currentCircuitData: Circuit = $state({
+        devices: {} as DeviceRecord,
+        connectors: [] as Connector[],
+        subcircuits: {} as Record<string, Subcircuit>,
+    })
+
     // create new node in the global store for circuitStore digital js backend.
     const newGateCircuitStore = (gateType: string) => {
         const nodeName: string = `${gateType}_${generateNonce()}`
@@ -32,6 +38,7 @@
             // get function from map
             const newDevice: Device = deviceFactoryMap[gateType](nodeName)
             currentCircuit.devices[nodeName] = newDevice
+            currentCircuitData = currentCircuit
             // Add the new connector
             // currentCircuit.connectors.push(newConnector)
 
@@ -41,19 +48,15 @@
         return nodeName
     }
 
-    const nodeList: { name: string; gateType: logicGateTypes }[] = $state([])
-
-    // called on "drop"
+    // called on "drop" in sidemenugroupitems.svelte
     function createGateOnCanvas(e: any) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
-        const newNodeId = newGateCircuitStore(gateType)
-
-        // create the node on the canvas
-        // make sure to delete when node is deleted.
-        nodeList.push({ name: newNodeId, gateType: gateType })
-        // add the node from the global store.
+        // this gate will update the store and then the subscribe will update the
+        // list of circuits currently active on the screen
+        newGateCircuitStore(gateType)
     }
 
+    // Subscribe to circuitStore changes
     circuitStore.subscribe((currentCircuit) => {
         console.log(currentCircuit)
     })
@@ -66,15 +69,15 @@
     <!-- svelte-ignore event_directive_deprecated -->
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
-        {#each nodeList as svelvetNode}
+        {#each Object.entries(currentCircuitData.devices) as [nodeId, device]}
             <!-- svelte-ignore svelte_component_deprecated -->
             <SimNode
-                gateType={svelvetNode.gateType}
+                gateType={device.type as logicGateTypes}
                 nodeProps={{
-                    gateType: svelvetNode.gateType as dualInputLogicTypes,
+                    gateType: device.type as dualInputLogicTypes,
                     width: 80,
                     height: 50,
-                    nodeId: svelvetNode.name,
+                    nodeId,
                     nodeStartPos: 200,
                     // Add any other specific props your node components need
                 }}

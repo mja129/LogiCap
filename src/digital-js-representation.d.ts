@@ -40,6 +40,15 @@ type LinkData = {
     port: string
 }
 
+
+// We need some way to transform digital js json representation into this, for loading in pre-existing circuits.
+// connections: svelvet type
+// Array<[nodeId, anchorId] | nodeId>default:"[]"
+// Used to specify Node connections ahead of time. Array of tuples representing a
+// node/anchor pair or of nodeIds themselves. IDs can be strings or numbers. When
+// specifying nodeIds only, connections are spread evenly across the input anchors
+// of the target.
+
 type ConnectorFrom = Record<'from', LinkData>
 type ConnectorTo = Record<'to', LinkData>
 type ConnectorPiece = ConnectorTo | ConnectorFrom

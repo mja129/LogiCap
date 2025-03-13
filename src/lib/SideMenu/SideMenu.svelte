@@ -45,7 +45,6 @@
 
     const menuJson: menuJsonType = menuJsonData
     const menuGroupNames = Object.keys(menuJson)
-    console.log(menuGroupNames)
 
     const randomLineSelectionGroup = [15, 23, 24, 25, 27, 17, 19, 21, 29]
 
@@ -88,7 +87,6 @@
         chosenLinesJson.forEach((selection: string, index: number) => {
             const currentMenuGroup = menuGroupNames[index]
             const svgImport = getSvgLineFileName(parseInt(selection, 10))
-            console.log(currentMenuGroup)
             if (currentMenuGroup !== undefined) {
                 menuJson[currentMenuGroup as NodeMenuGroups]['svg'] = svgImport
             }
