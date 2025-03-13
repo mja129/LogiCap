@@ -1,5 +1,10 @@
 <script lang="ts">
-    import { Anchor } from 'svelvet'
+    import {
+        Anchor,
+        generateInput,
+        generateOutput,
+        type CSSColorString,
+    } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -34,7 +39,7 @@
     } else if (location[0] == 'right') {
         portName = 'out'
     }
-    const anchorId = `${id}_${portName}`
+    const anchorId = `${portName}_${id}`
 
     // get state of linked node from child via closure function
     // I would like to make this and CustomAnchor one file, especially because all of the connection logic is in the child
@@ -57,10 +62,11 @@
         let:hovering
         let:connecting
         id={anchorId}
+        key={anchorId}
+        connections={[]}
         direction={location[0] === 'left' ? 'west' : 'east'}
         input={io === 'input'}
         output={io === 'output'}
-        multiple={false}
     >
         <CustomAnchor
             {io}
@@ -68,6 +74,7 @@
             {linked}
             {portName}
             nodeId={id}
+            {anchorId}
             {hovering}
         />
     </Anchor>

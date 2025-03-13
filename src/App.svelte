@@ -24,13 +24,11 @@
             (byte) => charset[byte % charset.length]
         ).join('')
     }
-    let currentCircuitData: Circuit = $state({
-        devices: {} as DeviceRecord,
-        connectors: [] as Connector[],
-        subcircuits: {} as Record<string, Subcircuit>,
-    })
+    // the Devices part of the digitalJS json.
+    let currentDevicesData: DeviceRecord = $state({})
 
     // create new node in the global store for circuitStore digital js backend.
+    // sync the devices list with the currentDevicesData variable.
     const newGateCircuitStore = (gateType: string) => {
         const nodeName: string = `${gateType}_${generateNonce()}`
         circuitStore.update((currentCircuit) => {
@@ -38,7 +36,9 @@
             // get function from map
             const newDevice: Device = deviceFactoryMap[gateType](nodeName)
             currentCircuit.devices[nodeName] = newDevice
-            currentCircuitData = currentCircuit
+
+            // sync new Device data with currentDevicesData
+            currentDevicesData = currentCircuit.devices
             // Add the new connector
             // currentCircuit.connectors.push(newConnector)
 
@@ -69,7 +69,7 @@
     <!-- svelte-ignore event_directive_deprecated -->
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
-        {#each Object.entries(currentCircuitData.devices) as [nodeId, device]}
+        {#each Object.entries(currentDevicesData) as [nodeId, device]}
             <!-- svelte-ignore svelte_component_deprecated -->
             <SimNode
                 gateType={device.type as logicGateTypes}

@@ -108,7 +108,7 @@ function handleAnchorConnection(
 // I don't want handleAnchorConnection to have to take a param to specify connect or disconnect
 // but that's essentially what this does without making the handleAnchorConnection do more than 1 thing
 // by making 2 separate functions and passing in a function for what to do once both nodes send events.
-export function handleLinkAnchorConnection(connection: ConnectorPiece) {
+export function handleLinkAnchorConnection(connection: Connector) {
     const pushNewLinking = (connector: Connector) => {
         circuitStore.update((currentCircuit) => {
             // Add the new device with a unique ID, e.g., 'newDeviceId'
@@ -120,7 +120,7 @@ export function handleLinkAnchorConnection(connection: ConnectorPiece) {
             return currentCircuit
         })
     }
-    handleAnchorConnection(connection, pushNewLinking)
+    pushNewLinking(connection)
 }
 
 // TODO: there is a way to restructure the map so that we can search by device and not have to spend all of this time with searching and inserting + shifting
