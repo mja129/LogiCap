@@ -9,7 +9,7 @@
 
     import TestEngine from './lib/TestEngine.svelte'
     import SimNode from './lib/SimNode.svelte'
-    import type { dualInputLogicTypes, logicGateTypes } from './lib/nodeModal'
+    import type { dualInputLogicTypes, logicGateTypes } from './lib/nodesModel'
     import { deviceFactoryMap } from './lib/makeDigitalJsJson'
 
     // console.log(currentCircuit.start())
