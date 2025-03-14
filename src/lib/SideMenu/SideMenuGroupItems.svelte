@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onDestroy, onMount } from 'svelte'
-    import { menuJsonData } from '../nodesModel.ts'
-    import type { NodeMenuGroups } from '../nodesModel.ts'
-    import type { menuJsonElement } from '../nodesModel.ts'
+    import { menuJsonData } from '../circuitModel.ts'
+    import type { NodeMenuGroups } from '../circuitModel.ts'
+    import type { menuJsonElement } from '../circuitModel.ts'
 
     // this will be a required prop but it is optional right now.
     let {

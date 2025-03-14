@@ -20,7 +20,7 @@
         menuJsonData,
         type menuJsonType,
         type NodeMenuGroups,
-    } from '../nodesModel.ts'
+    } from '../circuitModel.ts'
 
     let {
         createCanvasNode,

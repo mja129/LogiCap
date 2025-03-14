@@ -9,7 +9,7 @@
     import norGate from '../../assets/svg/norgate.svg'
     import xorGate from '../../assets/svg/xorgate.svg'
     import xnorGate from '../../assets/svg/xnorgate.svg'
-    import type { dualInputLogicTypes, logicGateTypes } from '../nodesModel'
+    import type { dualInputLogicTypes, logicGateTypes } from '../circuitModel'
 
     const circuitSvgs: Record<dualInputLogicTypes, string> = {
         And: andGate,
