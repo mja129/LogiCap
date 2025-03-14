@@ -6,6 +6,7 @@
         type CSSColorString,
     } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
+    import CustomWire from './CustomWire.svelte'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
@@ -77,5 +78,6 @@
             {anchorId}
             {hovering}
         />
+        <CustomWire slot="edge" />
     </Anchor>
 </div>

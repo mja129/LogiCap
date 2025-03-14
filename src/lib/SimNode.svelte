@@ -3,7 +3,7 @@
         getComponent,
         type AllNodeProps,
         type allNodeTypes,
-    } from './nodeModal'
+    } from './circuitModel'
 
     let {
         gateType,

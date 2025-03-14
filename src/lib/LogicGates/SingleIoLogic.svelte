@@ -7,7 +7,7 @@
     // these are different
     import notGate from '../../assets/svg/notgate.svg'
     import repeaterGate from '../../assets/svg/repeater.svg'
-    import type { logicGateTypes, singleIoLogicTypes } from '../nodeModal'
+    import type { logicGateTypes, singleIoLogicTypes } from '../circuitModel'
 
     const circuitSvgs: Record<singleIoLogicTypes, string> = {
         Not: notGate,
