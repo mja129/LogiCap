@@ -36,7 +36,6 @@
             // get function from map
             const newDevice: Device = deviceFactoryMap[gateType](nodeName)
             currentCircuit.devices[nodeName] = newDevice
-
             // sync new Device data with currentDevicesData
             currentDevicesData = currentCircuit.devices
             // Add the new connector

@@ -1,7 +1,14 @@
 <script lang="ts">
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
     import { circuitStore } from './circuitStore.ts'
-    import sampleCircuit from '../assets/CircuitJsonSampleData/testcircuit.json'
+    //import sampleCircuit from '../assets/CircuitJsonSampleData/testcircuit.json'
+    import { Vector3vl } from "3vl"
+
+    let oneBit: Vector3vl;
+    let zeroBit: Vector3vl
+
+    oneBit = Vector3vl.make(1, 1);
+    zeroBit = Vector3vl.make(1, 0);
 
     Object.defineProperty(HeadlessCircuit.prototype, "running", {
     get() {
@@ -19,19 +26,15 @@
     $: circuitData = $circuitStore; 
     
 
-    /*
+
     $: if (circuitData) {
-        console.log(circuitData)
         circuit = new HeadlessCircuit(circuitData);
-        console.log(circuit.getLabelIndex());
     }
-    */
+
 
     
-    let currentCircuit = new HeadlessCircuit(sampleCircuit); //Test clock->not->output
+    //let currentCircuit = new HeadlessCircuit(sampleCircuit); //Test clock->not->output
     let running = false;
-    let intervalId: any = null;
-    let previousJSON = "";
     
     //For key listener
     function updateRunning()
@@ -76,7 +79,7 @@
     function startSim()
     {
         if (running) {
-            currentCircuit.updateGates();
+            circuit.updateGates();
             setTimeout(startSim, 10);
         }
     }
@@ -101,14 +104,14 @@
         }
         if (event.key === "ArrowRight")
         {
-            currentCircuit.updateGates();
+            circuit.updateGates();
         }
         if (event.key === "ArrowUp")
         {
-            currentCircuit.updateGatesNext();
+            circuit.updateGatesNext();
         }
         //Temp testing stuff disabled
-        /*
+
         if (event.key === "ArrowLeft")
         {
             circuit = new HeadlessCircuit(circuitData);
@@ -116,18 +119,17 @@
             let wires = circuit.getLabelIndex().wires
     
             Object.entries(wires).forEach(wire => {
-                circuit.monitorWire(circuit.findWireByLabel(wire[0]), (tick: number) => wireMonitoring(wire[0], tick));
-            });
+                circuit.monitorWire(circuit.findWireByLabel(wire[0]), (tick: number) => wireMonitoring(wire, tick));
+             });
         }
         if (event.key == "ArrowDown")
         {
             inputSetter();
         }
-        */
+
     });
 
-    //Need to rewrite this to use setInput, changing avec does nothing as it doesnt update
-    /*
+
     function inputSetter()
     {
         let userInput: string | null;
@@ -136,20 +138,15 @@
         {
             userInput = "";
         }
-        console.log(circuit.getLabelIndex().devices[userInput].attributes.outputSignals.out._avec[0]);
-        console.log(circuit.getLabelIndex().devices[userInput].attributes.outputSignals.out._bvec[0]);
-        circuit.getLabelIndex().devices[userInput].attributes.outputSignals.out._avec[0] = 1;
-        circuit.getLabelIndex().devices[userInput].attributes.outputSignals.out._bvec[0] = 1;
-        console.log(circuit.getLabelIndex().devices[userInput].attributes.outputSignals.out._avec[0]);
-        console.log(circuit.getLabelIndex().devices[userInput].attributes.outputSignals.out._bvec[0]);
-        circuit.synchronize();
+        //console.log("oneBit size:", oneBit.bits);
+        circuit.setInput(userInput, oneBit);
     }
-    */
-    
+    /* 
     let wires = currentCircuit.getLabelIndex().wires
     
     Object.entries(wires).forEach(wire => {
         currentCircuit.monitorWire(currentCircuit.findWireByLabel(wire[0]), (tick: number) => wireMonitoring(wire, tick));
     });
+    */
     
     </script>

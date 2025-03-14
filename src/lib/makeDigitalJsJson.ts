@@ -25,7 +25,7 @@ function makeButton(nodeName: string, options?: { bits: number, net: string, lab
         type: "Button",
         label: options?.label || nodeName,
         net: options?.net || nodeName,
-        bits: options?.bits || 0,
+        bits: options?.bits || 1,
 
     };
 }
