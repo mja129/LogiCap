@@ -59,9 +59,9 @@
     }
 
     // Subscribe to circuitStore changes
-    circuitStore.subscribe((currentCircuit) => {
-        console.log(currentCircuit)
-    })
+    // circuitStore.subscribe((currentCircuit) => {
+    //     console.log(currentCircuit)
+    // })
 </script>
 
 <main>
