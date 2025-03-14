@@ -11,6 +11,7 @@
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
     type portNames = `in${number}` | 'out' | 'in' | ''
+
     let {
         location = ['left', 'top'],
         id,
@@ -22,6 +23,8 @@
         io: 'input' | 'output'
         offset?: [number, number] | []
     } = $props()
+
+    let wireName = $state('No connection')
 
     // TODO: deciding the port name should be done with a map and in a more generic way instead of an if statement.
     // Typescript could do some styff.
@@ -77,7 +80,8 @@
             nodeId={id}
             {anchorId}
             {hovering}
+            bind:wireName
         />
-        <CustomWire slot="edge" />
+        <CustomWire wireId={wireName} sourceAnchorId={anchorId} slot="edge" />
     </Anchor>
 </div>

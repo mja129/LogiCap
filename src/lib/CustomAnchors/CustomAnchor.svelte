@@ -3,6 +3,7 @@
         handleLinkAnchorConnection,
         handleUnlinkAnchorConnection,
     } from '../circuitStore'
+    import CustomWire from './CustomWire.svelte'
 
     let {
         linked,
@@ -10,6 +11,7 @@
         connecting,
         portName,
         nodeId,
+        wireName = $bindable(),
         anchorId,
         io = 'input',
     }: {
@@ -19,6 +21,7 @@
         portName: string
         nodeId: string
         anchorId: string
+        wireName: string
         io?: string
     } = $props()
 
@@ -91,6 +94,8 @@
     function createGlobalConnection(sourceClass: string, destClass: string) {
         const [port, nodeType, uuid] = sourceClass.split('_')
         const [portD, nodeTypeD, uuidD] = destClass.split('_')
+
+        // side effects
         const sourceConnectionJson: any = createConnectionJson(
             `${nodeType}_${uuid}`,
             port
@@ -118,6 +123,7 @@
                 name: `${wireId}`,
             }
         }
+        wireName = wireId
         handleLinkAnchorConnection(connector)
     }
 
