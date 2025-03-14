@@ -1,6 +1,6 @@
 <script lang="ts">
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
-    import { circuitStore } from '../lib/circuitStore';
+    import { circuitStore } from './circuitStore.ts'
     import sampleCircuit from '../assets/CircuitJsonSampleData/testcircuit.json'
 
     Object.defineProperty(HeadlessCircuit.prototype, "running", {
