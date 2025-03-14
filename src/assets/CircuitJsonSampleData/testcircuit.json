@@ -28,7 +28,7 @@
               "id": "dev2",
               "port": "out"
             },
-            "name": "clk"
+            "name": "Clock2Not"
           },
           {
             "to": {
@@ -39,7 +39,7 @@
               "id": "dev0",
               "port": "out"
             },
-            "name": "connect"
+            "name": "Not2Display"
           }
     ],
     "subcircuits": {}
