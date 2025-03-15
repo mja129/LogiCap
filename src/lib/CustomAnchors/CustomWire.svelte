@@ -3,10 +3,8 @@
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
     import { circuitStore } from '../circuitStore.ts'
 
-    let {
-        sourceAnchorId,
-        wireId = 'default-edge-name',
-    }: { sourceAnchorId: string; wireId?: string } = $props()
+    let { sourceAnchorId, wireId }: { sourceAnchorId: string; wireId: string } =
+        $props()
 
     // it won't have a name until the connection is fully made.
     let wireActive: number = $state(-1)
@@ -14,6 +12,10 @@
 
     // I need to find when, wire is created and connection is also created.
     console.log('WIRE CREATED FROM: ' + sourceAnchorId)
+
+    // the color of the anchor should start at blue,
+    // if it gets set from null -> something, that's okay
+    // if it goes from something -> -1, keep it the same. the circuit.
 
     // circuit.findWireByLabel(wire[0])
     // circuit.monitorWire(
@@ -37,6 +39,7 @@
             console.log(
                 `${wire.attributes.netname} has changed signal to ${logicValue} at tick ${tick}`
             )
+            wireActive = logicValue
             return logicValue
         }
     }
@@ -52,6 +55,11 @@
                 circuit.findWireByLabel(wireId),
                 (tick: number) => wireMonitoring(currWire, tick)
             )
+        }
+    })
+    document.addEventListener('keydown', (event: any) => {
+        if (event.key === 'Enter') {
+            circuit.updateGatesNext()
         }
     })
 </script>

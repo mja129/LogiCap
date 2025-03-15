@@ -1,7 +1,6 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
     import { Svelvet, Minimap } from 'svelvet'
-    import type { Component } from 'svelte'
 
     import { circuitStore } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
@@ -14,6 +13,7 @@
         logicGateTypes,
     } from './lib/circuitModel'
     import { deviceFactoryMap } from './lib/makeDigitalJsJson'
+    import SimMenu from './lib/SimMenu.svelte'
 
     // console.log(currentCircuit.start())
     // this happens on every connection
@@ -69,6 +69,7 @@
     <!-- svelte-ignore svelte_component_deprecated -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <!-- svelte-ignore event_directive_deprecated -->
+    <SimMenu />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         {#each Object.entries(currentDevicesData) as [nodeId, device]}

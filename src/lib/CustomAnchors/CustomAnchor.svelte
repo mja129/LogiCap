@@ -123,8 +123,10 @@
                 name: `${wireId}`,
             }
         }
-        wireName = wireId
+        // nodeMap[nodeName] = connectionMap[outputAnchorName]
         handleLinkAnchorConnection(connector)
+        // side effect
+        wireName = wireId
     }
 
     function checkDestLinked(
@@ -136,6 +138,13 @@
         // @ts-ignore
         const destAnchorLinked = eventClassList.contains('linked')
 
+        console.log(
+            sourceClassName === null
+                ? 'Source Class is null'
+                : destClassName === null
+                  ? 'DestClass Is null'
+                  : 'both are not null'
+        )
         if (sourceClassName !== null && destClassName !== null) {
             const validLinking = checkIOMatch(sourceClassName, destClassName)
             if (destAnchorLinked) {
@@ -166,6 +175,8 @@
                     `attempted to link two anchors of the same type: linking invalid: ${validLinking}`
                 )
                 return validLinking
+            } else {
+                console.warn('LJDLKFDJFLKDSJFKLD')
             }
         } else {
             console.warn('dropped edge on canvas most likely')
@@ -190,6 +201,9 @@
     $effect(() => {
         // Create event listener for mouse down with useCapture
         if (connecting) {
+            if (io === 'input') {
+                console.log('Started connecting an input')
+            }
             const handleMouseUp = (e: any) => {
                 // anchor dropped on source.
                 // create a click listener
@@ -210,7 +224,7 @@
                         handleStickyConnect,
                         true
                     ) // create a on click useCapture click listener, on that listener, run findAnchorTargetClass(e.target.classList) name on the click target
-                } else if (sourceAnchorClass != null) {
+                } else if (sourceAnchorClass !== null) {
                     const validateLinking = checkDestLinked(
                         e.target.classList, // where mouse up happened
                         anchorId // the node that created these listeners.
@@ -247,12 +261,13 @@
     class:linked
     class:hovering
     class:connecting
-    onmousedowncapture={() => {
-        if (linked && io === 'input') {
-            // unlink(nodeId, portName)
-        }
-    }}
 ></div>
+
+<!-- onmousedowncapture={() => {
+        // if (linked && io === 'input') {
+        //     // unlink(nodeId, portName)
+        // }
+    }} -->
 
 <style>
     .custom_anchor {
