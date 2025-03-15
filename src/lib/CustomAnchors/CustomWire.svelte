@@ -1,7 +1,8 @@
 <script lang="ts">
     import { Edge } from 'svelvet'
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
-    import { circuitStore } from '../circuitStore.ts'
+    import { wireSignals, addMonitor, circuitEngine } from '../TestEngine.ts'
+    import { get } from 'svelte/store'
 
     let { sourceAnchorId, wireId }: { sourceAnchorId: string; wireId: string } =
         $props()
@@ -13,69 +14,28 @@
     // I need to find when, wire is created and connection is also created.
     console.log('WIRE CREATED FROM: ' + sourceAnchorId)
 
-    // the color of the anchor should start at blue,
-    // if it gets set from null -> something, that's okay
-    // if it goes from something -> -1, keep it the same. the circuit.
-
     // circuit.findWireByLabel(wire[0])
     // circuit.monitorWire(
     //     circuit.findWireByLabel(wire[0]),
     //     (tick: number) => wireMonitoring(wire, tick)
     // )
 
-    function wireMonitoring(wire: any, tick: number) {
-        let logicValue: number
-        console.log(wire)
-        //console.log(wire)
-        if (wire.attributes.signal) {
-            if (
-                wire.attributes.signal._avec[0] ==
-                wire.attributes.signal._bvec[0]
-            ) {
-                logicValue = wire.attributes.signal._avec[0]
-            } else {
-                logicValue = -1
-            }
-            console.log(
-                `${wire.attributes.netname} has changed signal to ${logicValue} at tick ${tick}`
-            )
-            wireActive = logicValue
-            return logicValue
-        }
-    }
+    wireSignals.subscribe((signal) => {
+        wireActive = signal[wireId]
+    })
 
-    let circuit: HeadlessCircuit = $derived(new HeadlessCircuit($circuitStore))
-
-    $inspect(circuit).with(console.log)
     $effect(() => {
+        if (circuitEngine == null) {
+            return
+        }
         if (wireId !== 'No connection') {
             console.log(`Connection made with name ${wireId}`)
-            let currWire: any = circuit.findWireByLabel(wireId)
-            circuit.monitorWire(
-                circuit.findWireByLabel(wireId),
-                (tick: number) => wireMonitoring(currWire, tick)
-            )
-        }
-    })
-    document.addEventListener('keydown', (event: any) => {
-        if (event.key === 'Enter') {
-            circuit.updateGatesNext()
+            addMonitor(wireId)
         }
     })
 </script>
 
-<Edge
-    let:path
-    let:destroy
-    label={wireId}
-    edgeClick={() => {
-        if (wireActive === -1) {
-            wireActive = 0
-        } else {
-            wireActive = wireActive === 0 ? 1 : 0
-        }
-    }}
->
+<Edge let:path let:destroy>
     <path
         d={path}
         class={wireActive === -1 ? '' : wireActive === 1 ? 'on' : 'off'}

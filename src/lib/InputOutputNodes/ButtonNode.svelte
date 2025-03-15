@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Node } from 'svelvet'
     import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
+    import { inputSetter } from '../testEngine'
 
     let {
         width = 80,
@@ -57,6 +58,7 @@
                 e.preventDefault()
                 e.stopImmediatePropagation()
                 signalOn = !signalOn
+                inputSetter(nodeId)
             }}
             cx="50"
             cy="50"

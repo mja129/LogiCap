@@ -4,19 +4,45 @@
     import UpdateGatesIcon from '~icons/streamline/interface-arrows-synchronize-arrows-loading-load-sync-synchronize-arrow-reload'
     import PauseTickIcon from '~icons/streamline/button-pause-2'
     import ResetStateIcon from '~icons/streamline/entertainment-control-button-next-button-television-buttons-movies-skip-next-video-controls'
+    import {
+        toggleSimulation,
+        updateNext,
+        updateTick,
+        currentTick,
+    } from './TestEngine'
 
     let { simulationPlaying = false }: { simulationPlaying?: boolean } =
         $props()
+
+    function runSimulation(
+        event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+    ) {
+        toggleSimulation(10)
+    }
+
+    function updateGatesNext(
+        event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+    ) {
+        updateNext()
+    }
+    function updateGates(
+        event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+    ) {
+        updateTick()
+    }
 </script>
 
 <div class="menuRunButtons">
     <button>
         <ResetStateIcon width={40} />
     </button>
-    <button>
+    <button on:click={updateGatesNext}>
         <UpdateGatesNextIcon style="transform:scale(2);" width={50} />
     </button>
-    <button style="display:flex;align-items: center;padding-block:1px;">
+    <button
+        on:click={runSimulation}
+        style="display:flex;align-items: center;padding-block:1px;"
+    >
         <div>
             {#if true}
                 <!-- content here -->
@@ -25,9 +51,9 @@
                 <PauseTickIcon width={35} />
             {/if}
         </div>
-        <p id="tickNumber">0321gdgfd</p>
+        <p id="tickNumber">{$currentTick}</p>
     </button>
-    <button>
+    <button on:click={updateGates}>
         <UpdateGatesIcon width={40} />
     </button>
 </div>

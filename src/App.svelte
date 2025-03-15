@@ -6,7 +6,7 @@
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
-    import TestEngine from './lib/TestEngine.svelte'
+    import { toggleSimulation, updateTick, updateNext } from './lib/testEngine'
     import SimNode from './lib/SimNode.svelte'
     import type {
         dualInputLogicTypes,
@@ -62,6 +62,27 @@
     // circuitStore.subscribe((currentCircuit) => {
     //     console.log(currentCircuit)
     // })
+
+    window.addEventListener('keydown', (event) => {
+        /*
+        Runs simulation at 10ms per tick
+        */
+        if (event.key === 'r') {
+            toggleSimulation(10)
+        }
+        /*
+        Moves one tick forward in the simulation
+        */
+        if (event.key === 'ArrowRight') {
+            updateTick()
+        }
+        /*
+        Moves one event forward (next signal change) in the simulation
+        */
+        if (event.key === 'ArrowUp') {
+            updateNext()
+        }
+    })
 </script>
 
 <main>
@@ -88,7 +109,6 @@
             <!-- content here -->
         {/each}
     </Svelvet>
-    <TestEngine></TestEngine>
 </main>
 
 <style>

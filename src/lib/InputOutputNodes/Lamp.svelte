@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Node } from 'svelvet'
     import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
+    import { wireSignals } from '../testEngine'
 
     let {
         width = 80,
@@ -21,6 +22,21 @@
         outlineColor: signalOn ? 'var(--lime-green)' : 'var(--lime-red)',
     })
     // Define a new device
+
+    wireSignals.subscribe((signal) => {
+        let matchingWire = Object.keys(signal).find((wireId) =>
+            wireId.includes(nodeId)
+        )
+        if (matchingWire) {
+            if (signal[matchingWire] == 1) {
+                signalOn = true
+            } else {
+                signalOn = false
+            }
+        } else {
+            signalOn = false
+        }
+    })
 </script>
 
 <!-- cursor = drop -->
