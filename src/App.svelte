@@ -6,7 +6,11 @@
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
-    import { toggleSimulation, updateTick, updateNext } from './lib/testEngine'
+    import {
+        toggleSimulation,
+        updateTick,
+        updateNext,
+    } from './lib/circuitEngine.svelte.ts'
     import SimNode from './lib/SimNode.svelte'
     import type {
         dualInputLogicTypes,

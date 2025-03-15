@@ -9,7 +9,7 @@
         updateNext,
         updateTick,
         currentTick,
-    } from './TestEngine'
+    } from './circuitEngine.svelte'
 
     let { simulationPlaying = false }: { simulationPlaying?: boolean } =
         $props()

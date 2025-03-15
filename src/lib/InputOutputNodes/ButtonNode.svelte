@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Node } from 'svelvet'
     import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
-    import { inputSetter } from '../testEngine'
+    import { inputSetter } from '../circuitEngine.svelte'
 
     let {
         width = 80,

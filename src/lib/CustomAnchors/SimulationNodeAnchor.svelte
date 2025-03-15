@@ -24,7 +24,28 @@
         offset?: [number, number] | []
     } = $props()
 
-    let wireName = $state('No connection')
+    function onWireChange(
+        wireId: string,
+        wire: any,
+        tick: number,
+        changeWireValue: () => {}
+    ) {
+        let logicValue: number
+        if (wire.attributes.signal) {
+            if (
+                wire.attributes.signal._avec[0] ==
+                wire.attributes.signal._bvec[0]
+            ) {
+                logicValue = wire.attributes.signal._avec[0]
+            } else {
+                logicValue = -1
+            }
+            console.log(
+                `${wireId} has changed signal to ${logicValue} at tick ${tick}`
+            )
+            changeWireValue()
+        }
+    }
 
     // TODO: deciding the port name should be done with a map and in a more generic way instead of an if statement.
     // Typescript could do some styff.
@@ -45,10 +66,14 @@
     }
     const anchorId = `${portName}_${id}`
 
+    let wireName = $state('No Connection')
     // get state of linked node from child via closure function
     // I would like to make this and CustomAnchor one file, especially because all of the connection logic is in the child
     // But I cant get the let:linked into the outtermost scope of this file, Im not quite sure why.
     // to figure out how to make this one component, I need to figure out how the 'let:' directive works
+    let connectingMirror: boolean = $state(true)
+
+    $inspect(connectingMirror).with(console.warn)
 </script>
 
 <!--
@@ -75,6 +100,7 @@
         <CustomAnchor
             {io}
             {connecting}
+            bind:connectingMirror
             {linked}
             {portName}
             nodeId={id}
@@ -82,6 +108,11 @@
             {hovering}
             bind:wireName
         />
-        <CustomWire wireId={wireName} sourceAnchorId={anchorId} slot="edge" />
+        <CustomWire
+            wireId={wireName}
+            sourceAnchorId={anchorId}
+            slot="edge"
+            connecting={connectingMirror}
+        />
     </Anchor>
 </div>

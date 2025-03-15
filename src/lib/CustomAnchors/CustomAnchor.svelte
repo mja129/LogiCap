@@ -9,6 +9,7 @@
         linked,
         hovering,
         connecting,
+        connectingMirror = $bindable(),
         portName,
         nodeId,
         wireName = $bindable(),
@@ -18,6 +19,7 @@
         linked: boolean
         hovering: boolean
         connecting: boolean
+        connectingMirror: boolean
         portName: string
         nodeId: string
         anchorId: string
@@ -125,8 +127,7 @@
         }
         // nodeMap[nodeName] = connectionMap[outputAnchorName]
         handleLinkAnchorConnection(connector)
-        // side effect
-        wireName = wireId
+        return wireId
     }
 
     function checkDestLinked(
@@ -138,50 +139,55 @@
         // @ts-ignore
         const destAnchorLinked = eventClassList.contains('linked')
 
-        console.log(
-            sourceClassName === null
-                ? 'Source Class is null'
-                : destClassName === null
-                  ? 'DestClass Is null'
-                  : 'both are not null'
-        )
-        if (sourceClassName !== null && destClassName !== null) {
-            const validLinking = checkIOMatch(sourceClassName, destClassName)
-            if (destAnchorLinked) {
-                // fires when destination is already linked
-                if (destClassName.substring(0, 2) === 'in') {
-                    console.warn(
-                        `trying to connect to an input that has already been connected to: bad_input_already_linked`
-                    )
-                    return 'bad_input_already_linked'
-                } else if (destClassName.substring(0, 3) === 'out') {
-                    console.log(
-                        `valid linking from ${sourceClassName} to ${destClassName}`
-                    )
-                    createGlobalConnection(sourceClassName, destClassName)
-                    return 'good_dual_output'
-                }
+        if (sourceClassName === null) {
+            console.warn(
+                'sourceClassName is for a linking is null, this should be impossible'
+            )
+            return 'impossible'
+        }
+
+        let validLinking = 'bad'
+        if (destClassName !== null) {
+            validLinking = checkIOMatch(sourceClassName, destClassName)
+            if (destAnchorLinked && destClassName.substring(0, 2) === 'in') {
+                // fires when destination is an input and is already linked
+                console.warn(
+                    `trying to connect to an input that has already been connected to: bad_input_already_linked`
+                )
+                validLinking = 'bad_input_already_linked'
+            } else if (
+                destAnchorLinked &&
+                destClassName.substring(0, 3) === 'out'
+            ) {
+                // fires when destination is an output and is already linked.
+                console.log(
+                    `valid linking from ${sourceClassName} to ${destClassName}`
+                )
+                validLinking = 'good_multiple_outputs'
             } else if (validLinking === 'good') {
                 // fires on valid linking
                 console.log(
                     `valid linking from ${sourceClassName} to ${destClassName}`
                 )
-                createGlobalConnection(sourceClassName, destClassName)
-
-                return 'good'
+                validLinking = 'good'
             } else if (validLinking !== 'good') {
                 // fires when both are input or both are output
                 console.warn(
                     `attempted to link two anchors of the same type: linking invalid: ${validLinking}`
                 )
-                return validLinking
-            } else {
-                console.warn('LJDLKFDJFLKDSJFKLD')
+                validLinking = validLinking // this doesn't do anything, but its more explicit.
             }
         } else {
             console.warn('dropped edge on canvas most likely')
             return 'bad_invalid_drop'
         }
+
+        if (validLinking.startsWith('good')) {
+            connectingMirror = false
+            let wireId = createGlobalConnection(sourceClassName, destClassName)
+            wireName = wireId
+        }
+        return validLinking
     }
     const makeStickyConnectHandler = (anchorClass: string) => {
         function handleStickyConnect(event: any) {

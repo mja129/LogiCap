@@ -1,18 +1,31 @@
 <script lang="ts">
     import { Edge } from 'svelvet'
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
-    import { wireSignals, addMonitor, circuitEngine } from '../TestEngine.ts'
+    import {
+        wireSignals,
+        circuitEngine,
+        wireMonitoring,
+        onWireChange,
+    } from '../circuitEngine.svelte.ts'
     import { get } from 'svelte/store'
 
-    let { sourceAnchorId, wireId }: { sourceAnchorId: string; wireId: string } =
-        $props()
+    let {
+        sourceAnchorId,
+        wireId,
+        connecting = $bindable(),
+    }: {
+        sourceAnchorId: string
+        wireId: string
+        connecting: boolean
+    } = $props()
 
     // it won't have a name until the connection is fully made.
     let wireActive: number = $state(-1)
+    let wireListener: any = $state()
     // color is black until there is some signal going through it.
 
     // I need to find when, wire is created and connection is also created.
-    console.log('WIRE CREATED FROM: ' + sourceAnchorId)
+    $inspect(connecting).with(console.warn)
 
     // circuit.findWireByLabel(wire[0])
     // circuit.monitorWire(
@@ -20,26 +33,34 @@
     //     (tick: number) => wireMonitoring(wire, tick)
     // )
 
-    wireSignals.subscribe((signal) => {
-        wireActive = signal[wireId]
-    })
+    // wireSignals.subscribe((signal) => {
+    //     wireActive = signal[wireId]
+    // })
 
     $effect(() => {
-        if (circuitEngine == null) {
-            return
-        }
-        if (wireId !== 'No connection') {
-            console.log(`Connection made with name ${wireId}`)
-            addMonitor(wireId)
+        if (!connecting && wireId == 'No Connection') {
+            console.log('wire should be connected but wireID is ' + wireId)
+        } else if (wireId !== 'No Connection') {
+            // console.log('CONNECTION CREATED')
+            let curWir: any = circuitEngine?.findWireByLabel(wireId)
+            circuitEngine?.monitorWire(curWir, (tick: number) => {
+                let wireChange = onWireChange(wireId, curWir, tick)
+                console.log('wireChanged: ' + wireChange)
+                wireActive = wireChange
+            })
+
+            console.log(wireId)
         }
     })
 </script>
 
 <Edge let:path let:destroy>
-    <path
-        d={path}
-        class={wireActive === -1 ? '' : wireActive === 1 ? 'on' : 'off'}
-    />
+    {#key wireActive}
+        <path
+            d={path}
+            class={wireActive === -1 ? '' : wireActive === 1 ? 'on' : 'off'}
+        />
+    {/key}
 </Edge>
 
 <style>
@@ -62,10 +83,10 @@
     }
 
     .on {
-        stroke: green;
+        stroke: green !important;
         /* background-color: red; */
     }
     .off {
-        stroke: red;
+        stroke: red !important;
     }
 </style>
