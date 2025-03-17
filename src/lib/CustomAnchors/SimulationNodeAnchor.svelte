@@ -7,6 +7,7 @@
     } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     import CustomWire from './CustomWire.svelte'
+    import { writable, type Writable } from 'svelte/store'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
@@ -66,14 +67,13 @@
     }
     const anchorId = `${portName}_${id}`
 
-    let wireName = $state('No Connection')
     // get state of linked node from child via closure function
     // I would like to make this and CustomAnchor one file, especially because all of the connection logic is in the child
     // But I cant get the let:linked into the outtermost scope of this file, Im not quite sure why.
     // to figure out how to make this one component, I need to figure out how the 'let:' directive works
     let connectingMirror: boolean = $state(true)
 
-    $inspect(connectingMirror).with(console.warn)
+    // $inspect(connectingMirror).with(console.warn)
 </script>
 
 <!--
@@ -106,10 +106,8 @@
             nodeId={id}
             {anchorId}
             {hovering}
-            bind:wireName
         />
         <CustomWire
-            wireId={wireName}
             sourceAnchorId={anchorId}
             slot="edge"
             connecting={connectingMirror}

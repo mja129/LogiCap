@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { lastConnected } from '../circuitEngine.svelte'
     import {
         handleLinkAnchorConnection,
         handleUnlinkAnchorConnection,
@@ -12,7 +13,6 @@
         connectingMirror = $bindable(),
         portName,
         nodeId,
-        wireName = $bindable(),
         anchorId,
         io = 'input',
     }: {
@@ -23,7 +23,6 @@
         portName: string
         nodeId: string
         anchorId: string
-        wireName: string
         io?: string
     } = $props()
 
@@ -110,8 +109,8 @@
         // make sure that it is in the right order, From -> to
         let wireId: string | null = null
         let connector: any = null
+        wireId = destClass + '-' + sourceClass
         if (port.startsWith('in')) {
-            wireId = destClass + '-' + sourceClass
             connector = {
                 ...destConnectionJson,
                 ...sourceConnectionJson,
@@ -160,15 +159,9 @@
                 destClassName.substring(0, 3) === 'out'
             ) {
                 // fires when destination is an output and is already linked.
-                console.log(
-                    `valid linking from ${sourceClassName} to ${destClassName}`
-                )
                 validLinking = 'good_multiple_outputs'
             } else if (validLinking === 'good') {
                 // fires on valid linking
-                console.log(
-                    `valid linking from ${sourceClassName} to ${destClassName}`
-                )
                 validLinking = 'good'
             } else if (validLinking !== 'good') {
                 // fires when both are input or both are output
@@ -184,8 +177,13 @@
 
         if (validLinking.startsWith('good')) {
             connectingMirror = false
+            console.log(
+                `valid linking from ${sourceClassName} to ${destClassName}`
+            )
             let wireId = createGlobalConnection(sourceClassName, destClassName)
-            wireName = wireId
+
+            // TODO: Add the linking to the headless circuit graph.
+            $lastConnected = wireId
         }
         return validLinking
     }

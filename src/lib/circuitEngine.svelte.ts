@@ -7,14 +7,16 @@ import { writable, get, type Writable } from 'svelte/store';
 let oneBit: Vector3vl = Vector3vl.ones(1);
 let zeroBit: Vector3vl = Vector3vl.zeros(1);
 
-export let circuitEngine: HeadlessCircuit | null = null; //The null might be a little schizo
+export let circuitEngine: Writable<HeadlessCircuit | null> = writable<HeadlessCircuit | null>(null); //The null might be a little schizo
 export let running: boolean = false;
 export let monitoredWires: Set<string> = new Set() //For reupping on change
+export let lastConnected: Writable<string> = writable("First Connection")
 
-// RESP: Nah this is perfect.
-export let currentTick = writable<number>(0) //This is legit just for the display, if theres a better way to do this tell me
+// Naurr
 export let wireSignals = writable<Record<string, number>>({}); //Wire signal store
 
+// there is.
+export let currentTick = writable<number>(0) //This is legit just for the display, if theres a better way to do this tell me
 
 Object.defineProperty(HeadlessCircuit.prototype, "running", {
     get() {
@@ -43,14 +45,19 @@ export function toggleSimulation(tickRate: number) {
     if (!running) {
         console.log("Simulation Started")
         running = true;
+        if (get(circuitEngine) === null) {
+            console.log(get(circuitStore));
+            circuitEngine.set(new HeadlessCircuit(get(circuitStore)))
+            // circuitStore.subscribe((currCircuit) => {
+            //     circuitEngine = new HeadlessCircuit()
+            // })
+        }
         start(tickRate)
     }
     else {
         console.log("Simulation Stopped")
         running = false;
     }
-
-
 }
 
 /*
@@ -58,18 +65,16 @@ export function toggleSimulation(tickRate: number) {
 */
 function start(tickRate: number) {
     // you shouldn't ever run this function when running is false.
-    // if (running === false) {
-    //     return;
-    // }
-    if (circuitEngine === null) {
-        console.log(get(circuitStore));
-        circuitEngine = new HeadlessCircuit(get(circuitStore))
-        // circuitStore.subscribe((currCircuit) => {
-        //     circuitEngine = new HeadlessCircuit()
-        // })
+    if (running === false) {
+        return;
     }
-    circuitEngine.updateGates()
-    currentTick.set(circuitEngine.tick);
+    const currEngine: HeadlessCircuit | null = get(circuitEngine)
+    if (currEngine === null) {
+        console.log("impossible");
+        return
+    }
+    currEngine.updateGates()
+    currentTick.set(currEngine.tick);
     setTimeout(() => start(tickRate), tickRate);
 }
 
@@ -89,7 +94,6 @@ function start(tickRate: number) {
 
 export function onWireChange(wireId: string, wire: any, tick: number) {
     let logicValue: number
-    console.log(wire)
     if (wire.attributes.signal) {
         if (
             wire.attributes.signal._avec[0] ==
@@ -131,8 +135,13 @@ export function updateTick() {
         console.log("Circuit is null")
         return;
     }
-    circuitEngine.updateGates();
-    currentTick.set(circuitEngine.tick);
+    const currEngine: HeadlessCircuit | null = get(circuitEngine)
+    if (currEngine === null) {
+        console.log("impossible");
+        return
+    }
+    currEngine.updateGates();
+    currentTick.set(currEngine.tick);
 }
 
 export function updateNext() {
@@ -140,8 +149,13 @@ export function updateNext() {
         console.log("Circuit is null")
         return;
     }
-    circuitEngine.updateGatesNext();
-    currentTick.set(circuitEngine.tick);
+    const currEngine: HeadlessCircuit | null = get(circuitEngine)
+    if (currEngine === null) {
+        console.log("impossible");
+        return
+    }
+    currEngine.updateGatesNext();
+    currentTick.set(currEngine.tick);
 }
 
 
@@ -154,11 +168,17 @@ export function inputSetter(inputName: string) {
         console.log("Circuit is null")
         return;
     }
-    currentSig = circuitEngine.getLabelIndex().devices[inputName].attributes.outputSignals.out._avec[0];
+
+    const currEngine: HeadlessCircuit | null = get(circuitEngine)
+    if (currEngine === null) {
+        console.log("impossible");
+        return
+    }
+    currentSig = currEngine.getLabelIndex().devices[inputName].attributes.outputSignals.out._avec[0];
     if (currentSig == 1) {
-        circuitEngine.setInput(inputName, zeroBit);
+        currEngine.setInput(inputName, zeroBit);
     }
     else {
-        circuitEngine.setInput(inputName, oneBit);
+        currEngine.setInput(inputName, oneBit);
     }
 }
