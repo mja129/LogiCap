@@ -1,6 +1,6 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
-    import { Svelvet, Minimap } from 'svelvet'
+    import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
     import { circuitStore } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
@@ -97,6 +97,7 @@
     <SimMenu />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
+        <ThemeToggle main="dark" corner="SE" alt="light" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device]}
             <!-- svelte-ignore svelte_component_deprecated -->
             <SimNode
