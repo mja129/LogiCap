@@ -30,6 +30,30 @@
 }
 
 :root {
+    --purple: #9b5de5;
+    --lilac: #b0b5ed;
+    --dark-purple: #8a41e1;
+    --neon-purple: #747bff;
+    --cyan: #00f5d4;
+    --pink: #f15bb5;
+    --pastel-pink: #fce6f3;
+    --pastel-cyan: #d7fef9;
+    /* --pastel-purple: #e5d6f8; */
+    --pastel-purple: #e1d3f8;
+    --pastel-blue: #d7f5ff;
+    --pastel-green: #d5f0c1;
+    --yellow: #fee440;
+    --light-yellow: rgb(255, 255, 73);
+    --blue: #00bbf9;
+    /*    The dark blue is hella out of place      */
+    --dark-blue: #242652;
+    --cream: #fff0dc;
+    --dark-cream: #ffdbac;
+
+    --lime-green: #aaff75;
+    --lime-red: #ff5f63;
+    --red: #ff073a;
+
     line-height: 1.5;
     font-weight: 400;
 

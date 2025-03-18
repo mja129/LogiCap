@@ -1,13 +1,7 @@
 <script lang="ts">
-    import {
-        Anchor,
-        generateInput,
-        generateOutput,
-        type CSSColorString,
-    } from 'svelvet'
+    import { Anchor } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     import CustomWire from './CustomWire.svelte'
-    import { writable, type Writable } from 'svelte/store'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
@@ -41,9 +35,9 @@
             } else {
                 logicValue = -1
             }
-            console.log(
-                `${wireId} has changed signal to ${logicValue} at tick ${tick}`
-            )
+            // console.log(
+            //     `${wireId} has changed signal to ${logicValue} at tick ${tick}`
+            // )
             changeWireValue()
         }
     }

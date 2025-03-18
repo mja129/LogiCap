@@ -8,12 +8,14 @@
         height = 50,
         nodeStartPos,
         signalOn = false,
+        canvasClicked = false,
         nodeId,
     }: {
         width: number
         height: number
         nodeStartPos: number
         signalOn?: boolean
+        canvasClicked: boolean
         nodeId: string
     } = $props()
 
@@ -22,6 +24,8 @@
         outlineColor: signalOn ? 'var(--lime-green)' : 'var(--lime-red)',
     })
     // Define a new device
+
+    const lampOffset: [number, number] = [-5, 35.43]
 
     wireSignals.subscribe((signal) => {
         let matchingWire = Object.keys(signal).find((wireId) =>
@@ -40,7 +44,7 @@
 </script>
 
 <!-- cursor = drop -->
-<Node drop="cursor" id={nodeId}>
+<Node drop={canvasClicked ? 'cursor' : 'center'} id={nodeId}>
     <svg
         width="85"
         height="65"
@@ -69,7 +73,7 @@
 
     <!-- FEATURE: Make the line draggable around the whole circle  -->
     <SimulationNodeAnchor
-        offset={[-5, 35.43]}
+        offset={lampOffset}
         location={['left', 'mid']}
         id={nodeId}
         io="input"

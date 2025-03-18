@@ -1,7 +1,6 @@
 <script lang="ts">
     import { lastConnected } from '../circuitEngine.svelte'
     import { handleLinkAnchorConnection, removeLinking } from '../circuitStore'
-    import CustomWire from './CustomWire.svelte'
 
     let {
         linked,
@@ -118,8 +117,11 @@
             }
         }
         // nodeMap[nodeName] = connectionMap[outputAnchorName]
-        handleLinkAnchorConnection(connector)
-        return wireId
+        // side effects
+        return {
+            name: wireId,
+            connection: connector,
+        }
     }
 
     function checkDestLinked(
@@ -143,9 +145,9 @@
             validLinking = checkIOMatch(sourceClassName, destClassName)
             if (destAnchorLinked && destClassName.substring(0, 2) === 'in') {
                 // fires when destination is an input and is already linked
-                console.warn(
-                    `trying to connect to an input that has already been connected to: bad_input_already_linked`
-                )
+                // console.warn(
+                //     `trying to connect to an input that has already been connected to: bad_input_already_linked`
+                // )
                 validLinking = 'bad_input_already_linked'
             } else if (
                 destAnchorLinked &&
@@ -158,25 +160,29 @@
                 validLinking = 'good'
             } else if (validLinking !== 'good') {
                 // fires when both are input or both are output
-                console.warn(
-                    `attempted to link two anchors of the same type: linking invalid: ${validLinking}`
-                )
+                // console.warn(
+                //     `attempted to link two anchors of the same type: linking invalid: ${validLinking}`
+                // )
                 validLinking = validLinking // this doesn't do anything, but its more explicit.
             }
         } else {
-            console.warn('dropped edge on canvas most likely')
+            // console.warn('dropped edge on canvas most likely')
             return 'bad_invalid_drop'
         }
 
         if (validLinking.startsWith('good')) {
+            // update bound prop saying if an edge is a connecting edge or a connected edge
+            // this is important because we need to know that it was made.
             connectingMirror = false
-            console.log(
-                `valid linking from ${sourceClassName} to ${destClassName}`
-            )
-            let wireId = createGlobalConnection(sourceClassName, destClassName)
+            // console.log(
+            //     `valid linking from ${sourceClassName} to ${destClassName}`
+            // )
+            const wire: { name: string; connection: any } =
+                createGlobalConnection(sourceClassName, destClassName)
 
-            // TODO: Add the linking to the headless circuit graph.
-            $lastConnected = wireId
+            // side effects
+            $lastConnected = wire.name
+            handleLinkAnchorConnection(wire.connection)
         }
         return validLinking
     }
@@ -184,7 +190,7 @@
         function handleStickyConnect(event: any) {
             event.preventDefault()
             event.stopPropagation()
-            console.log('Click After sticky edge')
+            // console.log('Click After sticky edge')
 
             const validateLinking = checkDestLinked(
                 event.target.classList,
@@ -199,7 +205,7 @@
         // Create event listener for mouse down with useCapture
         if (connecting) {
             if (io === 'input') {
-                console.log('Started connecting an input')
+                // console.log('Started connecting an input')
             }
             const handleMouseUp = (e: any) => {
                 // anchor dropped on source.
@@ -211,7 +217,7 @@
                     sourceAnchorClass != null &&
                     sourceAnchorClass === anchorId
                 ) {
-                    console.log('dropped on source sticky edge')
+                    // console.log('dropped on source sticky edge')
 
                     const handleStickyConnect: (event: any) => void =
                         makeStickyConnectHandler(sourceAnchorClass)
@@ -228,23 +234,13 @@
                     )
                 } else {
                     // not dropped on an anchor, probably the canvas
-                    console.warn('invalid drop location, no linking created.')
+                    // console.warn('invalid drop location, no linking created.')
                 }
 
                 document.removeEventListener('mouseup', handleMouseUp, true)
                 return sourceAnchorClass
             }
             document.addEventListener('mouseup', handleMouseUp, true)
-        }
-
-        // if (linked && (io === 'input' || io === 'output')) {
-        //     link(nodeId, portName)
-        if (connecting && io === 'output') {
-            // also check the variable in the global store, to see if the disconnection is pending or not.
-            // I am not sure yet how we should do disconnection when the output node cannot fire 'connecting'
-            // i.e it has multiple connections to it.
-            // restructuring the connections array could fix this issue.
-            // console.log('disconnecting output from input')
         }
     })
 
@@ -260,6 +256,8 @@
     class:connecting
     onmousedowncapture={() => {
         if (linked && io === 'input') {
+            // make sure we are adding to the end of the list and starting the search from there.
+            // Stack order
             removeLinking(nodeId)
         }
     }}

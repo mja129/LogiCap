@@ -6,11 +6,6 @@
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
-    import {
-        toggleSimulation,
-        updateTick,
-        updateNext,
-    } from './lib/circuitEngine.svelte.ts'
     import SimNode from './lib/SimNode.svelte'
     import type {
         dualInputLogicTypes,
@@ -19,7 +14,6 @@
     import { deviceFactoryMap } from './lib/makeDigitalJsJson'
     import SimMenu from './lib/SimMenu.svelte'
 
-    // console.log(currentCircuit.start())
     // this happens on every connection
     // ON change of global JSON circuit DATA, Run this.
     function generateNonce(length: number = 16): string {
@@ -62,42 +56,34 @@
         newGateCircuitStore(gateType)
     }
 
-    // Subscribe to circuitStore changes
-    // circuitStore.subscribe((currentCircuit) => {
-    //     console.log(currentCircuit)
-    // })
+    // TELEPORT BUG GET FUCKED
+    // try to fix the teleport bug.
+    document.addEventListener('DOMContentLoaded', () => {
+        const canvas = document.querySelector('.svelvet-wrapper')
+        if (canvas) {
+            // Create a MouseEvent with additional options
+            const event = new MouseEvent('mousedown', {
+                bubbles: true,
+                cancelable: true,
+            })
 
-    window.addEventListener('keydown', (event) => {
-        /*
-        Runs simulation at 10ms per tick
-        */
-        if (event.key === 'r') {
-            toggleSimulation(10)
-        }
-        /*
-        Moves one tick forward in the simulation
-        */
-        if (event.key === 'ArrowRight') {
-            updateTick()
-        }
-        /*
-        Moves one event forward (next signal change) in the simulation
-        */
-        if (event.key === 'ArrowUp') {
-            updateNext()
+            // Dispatch the event on the canvas
+            canvas.dispatchEvent(event)
+            const eventUp = new MouseEvent('mouseup', {
+                bubbles: true,
+                cancelable: true,
+            })
+            canvas.dispatchEvent(eventUp)
         }
     })
 </script>
 
 <main>
     <SideMenu createCanvasNode={createGateOnCanvas} />
-    <!-- svelte-ignore svelte_component_deprecated -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- svelte-ignore event_directive_deprecated -->
     <SimMenu />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
-        <ThemeToggle main="dark" corner="SE" alt="light" slot="toggle" />
+        <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device]}
             <!-- svelte-ignore svelte_component_deprecated -->
             <SimNode
@@ -106,6 +92,7 @@
                     gateType: device.type as dualInputLogicTypes,
                     width: 80,
                     height: 50,
+                    canvasClicked: true,
                     nodeId,
                     nodeStartPos: 200,
                     // Add any other specific props your node components need
@@ -120,6 +107,30 @@
     :root {
         --app-bar-height: 50px;
         --main-app-flex-height: calc(100vh - var(--app-bar-height));
+    }
+
+    /*   Hide the svelvet theme toggle button   */
+    :global(button:has(.material-symbols-outlined)) {
+        display: none !important;
+    }
+    :global(.controls-wrapper:has(.save-button)) {
+        left: 360px !important;
+    }
+
+    :global(.save-button) {
+        font-size: 1.5rem;
+        padding-block: 5px !important;
+        padding-inline: 8px !important;
+    }
+    /*   That CSS is kinda sick!!   */
+    :global(.save-button::before) {
+        content: '💾';
+        margin-right: 10px;
+        margin-left: 0px;
+    }
+    :global(.controls-wrapper:has(.save-button):hover) {
+        filter: brightness(140%) !important;
+        /* background-color: red !important; */
     }
     main {
         display: flex;

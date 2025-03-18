@@ -1,13 +1,10 @@
 <script lang="ts">
     import { Edge } from 'svelvet'
-    import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
     import {
         circuitEngine,
         onWireChange,
         lastConnected,
     } from '../circuitEngine.svelte.ts'
-    import { get } from 'svelte/store'
-    import LogicGate from '../LogicGates/LogicGate.svelte'
 
     let {
         sourceAnchorId,
@@ -46,40 +43,6 @@
         }
     }
 
-    // $effect(() => {
-    //     if (!connecting && wireId == 'No Connection') {
-    //         console.log('wire should be connected but wireID is ' + wireId)
-    //     } else if (wireId !== 'No Connection') {
-    //         // console.log('CONNECTION CREATED')
-    //         if (!circuitEngine) {
-    //             // This should never be true, we should create
-    //             // the headless circuit and add gates to it on drop in app.svelte
-    //             // and create the links on line 189
-    //         }
-
-    //         // listen for global circuit change.
-    //         // make or remove listeners when this happens
-    //         // listen for circuitEngine change.
-    //         let curWir = $circuitEngine?.findWireByLabel(wireId)
-    //         if (!curWir) {
-    //             curWir = $circuitEngine?.findWireByLabel(wireId)
-    //         }
-    //         // monitorFn = () =>
-    //         //     $circuitEngine?.monitorWire(curWir, (tick: number) => {
-    //         //         let wireChange = onWireChange(wireId, curWir, tick)
-    //         //         console.log('wireChanged: ' + wireChange)
-    //         //         return wireChange
-    //         //     })
-
-    //         console.log(wireId)
-    //     }
-    // })
-    // could subscribe for connectors updates
-    // could subscribe for changes in global headlessCircuit.
-    // yes subscribe for changes in global headlessCircuit.
-    // unmonitor would be a good thing to do
-    // instead of unmonitor, what if I just replace the function that is monitoring.
-
     const setWire = (wireChange: number) => (wireActive = wireChange)
 
     circuitEngine.subscribe(
@@ -92,12 +55,12 @@
             // this isn't really a thing anymore
             // but we need to beware of the "connecTING node" vs the "connecTED node"
             if (wireId === 'No Connection') {
-                console.warn(
-                    "Wire that you tried to create a listener for is 'no connection'"
-                )
+                // console.warn(
+                //     "Wire that you tried to create a listener for is 'no connection'"
+                // )
                 return
             } else if (!digitalJsCircuit) {
-                console.warn('digital js circuit is null on subscribe')
+                // console.warn('digital js circuit is null on subscribe')
                 return
             }
 
@@ -111,13 +74,13 @@
             monitorFn = async () =>
                 await digitalJsCircuit.monitorWire(curWir, (tick: number) => {
                     let wireChange = onWireChange(wireId, curWir, tick)
-                    console.log('wireChanged: ' + wireChange)
+                    // console.log('wireChanged: ' + wireChange)
                     // you could get the callback result out of the return of this
                     // function and await in the await block below.
                     setWire(wireChange)
                 })
 
-            console.log('function created')
+            // console.log('function created')
         } // circuit engine should change when...
         // going from started to stopped
         // making a new link? (yes for now)

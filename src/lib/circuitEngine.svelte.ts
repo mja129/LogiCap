@@ -116,9 +116,9 @@ export function onWireChange(wireId: string, wire: any, tick: number) {
         } else {
             logicValue = -1
         }
-        console.log(
-            `${wireId} has changed signal to ${logicValue} at tick ${tick}`
-        )
+        // console.log(
+        //     `${wireId} has changed signal to ${logicValue} at tick ${tick}`
+        // )
         return logicValue
     }
     return -1

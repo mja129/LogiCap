@@ -11,6 +11,13 @@
     import xnorGate from '../../assets/svg/xnorgate.svg'
     import type { dualInputLogicTypes, logicGateTypes } from '../circuitModel'
 
+    type LogicGateAnchors = 'in1' | 'in2' | 'out'
+    const logicGateAnchorOffsets: Record<LogicGateAnchors, [number, number]> = {
+        in1: [-7.5, 68.5],
+        in2: [-7.5, 7.5],
+        out: [100, 37.58],
+    }
+
     const circuitSvgs: Record<dualInputLogicTypes, string> = {
         And: andGate,
         Nand: nandGate,
@@ -25,12 +32,14 @@
         height = 50,
         nodeStartPos,
         gateType = 'And',
+        canvasClicked = false,
         nodeId,
     }: {
         width: number
         height: number
         nodeStartPos: number
         gateType?: logicGateTypes
+        canvasClicked: boolean
         nodeId: string
     } = $props()
 
@@ -39,24 +48,24 @@
     // Define a new device
 </script>
 
-<Node drop={'cursor'} id={nodeId}>
+<Node drop={canvasClicked ? 'cursor' : 'center'} id={nodeId}>
     <img src={circuitSvg} alt={`${gateType} logic gate`} {width} {height} />
     <SimulationNodeAnchor
         location={['left', 'bot']}
         id={nodeId}
         io="input"
-        offset={[-7.5, 68.5]}
+        offset={logicGateAnchorOffsets['in2']}
     />
     <SimulationNodeAnchor
         location={['left', 'top']}
         id={nodeId}
         io="input"
-        offset={[-7.5, 7.5]}
+        offset={logicGateAnchorOffsets['in1']}
     />
     <SimulationNodeAnchor
         location={['right', 'mid']}
         id={nodeId}
         io="output"
-        offset={[100, 37.58]}
+        offset={logicGateAnchorOffsets['out']}
     />
 </Node>

@@ -21,6 +21,7 @@
         type menuJsonType,
         type NodeMenuGroups,
     } from '../circuitModel.ts'
+    import { fade, fly } from 'svelte/transition'
 
     let {
         createCanvasNode,
@@ -103,6 +104,15 @@
     // vs
     // drag menu item and drop on svelvet canvas
     // showAnimation = 'transition: min-height 1s ease'
+
+    function getAnimationStyle(showMenuMap: boolean[], index: number) {
+        if (index === showMenuMap.length - 1) {
+        } else if (!showMenuMap[index]) {
+            return 'transition: max-height .4s ease-out; max-height:75px'
+        } else {
+            return 'transition: max-height .4s ease-in; max-height:405px'
+        }
+    }
 </script>
 
 <nav class="side_menu noselect" aria-label="Side Menu">
@@ -121,10 +131,10 @@
         <!-- Use <li> for each menu item -->
         {#each menuGroupNames as groupName, index}
             <li
+                in:fly={{ y: 200, duration: 2000 }}
+                out:fade
                 id="menu_group_{index}"
-                style={!showSubMenu[index]
-                    ? 'transition: max-height .4s ease-out; max-height:75px'
-                    : 'transition: max-height .4s ease-in; max-height:405px'}
+                style={getAnimationStyle(showSubMenu, index)}
             >
                 <!-- Use a more descriptive clickable element -->
                 <div class="menu_group_section">
@@ -160,30 +170,6 @@
     /* <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 --> */
     /* https://colors.artyclick.com/color-names-dictionary/color-names/bright-lime-green-color */
     :root {
-        --purple: #9b5de5;
-        --lilac: #b0b5ed;
-        --dark-purple: #8a41e1;
-        --neon-purple: #747bff;
-        --cyan: #00f5d4;
-        --pink: #f15bb5;
-        --pastel-pink: #fce6f3;
-        --pastel-cyan: #d7fef9;
-        /* --pastel-purple: #e5d6f8; */
-        --pastel-purple: #e1d3f8;
-        --pastel-blue: #d7f5ff;
-        --pastel-green: #d5f0c1;
-        --yellow: #fee440;
-        --light-yellow: rgb(255, 255, 73);
-        --blue: #00bbf9;
-        /*    The dark blue is hella out of place      */
-        --dark-blue: #242652;
-        --cream: #fff0dc;
-        --dark-cream: #ffdbac;
-
-        --lime-green: #aaff75;
-        --lime-red: #ff5f63;
-        --red: #ff073a;
-
         /* --side-menu-spacing is important, I reasoned through it, and there are a lot of places here to add spacing and a lot of states
             the css variable is very good/useful here.
             - The lines are the main element which creates spacing

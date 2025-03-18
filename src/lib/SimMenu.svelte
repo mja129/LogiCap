@@ -73,8 +73,8 @@
     .menuRunButtons {
         position: absolute;
         /*    the side menu width should be 22.5% of the main app flexbox */
-        left: calc(22.5% + 15px);
-        top: 15px;
+        left: calc(22.5% + 10px);
+        top: 8px;
         z-index: 300;
         display: flex;
         align-items: stretch;

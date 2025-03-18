@@ -9,6 +9,15 @@
     import repeaterGate from '../../assets/svg/repeater.svg'
     import type { logicGateTypes, singleIoLogicTypes } from '../circuitModel'
 
+    type SingleLogicGateAnchors = 'in' | 'out'
+    const singleIoGateAnchorOffests: Record<
+        SingleLogicGateAnchors,
+        [number, number]
+    > = {
+        in: [-15, 38.7],
+        out: [100, 38],
+    }
+
     const circuitSvgs: Record<singleIoLogicTypes, string> = {
         Not: notGate,
         Repeater: repeaterGate,
@@ -19,19 +28,21 @@
         height = 50,
         nodeStartPos,
         gateType = 'Not',
+        canvasClicked = false,
         nodeId,
     }: {
         width: number
         height: number
         nodeStartPos: number
         gateType?: logicGateTypes
+        canvasClicked: boolean
         nodeId: string
     } = $props()
 
     // Define a new device
 </script>
 
-<Node drop={'cursor'} id={nodeId}>
+<Node drop={canvasClicked ? 'cursor' : 'center'} id={nodeId}>
     <img
         src={circuitSvgs[gateType as singleIoLogicTypes]}
         alt={`${gateType} logic gate`}
@@ -42,12 +53,12 @@
         location={['left', 'mid']}
         id={nodeId}
         io="input"
-        offset={[-15, 38.7]}
+        offset={singleIoGateAnchorOffests['in']}
     />
     <SimulationNodeAnchor
         location={['right', 'mid']}
         id={nodeId}
         io="output"
-        offset={[100, 38]}
+        offset={singleIoGateAnchorOffests['out']}
     />
 </Node>

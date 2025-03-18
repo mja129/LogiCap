@@ -7,11 +7,13 @@
         width = 80,
         height = 50,
         nodeStartPos,
+        canvasClicked = false,
         nodeId,
     }: {
         width: number
         height: number
         nodeStartPos: number
+        canvasClicked: boolean
         nodeId: string
     } = $props()
 
@@ -22,10 +24,12 @@
         outlineColor: signalOn ? 'var(--lime-green)' : 'var(--lime-red)',
     })
 
+    const buttonOffset: [number, number] = [95, 40.4]
+
     // Define a new device
 </script>
 
-<Node drop="cursor" id={nodeId}>
+<Node drop={canvasClicked ? 'cursor' : 'center'} id={nodeId}>
     <svg
         width="75"
         height="60"
@@ -71,7 +75,7 @@
     </svg>
 
     <SimulationNodeAnchor
-        offset={[95, 40.4]}
+        offset={buttonOffset}
         location={['right', 'mid']}
         id={nodeId}
         io="output"
