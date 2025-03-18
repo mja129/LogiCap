@@ -1,9 +1,6 @@
 <script lang="ts">
     import { lastConnected } from '../circuitEngine.svelte'
-    import {
-        handleLinkAnchorConnection,
-        handleUnlinkAnchorConnection,
-    } from '../circuitStore'
+    import { handleLinkAnchorConnection, removeLinking } from '../circuitStore'
     import CustomWire from './CustomWire.svelte'
 
     let {
@@ -50,10 +47,6 @@
     //     const triggeredAnchor = createConnectionJson(nodeId, portName)
     //     return handleLinkAnchorConnection(triggeredAnchor)
     // }
-    function unlink(nodeId: string, portName: string) {
-        const triggeredAnchor = createConnectionJson(nodeId, portName)
-        return handleUnlinkAnchorConnection(triggeredAnchor)
-    }
 
     function findAnchorTargetClassName(
         targetClassList: string[]
@@ -265,13 +258,12 @@
     class:linked
     class:hovering
     class:connecting
+    onmousedowncapture={() => {
+        if (linked && io === 'input') {
+            removeLinking(nodeId)
+        }
+    }}
 ></div>
-
-<!-- onmousedowncapture={() => {
-        // if (linked && io === 'input') {
-        //     // unlink(nodeId, portName)
-        // }
-    }} -->
 
 <style>
     .custom_anchor {

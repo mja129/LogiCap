@@ -40,11 +40,6 @@ function createGlobalTimeoutManager() {
 
 const timeoutManager = createGlobalTimeoutManager()
 export let circuitStore = writable<Circuit>(initialCircuit)
-let mouseClickHack = true
-
-export function toggleMouseClickHack() {
-    mouseClickHack = false
-}
 
 // potential problem, if 2 connections are received before timeout ends
 // (fixed by canceling timer) there is another implementation where you wait
@@ -124,19 +119,22 @@ export function handleLinkAnchorConnection(connection: Connector) {
 }
 
 // TODO: there is a way to restructure the map so that we can search by device and not have to spend all of this time with searching and inserting + shifting
-export function handleUnlinkAnchorConnection(connection: ConnectorPiece) {
-    const pushNewLinking = (connector: Connector) => {
-        circuitStore.update((currentCircuit) => {
-            const matchedIndex = currentCircuit.connectors.findIndex(
-                (conn) => JSON.stringify(conn) === JSON.stringify(connector)
-            )
-            // const matchedIndex = currentCircuit.connectors.fi(conn => { console.log(JSON.stringify(connector)); console.log(JSON.stringify(conn)); return JSON.stringify(conn) == JSON.stringify(connection) });
-            if (matchedIndex !== -1) {
-                // remove 1 element starting from 'matchedIndex'
-                currentCircuit.connectors.splice(matchedIndex, 1)
+export const removeLinking = (inputConnectionId: string) => {
+    console.log(inputConnectionId);
+    circuitStore.update((currentCircuit) => {
+        let foundInputLinking: number = -1
+        currentCircuit.connectors.forEach((item: any, idx: number) => {
+            // ASSUMPTION, 'to' is always input. this function will only run from an input.
+            if (item.to.id == inputConnectionId) {
+                foundInputLinking = idx;
             }
-            return currentCircuit
         })
-    }
-    handleAnchorConnection(connection, pushNewLinking)
+
+        // const matchedIndex = currentCircuit.connectors.fi(conn => { console.log(JSON.stringify(connector)); console.log(JSON.stringify(conn)); return JSON.stringify(conn) == JSON.stringify(connection) });
+        if (foundInputLinking !== -1) {
+            // remove 1 element starting from 'matchedIndex'
+            currentCircuit.connectors.splice(foundInputLinking, 1)
+        }
+        return currentCircuit
+    })
 }
