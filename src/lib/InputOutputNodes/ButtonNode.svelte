@@ -28,8 +28,8 @@
 <Node drop="cursor" id={nodeId}>
     <svg
         width="75"
-        height="75"
-        viewBox="10 00 100 190"
+        height="60"
+        viewBox="-2 2 140 95"
         xmlns="http://www.w3.org/2000/svg"
     >
         <rect
@@ -71,7 +71,7 @@
     </svg>
 
     <SimulationNodeAnchor
-        offset={[95, 19.63]}
+        offset={[95, 41.8]}
         location={['right', 'mid']}
         id={nodeId}
         io="output"

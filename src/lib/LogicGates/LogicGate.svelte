@@ -34,32 +34,29 @@
         nodeId: string
     } = $props()
 
+    const circuitSvg = circuitSvgs[gateType as dualInputLogicTypes]
+
     // Define a new device
 </script>
 
 <Node drop={'cursor'} id={nodeId}>
-    <img
-        src={circuitSvgs[gateType as dualInputLogicTypes]}
-        alt={`${gateType} logic gate`}
-        {width}
-        {height}
-    />
+    <img src={circuitSvg} alt={`${gateType} logic gate`} {width} {height} />
     <SimulationNodeAnchor
         location={['left', 'bot']}
         id={nodeId}
         io="input"
-        offset={[7.5, 58]}
+        offset={[-7.5, 70]}
     />
     <SimulationNodeAnchor
         location={['left', 'top']}
         id={nodeId}
         io="input"
-        offset={[7.5, 21.5]}
+        offset={[-7.5, 9]}
     />
     <SimulationNodeAnchor
         location={['right', 'mid']}
         id={nodeId}
         io="output"
-        offset={[78, 40]}
+        offset={[92, 40]}
     />
 </Node>

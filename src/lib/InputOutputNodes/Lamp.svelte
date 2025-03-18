@@ -43,8 +43,8 @@
 <Node drop="cursor" id={nodeId}>
     <svg
         width="85"
-        height="85"
-        viewBox="-50 0 200 100"
+        height="65"
+        viewBox="-12 0 95 100"
         xmlns="http://www.w3.org/2000/svg"
     >
         <line
@@ -69,7 +69,7 @@
 
     <!-- FEATURE: Make the line draggable around the whole circle  -->
     <SimulationNodeAnchor
-        offset={[-5, 41.8]}
+        offset={[-5, 37.2]}
         location={['left', 'mid']}
         id={nodeId}
         io="input"
