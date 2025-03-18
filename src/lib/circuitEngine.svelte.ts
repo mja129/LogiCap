@@ -8,15 +8,19 @@ let oneBit: Vector3vl = Vector3vl.ones(1);
 let zeroBit: Vector3vl = Vector3vl.zeros(1);
 
 export let circuitEngine: Writable<HeadlessCircuit | null> = writable<HeadlessCircuit | null>(null); //The null might be a little schizo
-export let running: boolean = false;
+
+// this is why we want circuitEngine.svelte.ts
+let running: boolean = $state(false)
 export let monitoredWires: Set<string> = new Set() //For reupping on change
 export let lastConnected: Writable<string> = writable("First Connection")
+
+export const getRunning = () => running
 
 // Naurr
 export let wireSignals = writable<Record<string, number>>({}); //Wire signal store
 
-// there is.
-export let currentTick = writable<number>(0) //This is legit just for the display, if theres a better way to do this tell me
+let currentTick = $state(0) //This is legit just for the display, if theres a better way to do this tell me
+export const getCurrTick = () => currentTick
 
 Object.defineProperty(HeadlessCircuit.prototype, "running", {
     get() {
@@ -56,6 +60,9 @@ export function toggleSimulation(tickRate: number) {
     }
     else {
         console.log("Simulation Stopped")
+        // reset on pause, is not necessarily a move.
+        circuitEngine.set(null)
+        currentTick = 0
         running = false;
     }
 }
@@ -74,7 +81,7 @@ function start(tickRate: number) {
         return
     }
     currEngine.updateGates()
-    currentTick.set(currEngine.tick);
+    currentTick = currEngine.tick;
     setTimeout(() => start(tickRate), tickRate);
 }
 
@@ -141,7 +148,7 @@ export function updateTick() {
         return
     }
     currEngine.updateGates();
-    currentTick.set(currEngine.tick);
+    currentTick = currEngine.tick;
 }
 
 export function updateNext() {
@@ -155,7 +162,7 @@ export function updateNext() {
         return
     }
     currEngine.updateGatesNext();
-    currentTick.set(currEngine.tick);
+    currentTick = currEngine.tick;
 }
 
 

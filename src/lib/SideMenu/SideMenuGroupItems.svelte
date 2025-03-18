@@ -126,10 +126,10 @@
 
 <ol style={`z-index:${zIndex};`} class="side_menu_group" id="section_{zIndex}">
     {#each menuItems as item}
-        <li>
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+        <li onmousedown={(event) => handleMouseDown(item, event)}>
             <button
                 class="gate-button"
-                onmousedown={(event) => handleMouseDown(item, event)}
                 style="background:none; border:none; padding:0; cursor:pointer;"
             >
                 <img src={item.icon} alt="{item.name} logic gate, hand-drawn" />

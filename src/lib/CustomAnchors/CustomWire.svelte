@@ -80,8 +80,18 @@
     // yes subscribe for changes in global headlessCircuit.
     // unmonitor would be a good thing to do
     // instead of unmonitor, what if I just replace the function that is monitoring.
+
+    const setWire = (wireChange: number) => (wireActive = wireChange)
+
     circuitEngine.subscribe(
         (digitalJsCircuit) => {
+            // reset on play/pause
+            if (digitalJsCircuit === null) {
+                wireActive = -1
+                return
+            }
+            // this isn't really a thing anymore
+            // but we need to beware of the "connecTING node" vs the "connecTED node"
             if (wireId === 'No Connection') {
                 console.warn(
                     "Wire that you tried to create a listener for is 'no connection'"
@@ -103,7 +113,9 @@
                 await digitalJsCircuit.monitorWire(curWir, (tick: number) => {
                     let wireChange = onWireChange(wireId, curWir, tick)
                     console.log('wireChanged: ' + wireChange)
-                    wireActive = wireChange
+                    // you could get the callback result out of the return of this
+                    // function and await in the await block below.
+                    setWire(wireChange)
                 })
 
             console.log('function created')

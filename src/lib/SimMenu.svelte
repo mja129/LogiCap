@@ -8,7 +8,8 @@
         toggleSimulation,
         updateNext,
         updateTick,
-        currentTick,
+        getRunning,
+        getCurrTick,
     } from './circuitEngine.svelte'
 
     let { simulationPlaying = false }: { simulationPlaying?: boolean } =
@@ -34,27 +35,32 @@
 
 <div class="menuRunButtons">
     <button>
-        <ResetStateIcon width={40} />
+        <ResetStateIcon style="transform:scale(1.5);" width={40} />
     </button>
-    <button on:click={updateGatesNext}>
+    <button onclick={updateGatesNext}>
         <UpdateGatesNextIcon style="transform:scale(2);" width={50} />
     </button>
     <button
-        on:click={runSimulation}
+        onclick={runSimulation}
         style="display:flex;align-items: center;padding-block:1px;"
     >
-        <div>
-            {#if true}
+        <div style="margin-left: -4px">
+            {#if getRunning()}
                 <!-- content here -->
-                <PlayTickIcon width={40} />
+                <PauseTickIcon style="transform:scale(1.5);" width={40} />
             {:else}
-                <PauseTickIcon width={35} />
+                <PlayTickIcon style="transform:scale(1.5);" width={40} />
             {/if}
         </div>
-        <p id="tickNumber">{$currentTick}</p>
+        <p
+            style={getRunning() ? 'border-color:green' : 'border-color:red'}
+            id="tickNumber"
+        >
+            {getCurrTick()}
+        </p>
     </button>
-    <button on:click={updateGates}>
-        <UpdateGatesIcon width={40} />
+    <button onclick={updateGates}>
+        <UpdateGatesIcon style="transform:scale(1.5);" width={40} />
     </button>
 </div>
 
@@ -76,10 +82,12 @@
     }
     .menuRunButtons p {
         background-color: white;
+        text-align: right;
         border: 3px solid black;
         border-radius: 5px;
         font-size: 1.8rem;
         padding-inline: 5px;
+        min-width: 80px;
         margin-block: 4px;
     }
     .menuRunButtons button {
