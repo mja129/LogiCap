@@ -3,7 +3,6 @@
     import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
     import {
         circuitEngine,
-        wireMonitoring,
         onWireChange,
         lastConnected,
     } from '../circuitEngine.svelte.ts'

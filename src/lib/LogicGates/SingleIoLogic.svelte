@@ -42,12 +42,12 @@
         location={['left', 'mid']}
         id={nodeId}
         io="input"
-        offset={[0, 40]}
+        offset={[-15, 38.7]}
     />
     <SimulationNodeAnchor
         location={['right', 'mid']}
         id={nodeId}
         io="output"
-        offset={[78, 40]}
+        offset={[100, 38]}
     />
 </Node>

@@ -85,6 +85,12 @@ function start(tickRate: number) {
     setTimeout(() => start(tickRate), tickRate);
 }
 
+export function resetCircuit() {
+    circuitEngine.set(null)
+    currentTick = 0
+    running = false;
+}
+
 /*
     Adds to monitorList
 */
@@ -118,20 +124,6 @@ export function onWireChange(wireId: string, wire: any, tick: number) {
     return -1
 }
 
-export function wireMonitoring(wireId: string) {
-    // circuitEngine = new HeadlessCircuit(get(circuitStore))
-    // if (wireListener !== undefined) {
-    //     circuitEngine.unmonitor(wireId)
-    // }
-    // if false we either didnt add the wire to the headless circuit
-    // in the queue but not in headless circuit
-    // add it to a list of things that will update when headless circuit does.
-    // in headless circuit.
-    // await findWireByLabel being true.
-    // subscribe to changes in the queue.
-    // subscribe to changes in global headless circuit.
-    return null
-}
 
 /*
     These are all just wrappers for the baseline updateGate functions

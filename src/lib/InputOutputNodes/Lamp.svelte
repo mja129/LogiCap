@@ -69,7 +69,7 @@
 
     <!-- FEATURE: Make the line draggable around the whole circle  -->
     <SimulationNodeAnchor
-        offset={[-5, 37.2]}
+        offset={[-5, 35.43]}
         location={['left', 'mid']}
         id={nodeId}
         io="input"

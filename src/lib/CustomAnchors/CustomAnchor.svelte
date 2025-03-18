@@ -277,8 +277,8 @@
     .custom_anchor {
         border: 2px solid black;
         border-radius: 50%;
-        height: 10px;
-        width: 10px;
+        height: 12.5px;
+        width: 12.5px;
     }
     .linked {
         background-color: black !important;

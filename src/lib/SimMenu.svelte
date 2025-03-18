@@ -1,15 +1,16 @@
 <script lang="ts">
     import UpdateGatesNextIcon from '~icons/streamline/button-fast-forward-2'
     import PlayTickIcon from '~icons/streamline/button-play'
-    import UpdateGatesIcon from '~icons/streamline/interface-arrows-synchronize-arrows-loading-load-sync-synchronize-arrow-reload'
+    import ResetStateIcon from '~icons/streamline/interface-arrows-synchronize-arrows-loading-load-sync-synchronize-arrow-reload'
     import PauseTickIcon from '~icons/streamline/button-pause-2'
-    import ResetStateIcon from '~icons/streamline/entertainment-control-button-next-button-television-buttons-movies-skip-next-video-controls'
+    import UpdateGatesIcon from '~icons/streamline/entertainment-control-button-next-button-television-buttons-movies-skip-next-video-controls'
     import {
         toggleSimulation,
         updateNext,
         updateTick,
         getRunning,
         getCurrTick,
+        resetCircuit,
     } from './circuitEngine.svelte'
 
     let { simulationPlaying = false }: { simulationPlaying?: boolean } =
@@ -34,12 +35,6 @@
 </script>
 
 <div class="menuRunButtons">
-    <button>
-        <ResetStateIcon style="transform:scale(1.5);" width={40} />
-    </button>
-    <button onclick={updateGatesNext}>
-        <UpdateGatesNextIcon style="transform:scale(2);" width={50} />
-    </button>
     <button
         onclick={runSimulation}
         style="display:flex;align-items: center;padding-block:1px;"
@@ -59,8 +54,18 @@
             {getCurrTick()}
         </p>
     </button>
+    <span class="vl"></span>
     <button onclick={updateGates}>
         <UpdateGatesIcon style="transform:scale(1.5);" width={40} />
+    </button>
+    <span class="vl"></span>
+    <button onclick={updateGatesNext}>
+        <UpdateGatesNextIcon style="transform:scale(2);" width={50} />
+    </button>
+
+    <span class="vl"></span>
+    <button onclick={resetCircuit}>
+        <ResetStateIcon style="transform:scale(1.5);" width={40} />
     </button>
 </div>
 
@@ -74,11 +79,19 @@
         display: flex;
         align-items: stretch;
         padding-inline: 5px;
-        padding-block: 7px;
+        padding-block: 0px;
         justify-content: space-between;
         background-color: lightblue;
         border-radius: 5px;
         border: 3px solid black;
+    }
+
+    .vl {
+        border: 1px solid black;
+        border-radius: 4px;
+        background-color: lightblue;
+        width: 5px;
+        margin-block: 4px;
     }
     .menuRunButtons p {
         background-color: white;
@@ -92,8 +105,12 @@
     }
     .menuRunButtons button {
         padding: 8px;
-        margin-inline: 5px;
-        border-radius: 5px;
+        margin-inline: 0px;
         max-height: 70px;
+        border: none;
+        background-color: lightblue;
+    }
+    :global(.menuRunButtons button:hover svg) {
+        color: red;
     }
 </style>

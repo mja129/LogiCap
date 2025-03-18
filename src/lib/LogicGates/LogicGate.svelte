@@ -45,18 +45,18 @@
         location={['left', 'bot']}
         id={nodeId}
         io="input"
-        offset={[-7.5, 70]}
+        offset={[-7.5, 68.5]}
     />
     <SimulationNodeAnchor
         location={['left', 'top']}
         id={nodeId}
         io="input"
-        offset={[-7.5, 9]}
+        offset={[-7.5, 7.5]}
     />
     <SimulationNodeAnchor
         location={['right', 'mid']}
         id={nodeId}
         io="output"
-        offset={[92, 40]}
+        offset={[100, 37.58]}
     />
 </Node>

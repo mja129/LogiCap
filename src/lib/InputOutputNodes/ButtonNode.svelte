@@ -71,7 +71,7 @@
     </svg>
 
     <SimulationNodeAnchor
-        offset={[95, 41.8]}
+        offset={[95, 40.4]}
         location={['right', 'mid']}
         id={nodeId}
         io="output"
