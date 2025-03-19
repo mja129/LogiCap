@@ -106,8 +106,7 @@
     // showAnimation = 'transition: min-height 1s ease'
 
     function getAnimationStyle(showMenuMap: boolean[], index: number) {
-        if (index === showMenuMap.length - 1) {
-        } else if (!showMenuMap[index]) {
+        if (!showMenuMap[index]) {
             return 'transition: max-height .4s ease-out; max-height:75px'
         } else {
             return 'transition: max-height .4s ease-in; max-height:405px'
@@ -131,8 +130,6 @@
         <!-- Use <li> for each menu item -->
         {#each menuGroupNames as groupName, index}
             <li
-                in:fly={{ y: 200, duration: 2000 }}
-                out:fade
                 id="menu_group_{index}"
                 style={getAnimationStyle(showSubMenu, index)}
             >
@@ -161,8 +158,6 @@
                 />
             </li>
         {/each}
-
-        <!-- Add more items as necessary -->
     </ul>
 </nav>
 
@@ -293,5 +288,36 @@
         /* padding-inline: 4px; */
         /* Lowkey weird the centering that the preforms, try toggling it.*/
         text-align: center;
+    }
+
+    :global(.light nav.side_menu ul > li:last-child button:after) {
+        background-color: var(--side-menu-bg);
+    }
+    :global(.dark nav.side_menu ul > li:last-child button:after) {
+        background-color: var(--side-menu-bg-dark);
+    }
+    nav.side_menu ul > li:last-child button:after {
+        /* padding-inline: 4px; */
+        /* Lowkey weird the centering that the preforms, try toggling it.*/
+
+        content: '';
+        visibility: visible;
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 70px;
+        top: 2px;
+        left: 0px;
+    }
+    :global(.dark nav.side_menu ul > li:last-child button:hover) {
+        background-color: var(--side-menu-bg-dark);
+    }
+    :global(.light nav.side_menu ul > li:last-child button:hover) {
+        background-color: var(--side-menu-bg);
+    }
+    nav.side_menu ul > li:last-child img {
+        /* padding-inline: 4px; */
+        /* Lowkey weird the centering that the preforms, try toggling it.*/
+        display: none;
     }
 </style>

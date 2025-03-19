@@ -20,7 +20,7 @@ import { type ComponentProps } from 'svelte'
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
 // or their grouping in the menu
-export type NodeMenuGroups = "Logic Gates" | "Input/Output"
+export type NodeMenuGroups = "Logic Gates" | "Input/Output" | "GhostElement"
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
@@ -70,6 +70,11 @@ export const menuJsonData: menuJsonType = {
         "groupElements": [
             { name: "Lamp", nodeType: "Lamp", icon: outputIcon },
             { name: "Button", nodeType: "Button", icon: inputIcon },
+        ]
+    },
+    "GhostElement": {
+        "svg": undefined,
+        "groupElements": [
         ]
     }
 }
