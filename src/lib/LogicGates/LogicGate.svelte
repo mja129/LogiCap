@@ -30,25 +30,24 @@
     let {
         width = 80,
         height = 50,
-        nodeStartPos,
         gateType = 'And',
         canvasClicked = false,
+        position = undefined,
         nodeId,
     }: {
         width: number
         height: number
-        nodeStartPos: number
         gateType?: logicGateTypes
         canvasClicked: boolean
         nodeId: string
+        position?: { x: number; y: number } | undefined
     } = $props()
 
     const circuitSvg = circuitSvgs[gateType as dualInputLogicTypes]
-
-    // Define a new device
 </script>
 
-<Node drop={canvasClicked ? 'cursor' : 'center'} id={nodeId}>
+<!-- Position property only works if cursor is set to false. -->
+<Node drop={position !== undefined ? false : 'cursor'} id={nodeId} {position}>
     <img src={circuitSvg} alt={`${gateType} logic gate`} {width} {height} />
     <SimulationNodeAnchor
         location={['left', 'bot']}

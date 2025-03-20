@@ -6,14 +6,14 @@
     let {
         width = 80,
         height = 50,
-        nodeStartPos,
         canvasClicked = false,
+        position = undefined,
         nodeId,
     }: {
         width: number
         height: number
-        nodeStartPos: number
         canvasClicked: boolean
+        position?: { x: number; y: number } | undefined
         nodeId: string
     } = $props()
 
@@ -62,7 +62,7 @@
     }
 </script>
 
-<Node drop={canvasClicked ? 'cursor' : 'center'} id={nodeId}>
+<Node drop={position !== undefined ? false : 'cursor'} id={nodeId}>
     <svg
         width="75"
         height="60"

@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store'
+import { writable, get } from 'svelte/store'
 
 // Explains the json representation
 // https://github.com/tilk/digitaljs
@@ -9,9 +9,101 @@ const initialCircuit: Circuit = {
     subcircuits: {},
 }
 
-let pendingConnection: ConnectorPiece | null = null
-
 export let circuitStore = writable<Circuit>(initialCircuit)
+
+export function resetCircuitStore() {
+    circuitStore.update((currentCircuit) => {
+        currentCircuit = {
+            devices: {},
+            connectors: [],
+            subcircuits: {},
+        }
+        return currentCircuit
+    })
+}
+
+export function saveDigitalJsState() {
+    const circuitStoreSave: string | null =
+        localStorage.getItem('circuitStoreSave')
+    if (circuitStoreSave === null) {
+        console.log(
+            'Setting circuit store save in local storage for the first time'
+        )
+    }
+    localStorage.setItem('circuitStoreSave', JSON.stringify(get(circuitStore)))
+}
+
+type NodeInfoList = {
+    nodeType: string
+    uuid: string
+    position: { x: number; y: number }
+}[]
+
+// saves the current circuitStore to localStorage under key 'circuitStoreSave'
+
+// filters the svelvet library store for the data that we need.
+function filterSvelvetSave(saveJsonText: string) {
+    const saveJson: SvelvetSave = JSON.parse(saveJsonText)
+    const savedNodeNames: NodeInfoList = saveJson.nodes.map(
+        (node: SvelvetNode) => {
+            let [nodeType, uuid] = node.id.substring(2).split('_')
+            return { nodeType, uuid, position: node.position }
+        }
+    )
+    return savedNodeNames
+}
+
+// saves positions from svelvet save to savePositionsToCircuitStore
+function savePositionsToCircuitStore() {
+    const saveJsonText =
+        localStorage.getItem('state') ||
+        (console.warn('No saved state found in localStorage.'), null)
+
+    if (saveJsonText === null) return null
+
+    const savedNodeNames: NodeInfoList | null =
+        filterSvelvetSave(saveJsonText) ||
+        (console.warn('save json exists but there are no nodes'), null)
+
+    if (savedNodeNames === null) return null
+
+    // create saved nodes on canvas.
+    circuitStore.update((currCircuit) => {
+        savedNodeNames.forEach(({ nodeType, uuid, position }) => {
+            const nodeName = `${nodeType}_${uuid}`
+            currCircuit.devices[nodeName].position = position
+            // side effects
+            // find nodeName in devices
+            // newGateCircuitStore(nodeType, uuid, { position })
+        })
+        return currCircuit
+    })
+    // save the state after updating it.
+    saveDigitalJsState()
+}
+
+export async function saveCircuit() {
+    // click on the hidden svelvet button, the button is in "theme toggle" but I set it to display: none,
+    // and now we trigger it with css, after it triggers we use the svelvet json positions to set our digitial js positions
+    // the digitalJS save is the main save and we are just piggybacking off the svelvet save a bit
+    // the svelvet save does save our camera position and stuff though.
+    const svelvetSaveButton = document.querySelector('.save-button')
+    const mouseEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+    })
+    // const mouseEventUp = new MouseEvent('mouseup', { bubbles: true })
+    svelvetSaveButton?.dispatchEvent(mouseEvent)
+
+    // make sure it actually updated
+    // there is a better way of doing this
+    // I don't even know if its a problem
+    const wait = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms))
+    await wait(100)
+
+    savePositionsToCircuitStore()
+}
 
 export function handleLinkAnchorConnection(connection: Connector) {
     const pushNewLinking = (connector: Connector) => {
@@ -35,7 +127,7 @@ export const removeLinking = (inputConnectionId: string) => {
         currentCircuit.connectors.forEach((item: any, idx: number) => {
             // ASSUMPTION, 'to' is always input. this function will only run from an input.
             if (item.to.id == inputConnectionId) {
-                foundInputLinking = idx;
+                foundInputLinking = idx
             }
         })
 

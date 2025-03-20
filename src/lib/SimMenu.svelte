@@ -4,6 +4,9 @@
     import ResetStateIcon from '~icons/streamline/interface-arrows-synchronize-arrows-loading-load-sync-synchronize-arrow-reload'
     import PauseTickIcon from '~icons/streamline/button-pause-2'
     import UpdateGatesIcon from '~icons/streamline/entertainment-control-button-next-button-television-buttons-movies-skip-next-video-controls'
+    import SaveIcon from '~icons/lucide/save'
+    import TrashIcon from '~icons/material-symbols/delete-outline'
+
     import {
         toggleSimulation,
         updateNext,
@@ -12,9 +15,13 @@
         getCurrTick,
         resetCircuit,
     } from './circuitEngine.svelte'
+    import {
+        circuitStore,
+        resetCircuitStore,
+        saveCircuit,
+    } from './circuitStore'
 
-    let { simulationPlaying = false }: { simulationPlaying?: boolean } =
-        $props()
+    let { clearCanvas }: { clearCanvas: Function } = $props()
 
     function runSimulation(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
@@ -32,6 +39,36 @@
     ) {
         updateTick()
     }
+
+    // don't lose the circuit when reloading the page.
+    // this will save the camera position too.
+
+    // This sort of works.
+    // window.addEventListener('beforeunload', async () => {
+    //     console.log('TRIGGERED')
+    //     await saveCircuit()
+    // })
+
+    async function backupDelete() {
+        // what if they clear an empty canvas.
+        await saveCircuit()
+        // save previously deleted.
+        localStorage.setItem(
+            'prevCircuitStore',
+            localStorage.getItem('circuitStoreSave') || ''
+        )
+        localStorage.removeItem('circuitStoreSave')
+        localStorage.removeItem('state')
+
+        // reset the global store.
+        resetCircuitStore()
+    }
+
+    async function onTrash() {
+        await backupDelete()
+        // clears the currentDevicesData variable in app.svelte
+        clearCanvas()
+    }
 </script>
 
 <div class="menuRunButtons">
@@ -39,12 +76,12 @@
         onclick={runSimulation}
         style="display:flex;align-items: center;padding-block:1px;"
     >
-        <div style="margin-left: -4px">
+        <div style="margin-left: -8px">
             {#if getRunning()}
                 <!-- content here -->
-                <PauseTickIcon style="transform:scale(1.5);" width={40} />
+                <PauseTickIcon style="transform:scale(1.8);" width={40} />
             {:else}
-                <PlayTickIcon style="transform:scale(1.5);" width={40} />
+                <PlayTickIcon style="transform:scale(1.8);" width={40} />
             {/if}
         </div>
         <p
@@ -56,16 +93,29 @@
     </button>
     <span class="vl"></span>
     <button onclick={updateGates}>
-        <UpdateGatesIcon style="transform:scale(1.5);" width={40} />
+        <UpdateGatesIcon style="transform:scale(2);" width={40} />
     </button>
     <span class="vl"></span>
     <button onclick={updateGatesNext}>
-        <UpdateGatesNextIcon style="transform:scale(2);" width={50} />
+        <UpdateGatesNextIcon style="transform:scale(2.3);" width={50} />
     </button>
 
     <span class="vl"></span>
     <button onclick={resetCircuit}>
-        <ResetStateIcon style="transform:scale(1.5);" width={40} />
+        <ResetStateIcon style="transform:scale(2);" width={40} />
+    </button>
+    <span class="vl" style="margin-right: 7px"></span>
+    <button onclick={() => saveCircuit()}>
+        <SaveIcon
+            style="transform:scale(2.4); margin-right: -9px;"
+            width={40}
+        />
+    </button>
+    <button onclick={() => onTrash()}>
+        <TrashIcon
+            style="transform:scale(2.69);margin-right: -9px;"
+            width={40}
+        />
     </button>
 </div>
 
@@ -73,14 +123,15 @@
     .menuRunButtons {
         position: absolute;
         /*    the side menu width should be 22.5% of the main app flexbox */
-        left: calc(22.5% + 10px);
-        top: 8px;
+        transform: scale(0.75);
+        left: calc(22.5% - 38px);
+        top: 2px;
         z-index: 300;
         display: flex;
         align-items: stretch;
         padding-inline: 5px;
         padding-block: 0px;
-        justify-content: space-between;
+        justify-content: space-evenly;
         background-color: lightblue;
         border-radius: 5px;
         border: 3px solid black;

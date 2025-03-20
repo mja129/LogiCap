@@ -94,7 +94,7 @@
 
             // const droppedOnCanvas =
             //     dropTarget?.classList.contains('svelvet-wrapper')
-            console.log(dropTarget?.classList)
+            // console.log(dropTarget?.classList)
             const sideMenu = document.querySelector('.svelvet-wrapper')
 
             // const droppedOnMenu = dropTarget?.classList.contains('side-menu')

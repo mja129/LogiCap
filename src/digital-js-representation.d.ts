@@ -6,6 +6,10 @@ type Button = {
     net: string
     order?: number
     bits: number
+    position?: {
+        x: number
+        y: number
+    }
 }
 
 type Lamp = {
@@ -16,6 +20,10 @@ type Lamp = {
     inputs: number
     outputs: number
     label: string
+    position?: {
+        x: number
+        y: number
+    }
 }
 
 type LogicGate = {
