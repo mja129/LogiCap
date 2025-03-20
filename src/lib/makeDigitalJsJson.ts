@@ -1,18 +1,20 @@
 // These functions should use eachother.
 //
 // export a function map from this function, then depending on the type, create this json in app.svelte
-function makeLamp(nodeName: string, options?: {
-    bits: number,
-    net: string,
-    label: string,
-    order: number,
-    inputs: number,
-    outputs: number,
-    position?: {x: number, y: number}
-}): Lamp {
+function makeLamp(
+    nodeName: string,
+    options?: {
+        bits: number
+        net: string
+        label: string
+        order: number
+        inputs: number
+        outputs: number
+        position?: { x: number; y: number }
+    }
+): Lamp {
     return {
-
-        type: "Lamp",
+        type: 'Lamp',
         net: nodeName,
         inputs: options?.inputs || 1,
         outputs: options?.outputs || 0,
@@ -26,12 +28,19 @@ function makeLamp(nodeName: string, options?: {
             },
         }),
     }
-};
+}
 
-function makeButton(nodeName: string, options?: { bits?: number, net?: string, label?: string, position?: {x: number, y: number} }): Button {
+function makeButton(
+    nodeName: string,
+    options?: {
+        bits?: number
+        net?: string
+        label?: string
+        position?: { x: number; y: number }
+    }
+): Button {
     return {
-
-        type: "Button",
+        type: 'Button',
         label: options?.label || nodeName,
         net: options?.net || nodeName,
         bits: options?.bits || 1,
@@ -41,11 +50,14 @@ function makeButton(nodeName: string, options?: { bits?: number, net?: string, l
                 y: options.position.y,
             },
         }),
-
-    };
+    }
 }
 
-function makeLogicNode(type: string, nodeName: string, options?: {position?: {x: number, y: number}} ): LogicGate {
+function makeLogicNode(
+    type: string,
+    nodeName: string,
+    options?: { position?: { x: number; y: number } }
+): LogicGate {
     return {
         type,
         label: nodeName,
@@ -56,22 +68,32 @@ function makeLogicNode(type: string, nodeName: string, options?: {position?: {x:
                 y: options.position.y,
             },
         }),
-    };
+    }
 }
 
-export const deviceFactoryMap: Record<string, (nodeName: string, options?: any) => Device> = {
+export const deviceFactoryMap: Record<
+    string,
+    (nodeName: string, options?: any) => Device
+> = {
     Button: makeButton,
     Lamp: makeLamp,
-    And: (nodeName, options?) => makeLogicNode("And", nodeName, ...(options ? [options] : [])),
-    Nand: (nodeName, options?) => makeLogicNode("Nand", nodeName, ...(options ? [options] : [])),
-    Or: (nodeName, options?) => makeLogicNode("Or", nodeName, ...(options ? [options] : [])),
-    Nor: (nodeName, options?) => makeLogicNode("Nor", nodeName, ...(options ? [options] : [])),
-    Xor: (nodeName, options?) => makeLogicNode("Xor", nodeName, ...(options ? [options] : [])),
-    Xnor: (nodeName, options?) => makeLogicNode("Xnor", nodeName, ...(options ? [options] : [])),
-    Not: (nodeName, options?) => makeLogicNode("Not", nodeName, ...(options ? [options] : [])),
-    Repeater: (nodeName, options?) => makeLogicNode("Repeater", nodeName, ...(options ? [options] : [])),
-};
-
+    And: (nodeName, options?) =>
+        makeLogicNode('And', nodeName, ...(options ? [options] : [])),
+    Nand: (nodeName, options?) =>
+        makeLogicNode('Nand', nodeName, ...(options ? [options] : [])),
+    Or: (nodeName, options?) =>
+        makeLogicNode('Or', nodeName, ...(options ? [options] : [])),
+    Nor: (nodeName, options?) =>
+        makeLogicNode('Nor', nodeName, ...(options ? [options] : [])),
+    Xor: (nodeName, options?) =>
+        makeLogicNode('Xor', nodeName, ...(options ? [options] : [])),
+    Xnor: (nodeName, options?) =>
+        makeLogicNode('Xnor', nodeName, ...(options ? [options] : [])),
+    Not: (nodeName, options?) =>
+        makeLogicNode('Not', nodeName, ...(options ? [options] : [])),
+    Repeater: (nodeName, options?) =>
+        makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
+}
 
 // // Example usage
 // const defaultAnd = deviceFactoryMap["And"]("andGate");

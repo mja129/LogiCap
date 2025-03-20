@@ -62,7 +62,7 @@
     }
 </script>
 
-<Node drop={position !== undefined ? false : 'cursor'} id={nodeId}>
+<Node drop={position !== undefined ? false : 'cursor'} {position} id={nodeId}>
     <svg
         width="75"
         height="60"
