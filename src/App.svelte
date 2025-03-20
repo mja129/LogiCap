@@ -36,8 +36,12 @@
             // Add the new device with a unique ID, e.g., 'newDeviceId'
             // get function from map
             const newDevice: Device = deviceFactoryMap[gateType](nodeName)
+            // const nextDeviceNum = Object.keys(currentDevicesData).length
             currentCircuit.devices[nodeName] = newDevice
+
             // sync new Device data with currentDevicesData
+            // I guess this could also just be currentDevicesData =
+            // $circuitStore.devices, but it may update more frequently than we need.
             currentDevicesData = currentCircuit.devices
             // Add the new connector
             // currentCircuit.connectors.push(newConnector)
@@ -47,9 +51,10 @@
         })
         return nodeName
     }
+    $inspect($circuitStore).with(console.log)
 
     // called on "drop" in sidemenugroupitems.svelte
-    function createGateOnCanvas(e: any) {
+    function createCanvasNode(e: any) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         // this gate will update the store and then the subscribe will update the
         // list of circuits currently active on the screen
@@ -59,8 +64,8 @@
     // TELEPORT BUG GET FUCKED
     // try to fix the teleport bug.
     document.addEventListener('DOMContentLoaded', () => {
-        const canvas = document.querySelector('.svelvet-wrapper')
-        if (canvas) {
+        const svelvetCanvas = document.querySelector('.svelvet-wrapper')
+        if (svelvetCanvas) {
             // Create a MouseEvent with additional options
             const event = new MouseEvent('mousedown', {
                 bubbles: true,
@@ -68,18 +73,18 @@
             })
 
             // Dispatch the event on the canvas
-            canvas.dispatchEvent(event)
+            svelvetCanvas.dispatchEvent(event)
             const eventUp = new MouseEvent('mouseup', {
                 bubbles: true,
                 cancelable: true,
             })
-            canvas.dispatchEvent(eventUp)
+            svelvetCanvas.dispatchEvent(eventUp)
         }
     })
 </script>
 
 <main>
-    <SideMenu createCanvasNode={createGateOnCanvas} />
+    <SideMenu {createCanvasNode} />
     <SimMenu />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />

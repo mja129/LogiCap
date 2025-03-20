@@ -27,6 +27,39 @@
     const buttonOffset: [number, number] = [95, 40.4]
 
     // Define a new device
+
+    // pretty simple function
+    // after a mouse down, if you start dragging, don't flip the signal
+    // if after mousedown you get mouseUp, flip the signal
+    // After you get either of them, both listeners are killed and created again on the next mousedown.
+    function handleMouseDown(e: any) {
+        e.preventDefault()
+
+        let isDragging = false
+
+        function handleMouseMove() {
+            isDragging = true
+            cleanup()
+        }
+
+        function handleMouseUp() {
+            if (!isDragging) {
+                // Flip the signal only if it was a click, not a drag
+                // Side Effects!!
+                signalOn = !signalOn
+                inputSetter(nodeId)
+            }
+            cleanup()
+        }
+
+        function cleanup() {
+            window.removeEventListener('mousemove', handleMouseMove)
+            window.removeEventListener('mouseup', handleMouseUp)
+        }
+
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('mouseup', handleMouseUp)
+    }
 </script>
 
 <Node drop={canvasClicked ? 'cursor' : 'center'} id={nodeId}>
@@ -58,12 +91,7 @@
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <circle
-            onclick={(e) => {
-                e.preventDefault()
-                e.stopImmediatePropagation()
-                signalOn = !signalOn
-                inputSetter(nodeId)
-            }}
+            onmousedowncapture={handleMouseDown}
             cx="50"
             cy="50"
             r="30"

@@ -45,7 +45,7 @@
         ghostElement.style.left = pageX + 'px'
         ghostElement.style.top = pageY + 'px'
         ghostElement.style.zIndex = '200'
-        ghostElement.style.transform = 'translate(-50%, -50%)'
+        ghostElement.style.transform = 'scale(1.3)'
 
         const img = document.createElement('img')
         img.src = item.icon
@@ -84,6 +84,7 @@
     }
 
     function handleGlobalClick(event: MouseEvent): void {
+        event.stopPropagation()
         if (draggingItem && ghostElement) {
             const dropTarget = document.elementFromPoint(
                 event.clientX,
@@ -91,8 +92,14 @@
             )
             updateGhostPosition(event.pageX, event.pageY)
 
-            const droppedOnCanvas =
-                dropTarget?.classList.contains('svelvet-wrapper')
+            // const droppedOnCanvas =
+            //     dropTarget?.classList.contains('svelvet-wrapper')
+            console.log(dropTarget?.classList)
+            const sideMenu = document.querySelector('.svelvet-wrapper')
+
+            // const droppedOnMenu = dropTarget?.classList.contains('side-menu')
+
+            const droppedOnCanvas = sideMenu?.contains(dropTarget)
 
             if (droppedOnCanvas) {
                 let e: any = {
