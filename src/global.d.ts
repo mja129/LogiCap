@@ -17,43 +17,50 @@ declare module "custom_digitaljs" {
     //     previous(attribute: string): any;
     // }
 
+	type Graph = any;
+	type Link = any;
+	type Cells = any;
+	type Gate = any;
+	type PriorityQueue = any;
+
+
     // Typescript interfaces' don't have a runtime and 
     // there won't be any code emitted for them
     export interface BaseEngine {
-        _graph: any;
+        _graph: Graph;
         _queue: Map<any, any>;
-        _pq: any;  // Assuming this is a priority queue type (you can import the exact type if necessary)
+        _pq: PriorityQueue;  // Assuming this is a priority queue type (you can import the exact type if necessary)
         _tick: number;
-        _cells: any;
+        _cells: Cells;
         _monitorChecks: Map<any, any>;
         _alarms: Map<any, any>;
         _alarmQueue: Map<any, any>;
 
         // Methods
-        _addGate(graph: any, gate: any): void;
-        _addLink(graph: any, link: any): void;
-        _addGraph(graph: any): void;
-        _removeGate(graph: any, gate: any): void;
-        _removeLink(graph: any, link: any): void;
-        _changeLinkSource(graph: any, link: any, src: any, prevSrc: any): void;
-        _changeLinkTarget(graph: any, link: any, end: any, prevEnd: any): void;
-        _changeLinkWarning(graph: any, link: any, warn: any, prevWarn: any): void;
+        _addGate(graph: Graph, gate: Gate): void;
+        _addLink(graph: Graph, link: Link): void;
+        _addGraph(graph: Graph): void;
+        _removeGate(graph: Graph, gate: Gate): void;
+        _removeLink(graph: Graph, link: Link): void;
+        _changeLinkSource(graph: Graph, link: Link, src: any, prevSrc: any): void;
+        _changeLinkTarget(graph: Graph, link: Link, end: any, prevEnd: any): void;
+        _changeLinkWarning(graph: Graph, link: Link, warn: any, prevWarn: any): void;
 
         // this function is extended from backbone I likely
         // backbone has to do with events
-        listenTo(graph: any, event: string, callback: Function): void;
+        listenTo(graph: Graph, event: string, callback: Function): void;
     };
 
 
 
     export interface SynchEngine extends BaseEngine {
-        new(graph: any, { cells: any }): SynchEngine;
+        new(graph: Graph, { cells: Cells }): SynchEngine;
 
         // Specific properties for SynchEngine
         _queue: Map<any, any>;
-        _pq: any;
+        _pq: PriorityQueue;
         _tick: number;
-        _cells: any;
+        _cells: Cells;
         _monitorChecks: Map<any, any>;
         _alarms: Map<any, any>;
         _alarmQueue: Map<any, any>;
@@ -65,8 +72,8 @@ declare module "custom_digitaljs" {
         shutdown(): void;
         // Methods specific to SynchEngine
         _updateSubcircuit(gate: Gate, sigs: any, prevSigs?: any): void;
-        _addGate(graph: any, gate: Gate): void;
-        _addGraph(graph: any): void;
+        _addGate(graph: Graph, gate: Gate): void;
+        _addGraph(graph: Graph): void;
         _enqueue(gate: Gate): void;
         updateGatesNext(): Promise<number>;
         // probably also important
@@ -79,8 +86,8 @@ declare module "custom_digitaljs" {
         get interval(): number;
         set interval(ms: number);
         get running(): boolean;
-        observeGraph(graph: any): void;
-        unobserveGraph(graph: any): Function;
+        observeGraph(graph: Graph): void;
+        unobserveGraph(graph: Graph): Function;
         monitor(gate: Gate, port: string, callback: Function, options: { triggerValues: any, stopOnTrigger: boolean, oneShot: boolean }): { gate: Gate, callback: Function };
         unmonitor(monitorId: any): void;
         alarm(tick: number, callback: Function, options: { stopOnAlarm: boolean }): void;
@@ -103,7 +110,7 @@ declare module "custom_digitaljs" {
     }
     export class SynchEngine implements SynchEngine {
         // constructor();
-        constructor(graph: any, { cells: any });
+        constructor(graph: Graph, { cells: Cells });
         // No need to redeclare methods here since they're in the interface
     }
 

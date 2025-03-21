@@ -89,18 +89,21 @@
         const [portD, nodeTypeD, uuidD] = destClass.split('_')
 
         // side effects
-        const sourceConnectionJson: any = createConnectionJson(
+		//*gs Type Casting?
+        const sourceConnectionJson: ConnectorFrom = createConnectionJson(
             `${nodeType}_${uuid}`,
             port
         )
-        const destConnectionJson: any = createConnectionJson(
+		//*gs Type Casting?
+        const destConnectionJson: ConnectorTo = createConnectionJson(
             `${nodeTypeD}_${uuidD}`,
             portD
         )
 
         // make sure that it is in the right order, From -> to
         let wireId: string | null = null
-        let connector: any = null
+		//* Type Connector
+        let connector: Connector = null
         wireId = destClass + '-' + sourceClass
         if (port.startsWith('in')) {
             connector = {
@@ -177,7 +180,7 @@
             // console.log(
             //     `valid linking from ${sourceClassName} to ${destClassName}`
             // )
-            const wire: { name: string; connection: any } =
+            const wire: { name: string; connection: Connector } =
                 createGlobalConnection(sourceClassName, destClassName)
 
             // side effects

@@ -32,7 +32,7 @@ export function handleLinkAnchorConnection(connection: Connector) {
 export const removeLinking = (inputConnectionId: string) => {
     circuitStore.update((currentCircuit) => {
         let foundInputLinking: number = -1
-        currentCircuit.connectors.forEach((item: any, idx: number) => {
+        currentCircuit.connectors.forEach((item: Connector, idx: number) => {
             // ASSUMPTION, 'to' is always input. this function will only run from an input.
             if (item.to.id == inputConnectionId) {
                 foundInputLinking = idx;
