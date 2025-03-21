@@ -44,10 +44,9 @@
     // this will save the camera position too.
 
     // This sort of works.
-    // window.addEventListener('beforeunload', async () => {
-    //     console.log('TRIGGERED')
-    //     await saveCircuit()
-    // })
+    window.addEventListener('beforeunload', () => {
+        saveCircuit()
+    })
 
     async function backupDelete() {
         // what if they clear an empty canvas.
@@ -77,7 +76,7 @@
         style="display:flex;align-items: center;padding-block:1px;"
     >
         <div style="margin-left: -8px">
-            {#if getRunning()}
+            {#if getRunning()}$circuitStors
                 <!-- content here -->
                 <PauseTickIcon style="transform:scale(1.8);" width={40} />
             {:else}

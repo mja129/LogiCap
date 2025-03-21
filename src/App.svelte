@@ -2,7 +2,7 @@
 <script lang="ts">
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    import { circuitStore } from './lib/circuitStore'
+    import { circuitStore, saveCircuit } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
@@ -93,6 +93,9 @@
         // saves state to local storage on node add.
         const uuid = generateNonce()
         newGateCircuitStore(gateType, uuid)
+        // there is a bug with this, the most recently created node wont be included.
+        // also there is a ton of overhead, it could be reduced.
+        saveCircuit()
     }
 
     // TELEPORT BUG GET FUCKED

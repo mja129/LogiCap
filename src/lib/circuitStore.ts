@@ -82,11 +82,9 @@ function savePositionsToCircuitStore() {
     saveDigitalJsState()
 }
 
-export async function saveCircuit() {
-    // click on the hidden svelvet button, the button is in "theme toggle" but I set it to display: none,
-    // and now we trigger it with css, after it triggers we use the svelvet json positions to set our digitial js positions
-    // the digitalJS save is the main save and we are just piggybacking off the svelvet save a bit
-    // the svelvet save does save our camera position and stuff though.
+
+export function clickSvelvetSave() {
+
     const svelvetSaveButton = document.querySelector('.save-button')
     const mouseEvent = new MouseEvent('click', {
         bubbles: true,
@@ -94,6 +92,14 @@ export async function saveCircuit() {
     })
     // const mouseEventUp = new MouseEvent('mouseup', { bubbles: true })
     svelvetSaveButton?.dispatchEvent(mouseEvent)
+}
+
+export async function saveCircuit() {
+    // click on the hidden svelvet button, the button is in "theme toggle" but I set it to display: none,
+    // and now we trigger it with css, after it triggers we use the svelvet json positions to set our digitial js positions
+    // the digitalJS save is the main save and we are just piggybacking off the svelvet save a bit
+    // the svelvet save does save our camera position and stuff though.
+    clickSvelvetSave()
 
     // make sure it actually updated
     // there is a better way of doing this
