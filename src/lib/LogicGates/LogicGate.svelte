@@ -38,12 +38,14 @@
         width: number
         height: number
         gateType?: logicGateTypes
-        nodeId: string
-        connections: any
         position?: { x: number; y: number } | undefined
+        connections: any
+        nodeId: string
     } = $props()
 
     const circuitSvg = circuitSvgs[gateType as dualInputLogicTypes]
+
+    // $inspect($savedConnections).with(console.log)
 </script>
 
 <!-- Position property only works if cursor is set to false. -->

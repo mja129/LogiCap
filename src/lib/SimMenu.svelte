@@ -76,7 +76,7 @@
         style="display:flex;align-items: center;padding-block:1px;"
     >
         <div style="margin-left: -8px">
-            {#if getRunning()}$circuitStors
+            {#if getRunning()}
                 <!-- content here -->
                 <PauseTickIcon style="transform:scale(1.8);" width={40} />
             {:else}

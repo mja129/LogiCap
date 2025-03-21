@@ -2,7 +2,6 @@
     import { Anchor } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     import CustomWire from './CustomWire.svelte'
-    import { savedConnections } from '../circuitStore'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]

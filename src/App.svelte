@@ -1,6 +1,6 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
-    import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
+    import { Svelvet, Minimap, ThemeToggle, Node, Anchor } from 'svelvet'
 
     import {
         circuitStore,
@@ -35,7 +35,8 @@
     // the Devices part of the digitalJS json.
     let currentDevicesData: DeviceRecord = $state({})
     // this is literally not state
-    let savedInitData: Circuit | undefined = $state()
+    let existingConnections: Map<string, Array<[string, string]>> | any =
+        $state()
 
     // check if circuitStore is not null when the app starts up.
     onMount(() => {
@@ -49,11 +50,12 @@
         }
 
         const saveJson = JSON.parse(saveJsonText)
-        savedInitData = saveJson
 
         $circuitStore = saveJson
 
-        translateConnectionsToSvelvet($circuitStore.connectors)
+        existingConnections = translateConnectionsToSvelvet(
+            $circuitStore.connectors
+        )
 
         // console.log('circuitStore has devices on init')
         currentDevicesData = $circuitStore.devices
@@ -110,8 +112,6 @@
         saveCircuit()
     }
 
-    $inspect($circuitStore.connectors).with(console.log)
-
     // TELEPORT BUG GET FUCKED
     // try to fix the teleport bug.
     document.addEventListener('DOMContentLoaded', () => {
@@ -139,33 +139,57 @@
 <main>
     <SideMenu {createCanvasNode} />
     <SimMenu {clearCanvas} />
-    {#await translateConnectionsToSvelvet(savedInitData?.connectors) then existingConnections}
-        <Svelvet theme="LogiCap" disableSelection={false} controls>
-            <Minimap width={100} corner="NE" slot="minimap" />
-            <ThemeToggle
-                main="LogiCap"
-                corner="NW"
-                alt="LogiCap"
-                slot="toggle"
+    <Svelvet theme="LogiCap" disableSelection={false} controls>
+        <Minimap width={100} corner="NE" slot="minimap" />
+        <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
+        {#each Object.entries(currentDevicesData) as [nodeId, device]}
+            <!-- svelte-ignore svelte_component_deprecated -->
+            <SimNode
+                gateType={device.type as logicGateTypes}
+                nodeProps={{
+                    gateType: device.type as dualInputLogicTypes,
+                    width: 80,
+                    height: 50,
+                    position: device.position,
+                    connections:
+                        'default' in existingConnections
+                            ? []
+                            : existingConnections.get(nodeId) || [],
+                    nodeId,
+                    // Add any other specific props your node components need
+                }}
             />
-            {#each Object.entries(currentDevicesData) as [nodeId, device]}
-                <!-- svelte-ignore svelte_component_deprecated -->
-                <SimNode
-                    gateType={device.type as logicGateTypes}
-                    nodeProps={{
-                        gateType: device.type as dualInputLogicTypes,
-                        width: 80,
-                        height: 50,
-                        position: device.position,
-                        connections: existingConnections[nodeId],
-                        nodeId,
-                        // Add any other specific props your node components need
-                    }}
-                />
-                <!-- content here -->
-            {/each}
-        </Svelvet>
-    {/await}
+            <!-- content here -->
+        {/each}
+        <!-- <Node id="testNode2" connections={['testNode1', 'in_testNode1']}> -->
+        <!--     <div style="width:300px; background-color: red; height: 100px;"> -->
+        <!--         testNode2 -->
+        <!--     </div> -->
+        <!--     <Anchor -->
+        <!--         let:linked -->
+        <!--         let:hovering -->
+        <!--         let:connecting -->
+        <!--         id={'out_testNode2'} -->
+        <!--         key={'out_testNode2'} -->
+        <!--         direction={'east'} -->
+        <!--         output -->
+        <!--     ></Anchor> -->
+        <!-- </Node> -->
+        <!-- <Node id="testNode1" position={{ x: 40, y: 60 }}> -->
+        <!--     <div style="width:300px; background-color: red; height: 100px;"> -->
+        <!--         testNode1 -->
+        <!--     </div> -->
+        <!--     <Anchor -->
+        <!--         let:linked -->
+        <!--         let:hovering -->
+        <!--         let:connecting -->
+        <!--         id={'in_testNode1'} -->
+        <!--         key={'in_testNode1'} -->
+        <!--         direction={'west'} -->
+        <!--         input -->
+        <!--     ></Anchor> -->
+        <!-- </Node> -->
+    </Svelvet>
 </main>
 
 <style>

@@ -79,41 +79,6 @@ function savePositionsToCircuitStore() {
         return currCircuit
     })
     // save the state after updating it.
-    saveDigitalJsState()
-}
-
-type NodeId = string
-type InputAnchorId = string
-type OutputAnchorId = string
-type ConnectionTuple = [NodeId, InputAnchorId]
-type SvelvetConnection = Array<ConnectionTuple | NodeId>
-// AnchorId will always be anchorId's for output nodes. all input linkings are dependent on output ones
-type SvelvetConnections = Record<OutputAnchorId, SvelvetConnection>
-export let savedConnections: Writable<SvelvetConnections | {}> = writable({})
-
-export async function translateConnectionsToSvelvet(connections : Connector[] | undefined) {
-    let svelvetConnections: SvelvetConnections | {} = {}
-
-    if(connections === undefined) {
-        return
-    }
-
-    for (let i = 0; i < connections.length && connections[i] !== undefined; i++) {
-        const outId = connections[i].from.id
-        const inId = connections[i].to.id
-
-        // const [outFrom, inTo] = connections[i].name.split["-"]
-        const [outGateType, outUuid] = outId.split("_")
-        const [inGateType, inUuid] = inId.split("_")
-        const inputAnchorName = connections[i].to.port + "_" + inId
-
-        if (!svelvetConnections[outId]) {
-            svelvetConnections[outId] = []
-        }
-        svelvetConnections[outId].push([inId, inputAnchorName])
-
-    }
-    return svelvetConnections
 }
 
 export function clickSvelvetSave() {
@@ -134,12 +99,54 @@ export async function saveCircuit() {
     // the svelvet save does save our camera position and stuff though.
     clickSvelvetSave()
 
-    // make sure it actually updated
-    // there is a better way of doing this
-    // I don't even know if its a problem
-
     savePositionsToCircuitStore()
 
+    saveDigitalJsState()
+
+}
+
+type NodeId = string
+type InputAnchorId = string
+type OutputAnchorId = string
+type ConnectionTuple = [NodeId, InputAnchorId]
+type SvelvetConnection = Array<ConnectionTuple | NodeId>
+// AnchorId will always be anchorId's for output nodes. all input linkings are dependent on output ones
+type SvelvetConnections = Map<OutputAnchorId, SvelvetConnection>
+// export let savedConnections: Writable<SvelvetConnections | {default: }> = writable({})
+
+export function translateConnectionsToSvelvet(connections: Connector[] | undefined) {
+    let svelvetConnections: SvelvetConnections = new Map<OutputAnchorId, SvelvetConnection>()
+
+    if (connections === undefined) {
+        console.log("nothing when trying to load saved connections")
+        return { default: undefined }
+    }
+
+    if (connections.length === 0) {
+        console.log("saved circuit has no connections: when trying to load saved connections")
+        return { default: undefined }
+    }
+
+    for (let i = 0; i < connections.length && connections[i] !== undefined; i++) {
+        const outId = connections[i].from.id
+        const inId = connections[i].to.id
+
+        // const [outFrom, inTo] = connections[i].name.split["-"]
+        const [outGateType, outUuid] = outId.split("_")
+        const [inGateType, inUuid] = inId.split("_")
+        const inputAnchorName = connections[i].to.port + "_" + inId
+
+        if (outId in svelvetConnections) {
+            svelvetConnections.get(outId)?.push([inId, inputAnchorName]);
+            // svelvetConnections[outId].push([inId, inputAnchorName]);
+        }
+        else {
+            svelvetConnections.set(outId, [[inId, inputAnchorName]])
+        }
+
+    }
+    // savedConnections.set(svelvetConnections)
+    return svelvetConnections
 }
 
 export function handleLinkAnchorConnection(connection: Connector) {
