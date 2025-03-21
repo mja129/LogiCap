@@ -66,7 +66,7 @@ type NodeInfoList = {
     position: { x: number; y: number }
 }[]
 
-// saves the current circuitStore to localStorage under key 'circuitStoreSave'
+// SAVE RELATED CODE //
 
 // filters the svelvet library store for the data that we need.
 function filterSvelvetSave(saveJsonText: string) {
@@ -86,18 +86,25 @@ function filterSvelvetSave(saveJsonText: string) {
     return savedNodeNames
 }
 
-function hasLocalStorageItem(lsKey: string): string | null {
+function getLsItem(lsKey: string): string | null {
     return localStorage.getItem(lsKey) || (console.warn(`No saved "${lsKey}" found in localStorage.`), null)
 }
 
-// saves positions from svelvet save to savePositionsToCircuitStore
-function savePositionsToCircuitStore() {
-    const saveJsonText = hasLocalStorageItem("state")
 
+// saves positions from svelvet save to circuitStore, in memory
+function savePositionsToCircuitStore() {
+    // this is an arrow function because this function kinda loads -> and saves
+    // and it could be a separate function, I want it to be at least named getSvelvetSave
+    // so im wrapping for the naming.
+    const getSvelvetSave = () => getLsItem("state")
+    const saveJsonText = getSvelvetSave()
+
+    // early return, state not found in localStorage
     if (saveJsonText === null) return null
 
     const savedNodeNames: NodeInfoList | null = filterSvelvetSave(saveJsonText)
 
+    // state exists but there are no nodes.
     if (savedNodeNames === null) return null
 
     // create saved nodes on canvas.
@@ -111,13 +118,12 @@ function savePositionsToCircuitStore() {
 }
 
 // save the current circuit store to localStorage
-export function saveDigitalJsState() {
-    const circuitStoreSave: string | null = hasLocalStorageItem("circuitStoreSave")
-    if (circuitStoreSave === null) {
-        console.log(
-            'Setting circuit store save in local storage for the first time'
-        )
-    }
+function saveCircuitStoreToLS() {
+    const circuitStoreSave: string | null = getLsItem("circuitStoreSave")
+
+    // getLsItem might warn that circuitStoreSave does not exist, in this case
+    // we are creating it for the first time, thats okay
+
     localStorage.setItem('circuitStoreSave', JSON.stringify(get(circuitStore)))
 }
 
@@ -134,7 +140,7 @@ export function clickSvelvetSave() {
 }
 
 // this is essentially a sync with localStorage.
-// Sync svelvet by clicking its button
+// Sync svelvet by clicking its button through clickListener, (I could probably find the function they use on this button lol, sounds like a good idea)
 // 
 export async function saveCircuit() {
     // click on the hidden svelvet button, the button is in "theme toggle" but I set it to display: none,
@@ -145,7 +151,7 @@ export async function saveCircuit() {
 
     savePositionsToCircuitStore()
 
-    saveDigitalJsState()
+    saveCircuitStoreToLS()
 
 }
 
@@ -183,6 +189,7 @@ export function translateConnectionsToSvelvet(connections: Connector[] | undefin
         const inId = connections[i].to.id
 
         // there is some issue with this code when it comes to dual outputs.
+        // 1 output with multiple wires.
         // const [outFrom, inTo] = connections[i].name.split["-"]
         const inputAnchorName = connections[i].to.port + "_" + inId
 
