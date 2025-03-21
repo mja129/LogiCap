@@ -1,8 +1,12 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
-    import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
+    import { Svelvet, Minimap, ThemeToggle, Node, Anchor } from 'svelvet'
 
-    import { circuitStore } from './lib/circuitStore'
+    import {
+        circuitStore,
+        saveCircuit,
+        translateConnectionsToSvelvet,
+    } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
@@ -13,6 +17,73 @@
     } from './lib/circuitModel'
     import { deviceFactoryMap } from './lib/makeDigitalJsJson'
     import SimMenu from './lib/SimMenu.svelte'
+    import { onMount } from 'svelte'
+
+    // this should probably be it's own file soon.
+
+    // the Devices part of the digitalJS json.
+    let currentDevicesData: DeviceRecord = $state({})
+    // this is literally not state
+    let existingConnections:
+        | Map<string, Array<[string, string] | string>>
+        | any = $state()
+
+    // check if circuitStore is not null when the app starts up.
+    onMount(() => {
+        const saveJsonText =
+            localStorage.getItem('circuitStoreSave') ||
+            (console.log('No saved state found in localStorage.'), null)
+
+        // sync up here.
+        if (saveJsonText === null) {
+            return
+        }
+
+        const saveJson = JSON.parse(saveJsonText)
+
+        $circuitStore = saveJson
+
+        existingConnections = translateConnectionsToSvelvet(
+            $circuitStore.connectors
+        )
+
+        // console.log('circuitStore has devices on init')
+        currentDevicesData = $circuitStore.devices
+    })
+
+    // create new node in the global store for circuitStore digital js backend.
+    // sync the devices list with the currentDevicesData variable.
+    const newGateCircuitStore = (
+        gateType: string,
+        uuid: string,
+        options?: any
+    ) => {
+        const nodeName: string = `${gateType}_${uuid}`
+        circuitStore.update((currentCircuit) => {
+            // Add the new device with a unique ID, e.g., 'newDeviceId'
+            // get function from map
+
+            const newDevice: Device =
+                options === undefined
+                    ? deviceFactoryMap[gateType](nodeName)
+                    : deviceFactoryMap[gateType](nodeName, options)
+
+            // const nextDeviceNum = Object.keys(currentDevicesData).length
+            currentCircuit.devices[nodeName] = newDevice
+
+            // sync new Device data with currentDevicesData
+            // I guess this could also just be currentDevicesData =
+            // $circuitStore.devices, but it may update more frequently than we need.
+            // makes more sense for it to be here.
+            currentDevicesData = currentCircuit.devices
+            // Add the new connector
+            // currentCircuit.connectors.push(newConnector)
+
+            // Return the updated circuit
+            return currentCircuit
+        })
+        return nodeName
+    }
 
     // this happens on every connection
     // ON change of global JSON circuit DATA, Run this.
@@ -25,40 +96,20 @@
             (byte) => charset[byte % charset.length]
         ).join('')
     }
-    // the Devices part of the digitalJS json.
-    let currentDevicesData: DeviceRecord = $state({})
 
-    // create new node in the global store for circuitStore digital js backend.
-    // sync the devices list with the currentDevicesData variable.
-    const newGateCircuitStore = (gateType: string) => {
-        const nodeName: string = `${gateType}_${generateNonce()}`
-        circuitStore.update((currentCircuit) => {
-            // Add the new device with a unique ID, e.g., 'newDeviceId'
-            // get function from map
-            const newDevice: Device = deviceFactoryMap[gateType](nodeName)
-            // const nextDeviceNum = Object.keys(currentDevicesData).length
-            currentCircuit.devices[nodeName] = newDevice
-
-            // sync new Device data with currentDevicesData
-            // I guess this could also just be currentDevicesData =
-            // $circuitStore.devices, but it may update more frequently than we need.
-            currentDevicesData = currentCircuit.devices
-            // Add the new connector
-            // currentCircuit.connectors.push(newConnector)
-
-            // Return the updated circuit
-            return currentCircuit
-        })
-        return nodeName
-    }
-    $inspect($circuitStore).with(console.log)
-
+    // $inspect($circuitStore).with(console.log)
     // called on "drop" in sidemenugroupitems.svelte
     function createCanvasNode(e: any) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         // this gate will update the store and then the subscribe will update the
         // list of circuits currently active on the screen
-        newGateCircuitStore(gateType)
+
+        // saves state to local storage on node add.
+        const uuid = generateNonce()
+        newGateCircuitStore(gateType, uuid)
+
+        // save on every addition of a new node.
+        saveCircuit()
     }
 
     // TELEPORT BUG GET FUCKED
@@ -81,11 +132,13 @@
             svelvetCanvas.dispatchEvent(eventUp)
         }
     })
+
+    const clearCanvas = () => (currentDevicesData = {})
 </script>
 
 <main>
     <SideMenu {createCanvasNode} />
-    <SimMenu />
+    <SimMenu {clearCanvas} />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
@@ -97,14 +150,45 @@
                     gateType: device.type as dualInputLogicTypes,
                     width: 80,
                     height: 50,
-                    canvasClicked: true,
+                    position: device.position,
+                    connections:
+                        existingConnections === undefined
+                            ? []
+                            : existingConnections.get(nodeId) || [],
                     nodeId,
-                    nodeStartPos: 200,
                     // Add any other specific props your node components need
                 }}
             />
             <!-- content here -->
         {/each}
+        <!-- <Node id="testNode2" connections={['testNode1', 'in_testNode1']}> -->
+        <!--     <div style="width:300px; background-color: red; height: 100px;"> -->
+        <!--         testNode2 -->
+        <!--     </div> -->
+        <!--     <Anchor -->
+        <!--         let:linked -->
+        <!--         let:hovering -->
+        <!--         let:connecting -->
+        <!--         id={'out_testNode2'} -->
+        <!--         key={'out_testNode2'} -->
+        <!--         direction={'east'} -->
+        <!--         output -->
+        <!--     ></Anchor> -->
+        <!-- </Node> -->
+        <!-- <Node id="testNode1" position={{ x: 40, y: 60 }}> -->
+        <!--     <div style="width:300px; background-color: red; height: 100px;"> -->
+        <!--         testNode1 -->
+        <!--     </div> -->
+        <!--     <Anchor -->
+        <!--         let:linked -->
+        <!--         let:hovering -->
+        <!--         let:connecting -->
+        <!--         id={'in_testNode1'} -->
+        <!--         key={'in_testNode1'} -->
+        <!--         direction={'west'} -->
+        <!--         input -->
+        <!--     ></Anchor> -->
+        <!-- </Node> -->
     </Svelvet>
 </main>
 
@@ -114,29 +198,11 @@
         --main-app-flex-height: calc(100vh - var(--app-bar-height));
     }
 
-    /*   Hide the svelvet theme toggle button   */
-    :global(button:has(.material-symbols-outlined)) {
+    /*   Hide the svelvet theme toggle button but make a proxy for it in simMenu.svelte */
+    :global(.controls-wrapper:has(.save-button)) {
         display: none !important;
     }
-    :global(.controls-wrapper:has(.save-button)) {
-        left: 360px !important;
-    }
 
-    :global(.save-button) {
-        font-size: 1.5rem;
-        padding-block: 5px !important;
-        padding-inline: 8px !important;
-    }
-    /*   That CSS is kinda sick!!   */
-    :global(.save-button::before) {
-        content: '💾';
-        margin-right: 10px;
-        margin-left: 0px;
-    }
-    :global(.controls-wrapper:has(.save-button):hover) {
-        filter: brightness(140%) !important;
-        /* background-color: red !important; */
-    }
     main {
         display: flex;
         flex-direction: row;

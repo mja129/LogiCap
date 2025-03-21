@@ -26,23 +26,28 @@
     let {
         width = 80,
         height = 50,
-        nodeStartPos,
         gateType = 'Not',
-        canvasClicked = false,
+        position = undefined,
+        connections = [],
         nodeId,
     }: {
         width: number
         height: number
-        nodeStartPos: number
         gateType?: logicGateTypes
-        canvasClicked: boolean
+        position?: { x: number; y: number } | undefined
+        connections: any
         nodeId: string
     } = $props()
 
     // Define a new device
 </script>
 
-<Node drop={canvasClicked ? 'cursor' : 'center'} id={nodeId}>
+<Node
+    drop={position !== undefined ? false : 'cursor'}
+    {connections}
+    {position}
+    id={nodeId}
+>
     <img
         src={circuitSvgs[gateType as singleIoLogicTypes]}
         alt={`${gateType} logic gate`}

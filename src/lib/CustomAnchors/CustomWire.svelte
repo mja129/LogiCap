@@ -22,7 +22,7 @@
     // color is black until there is some signal going through it.
 
     // I need to find when, wire is created and connection is also created.
-    $inspect(wireId).with(console.warn)
+    // $inspect(wireId).with(console.warn)
 
     // circuit.findWireByLabel(wire[0])
     // circuit.monitorWire(
