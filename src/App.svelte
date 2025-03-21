@@ -24,8 +24,9 @@
     // the Devices part of the digitalJS json.
     let currentDevicesData: DeviceRecord = $state({})
     // this is literally not state
-    let existingConnections: Map<string, Array<[string, string]>> | any =
-        $state()
+    let existingConnections:
+        | Map<string, Array<[string, string] | string>>
+        | any = $state()
 
     // check if circuitStore is not null when the app starts up.
     onMount(() => {
@@ -151,7 +152,7 @@
                     height: 50,
                     position: device.position,
                     connections:
-                        'default' in existingConnections
+                        existingConnections === undefined
                             ? []
                             : existingConnections.get(nodeId) || [],
                     nodeId,

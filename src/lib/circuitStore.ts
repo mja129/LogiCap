@@ -11,6 +11,17 @@ const initialCircuit: Circuit = {
 
 export let circuitStore = writable<Circuit>(initialCircuit)
 
+export function resetCircuitStore() {
+    circuitStore.update((currentCircuit) => {
+        currentCircuit = {
+            devices: {},
+            connectors: [],
+            subcircuits: {},
+        }
+        return currentCircuit
+    })
+}
+
 // Link anchor used in customAnchor.svelte mainly
 export function handleLinkAnchorConnection(connection: Connector) {
     const pushNewLinking = (connector: Connector) => {
@@ -47,16 +58,6 @@ export const removeLinking = (inputConnectionId: string) => {
     })
 }
 
-export function resetCircuitStore() {
-    circuitStore.update((currentCircuit) => {
-        currentCircuit = {
-            devices: {},
-            connectors: [],
-            subcircuits: {},
-        }
-        return currentCircuit
-    })
-}
 
 // the info that we will extract from the svelvet save.
 type NodeInfoList = {
@@ -111,8 +112,7 @@ function savePositionsToCircuitStore() {
 
 // save the current circuit store to localStorage
 export function saveDigitalJsState() {
-    const circuitStoreSave: string | null =
-        localStorage.getItem('circuitStoreSave')
+    const circuitStoreSave: string | null = hasLocalStorageItem("circuitStoreSave")
     if (circuitStoreSave === null) {
         console.log(
             'Setting circuit store save in local storage for the first time'
@@ -130,6 +130,7 @@ export function clickSvelvetSave() {
     })
     // const mouseEventUp = new MouseEvent('mouseup', { bubbles: true })
     svelvetSaveButton?.dispatchEvent(mouseEvent)
+    // some error handling?
 }
 
 // this is essentially a sync with localStorage.
