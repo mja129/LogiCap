@@ -82,6 +82,39 @@ function savePositionsToCircuitStore() {
     saveDigitalJsState()
 }
 
+type NodeId = string
+type InputAnchorId = string
+type OutputAnchorId = string
+type ConnectionTuple = [NodeId, InputAnchorId]
+type SvelvetConnection = Array<ConnectionTuple | NodeId>
+// AnchorId will always be anchorId's for output nodes. all input linkings are dependent on output ones
+type SvelvetConnections = Record<OutputAnchorId, SvelvetConnection>
+export let savedConnections: Writable<SvelvetConnections | {}> = writable({})
+
+export async function translateConnectionsToSvelvet(connections : Connector[] | undefined) {
+    let svelvetConnections: SvelvetConnections | {} = {}
+
+    if(connections === undefined) {
+        return
+    }
+
+    for (let i = 0; i < connections.length && connections[i] !== undefined; i++) {
+        const outId = connections[i].from.id
+        const inId = connections[i].to.id
+
+        // const [outFrom, inTo] = connections[i].name.split["-"]
+        const [outGateType, outUuid] = outId.split("_")
+        const [inGateType, inUuid] = inId.split("_")
+        const inputAnchorName = connections[i].to.port + "_" + inId
+
+        if (!svelvetConnections[outId]) {
+            svelvetConnections[outId] = []
+        }
+        svelvetConnections[outId].push([inId, inputAnchorName])
+
+    }
+    return svelvetConnections
+}
 
 export function clickSvelvetSave() {
 
@@ -104,11 +137,9 @@ export async function saveCircuit() {
     // make sure it actually updated
     // there is a better way of doing this
     // I don't even know if its a problem
-    const wait = (ms: number) =>
-        new Promise((resolve) => setTimeout(resolve, ms))
-    await wait(100)
 
     savePositionsToCircuitStore()
+
 }
 
 export function handleLinkAnchorConnection(connection: Connector) {

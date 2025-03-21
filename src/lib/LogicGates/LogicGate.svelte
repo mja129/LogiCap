@@ -31,15 +31,15 @@
         width = 80,
         height = 50,
         gateType = 'And',
-        canvasClicked = false,
         position = undefined,
+        connections = [],
         nodeId,
     }: {
         width: number
         height: number
         gateType?: logicGateTypes
-        canvasClicked: boolean
         nodeId: string
+        connections: any
         position?: { x: number; y: number } | undefined
     } = $props()
 
@@ -47,7 +47,12 @@
 </script>
 
 <!-- Position property only works if cursor is set to false. -->
-<Node drop={position !== undefined ? false : 'cursor'} id={nodeId} {position}>
+<Node
+    drop={position !== undefined ? false : 'cursor'}
+    {connections}
+    id={nodeId}
+    {position}
+>
     <img src={circuitSvg} alt={`${gateType} logic gate`} {width} {height} />
     <SimulationNodeAnchor
         location={['left', 'bot']}

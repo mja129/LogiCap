@@ -2,7 +2,11 @@
 <script lang="ts">
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    import { circuitStore, saveCircuit } from './lib/circuitStore'
+    import {
+        circuitStore,
+        saveCircuit,
+        translateConnectionsToSvelvet,
+    } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
@@ -30,6 +34,8 @@
     }
     // the Devices part of the digitalJS json.
     let currentDevicesData: DeviceRecord = $state({})
+    // this is literally not state
+    let savedInitData: Circuit | undefined = $state()
 
     // check if circuitStore is not null when the app starts up.
     onMount(() => {
@@ -43,8 +49,11 @@
         }
 
         const saveJson = JSON.parse(saveJsonText)
+        savedInitData = saveJson
 
         $circuitStore = saveJson
+
+        translateConnectionsToSvelvet($circuitStore.connectors)
 
         // console.log('circuitStore has devices on init')
         currentDevicesData = $circuitStore.devices
@@ -95,8 +104,13 @@
         newGateCircuitStore(gateType, uuid)
         // there is a bug with this, the most recently created node wont be included.
         // also there is a ton of overhead, it could be reduced.
+        // maybe adding a timer somewhere tbh, this is a reasonable solution
+        // or some kind of polling for the next value in the circuitStore
+        // im 'hitting the save' before the node exists in "state" localstorage
         saveCircuit()
     }
+
+    $inspect($circuitStore.connectors).with(console.log)
 
     // TELEPORT BUG GET FUCKED
     // try to fix the teleport bug.
@@ -125,26 +139,33 @@
 <main>
     <SideMenu {createCanvasNode} />
     <SimMenu {clearCanvas} />
-    <Svelvet theme="LogiCap" disableSelection={false} controls>
-        <Minimap width={100} corner="NE" slot="minimap" />
-        <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
-        {#each Object.entries(currentDevicesData) as [nodeId, device]}
-            <!-- svelte-ignore svelte_component_deprecated -->
-            <SimNode
-                gateType={device.type as logicGateTypes}
-                nodeProps={{
-                    gateType: device.type as dualInputLogicTypes,
-                    width: 80,
-                    height: 50,
-                    canvasClicked: true,
-                    position: device.position,
-                    nodeId,
-                    // Add any other specific props your node components need
-                }}
+    {#await translateConnectionsToSvelvet(savedInitData?.connectors) then existingConnections}
+        <Svelvet theme="LogiCap" disableSelection={false} controls>
+            <Minimap width={100} corner="NE" slot="minimap" />
+            <ThemeToggle
+                main="LogiCap"
+                corner="NW"
+                alt="LogiCap"
+                slot="toggle"
             />
-            <!-- content here -->
-        {/each}
-    </Svelvet>
+            {#each Object.entries(currentDevicesData) as [nodeId, device]}
+                <!-- svelte-ignore svelte_component_deprecated -->
+                <SimNode
+                    gateType={device.type as logicGateTypes}
+                    nodeProps={{
+                        gateType: device.type as dualInputLogicTypes,
+                        width: 80,
+                        height: 50,
+                        position: device.position,
+                        connections: existingConnections[nodeId],
+                        nodeId,
+                        // Add any other specific props your node components need
+                    }}
+                />
+                <!-- content here -->
+            {/each}
+        </Svelvet>
+    {/await}
 </main>
 
 <style>

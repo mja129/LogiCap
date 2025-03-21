@@ -2,6 +2,7 @@
     import { Anchor } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     import CustomWire from './CustomWire.svelte'
+    import { savedConnections } from '../circuitStore'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
@@ -68,6 +69,10 @@
     let connectingMirror: boolean = $state(true)
 
     // $inspect(connectingMirror).with(console.warn)
+    // console.warn($savedConnections[anchorId])
+    // $inspect($savedConnections).with(console.warn)
+
+    // only for loading in saved
 </script>
 
 <!--
@@ -86,7 +91,6 @@
         let:connecting
         id={anchorId}
         key={anchorId}
-        connections={[]}
         direction={location[0] === 'left' ? 'west' : 'east'}
         input={io === 'input'}
         output={io === 'output'}
