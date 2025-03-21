@@ -93,12 +93,12 @@
         const sourceConnectionJson: ConnectorFrom = createConnectionJson(
             `${nodeType}_${uuid}`,
             port
-        )
+        ) as ConnectorFrom
 		//*gs Type Casting?
         const destConnectionJson: ConnectorTo = createConnectionJson(
             `${nodeTypeD}_${uuidD}`,
             portD
-        )
+        ) as ConnectorTo
 
         // make sure that it is in the right order, From -> to
         let wireId: string | null = null
