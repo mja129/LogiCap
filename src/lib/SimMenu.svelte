@@ -15,11 +15,7 @@
         getCurrTick,
         resetCircuit,
     } from './circuitEngine.svelte'
-    import {
-        circuitStore,
-        resetCircuitStore,
-        saveCircuit,
-    } from './circuitStore'
+    import { resetCircuitStore, saveCircuit } from './circuitStore'
 
     let { clearCanvas }: { clearCanvas: Function } = $props()
 
@@ -43,7 +39,8 @@
     // don't lose the circuit when reloading the page.
     // this will save the camera position too.
 
-    // This sort of works.
+    // save circuit on page reload.
+    // works greatish
     window.addEventListener('beforeunload', () => {
         saveCircuit()
     })
@@ -52,10 +49,22 @@
         // what if they clear an empty canvas.
         await saveCircuit()
         // save previously deleted.
-        localStorage.setItem(
-            'prevCircuitStore',
-            localStorage.getItem('circuitStoreSave') || ''
-        )
+
+        const saveDeleted = localStorage.getItem('circuitStoreSave')
+        if (!saveDeleted) {
+            console.warn(
+                'we saved before deleting so this should not be possible'
+            )
+        } else if (
+            // only save non empty circuits to previousCircuitStore.
+            saveDeleted === '{"devices":{},"connectors":[],"subcircuits":{}}'
+        ) {
+            console.warn(
+                'EMPTY on delete, do not set prevCircuitStore just empty stores.'
+            )
+        } else {
+            localStorage.setItem('prevCircuitStore', saveDeleted)
+        }
         localStorage.removeItem('circuitStoreSave')
         localStorage.removeItem('state')
 
@@ -65,6 +74,7 @@
 
     async function onTrash() {
         await backupDelete()
+
         // clears the currentDevicesData variable in app.svelte
         clearCanvas()
     }

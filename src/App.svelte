@@ -21,17 +21,6 @@
 
     // this should probably be it's own file soon.
 
-    // this happens on every connection
-    // ON change of global JSON circuit DATA, Run this.
-    function generateNonce(length: number = 16): string {
-        const charset =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-        const values = crypto.getRandomValues(new Uint8Array(length))
-        return Array.from(
-            values,
-            (byte) => charset[byte % charset.length]
-        ).join('')
-    }
     // the Devices part of the digitalJS json.
     let currentDevicesData: DeviceRecord = $state({})
     // this is literally not state
@@ -94,6 +83,19 @@
         })
         return nodeName
     }
+
+    // this happens on every connection
+    // ON change of global JSON circuit DATA, Run this.
+    function generateNonce(length: number = 16): string {
+        const charset =
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        const values = crypto.getRandomValues(new Uint8Array(length))
+        return Array.from(
+            values,
+            (byte) => charset[byte % charset.length]
+        ).join('')
+    }
+
     // $inspect($circuitStore).with(console.log)
     // called on "drop" in sidemenugroupitems.svelte
     function createCanvasNode(e: any) {
@@ -104,11 +106,8 @@
         // saves state to local storage on node add.
         const uuid = generateNonce()
         newGateCircuitStore(gateType, uuid)
-        // there is a bug with this, the most recently created node wont be included.
-        // also there is a ton of overhead, it could be reduced.
-        // maybe adding a timer somewhere tbh, this is a reasonable solution
-        // or some kind of polling for the next value in the circuitStore
-        // im 'hitting the save' before the node exists in "state" localstorage
+
+        // save on every addition of a new node.
         saveCircuit()
     }
 

@@ -11,6 +11,42 @@ const initialCircuit: Circuit = {
 
 export let circuitStore = writable<Circuit>(initialCircuit)
 
+// Link anchor used in customAnchor.svelte mainly
+export function handleLinkAnchorConnection(connection: Connector) {
+    const pushNewLinking = (connector: Connector) => {
+        circuitStore.update((currentCircuit) => {
+            // Add the new device with a unique ID, e.g., 'newDeviceId'
+            currentCircuit.connectors.push(connector)
+            // Add the new connector
+            // currentCircuit.connectors.push(newConnector)
+
+            // Return the updated circuit
+            return currentCircuit
+        })
+    }
+    pushNewLinking(connection)
+}
+
+// Unlink Connection linking in our json representation
+// TODO: there is a way to restructure the map so that we can search by device and not have to spend all of this time with searching and inserting + shifting
+export const removeLinking = (inputConnectionId: string) => {
+    circuitStore.update((currentCircuit) => {
+        let foundInputLinking: number = -1
+        currentCircuit.connectors.forEach((item: any, idx: number) => {
+            // ASSUMPTION, 'to' is always input. this function will only run from an input.
+            if (item.to.id == inputConnectionId) {
+                foundInputLinking = idx
+            }
+        })
+
+        if (foundInputLinking !== -1) {
+            // remove 1 element starting from 'matchedIndex'
+            currentCircuit.connectors.splice(foundInputLinking, 1)
+        }
+        return currentCircuit
+    })
+}
+
 export function resetCircuitStore() {
     circuitStore.update((currentCircuit) => {
         currentCircuit = {
@@ -22,17 +58,7 @@ export function resetCircuitStore() {
     })
 }
 
-export function saveDigitalJsState() {
-    const circuitStoreSave: string | null =
-        localStorage.getItem('circuitStoreSave')
-    if (circuitStoreSave === null) {
-        console.log(
-            'Setting circuit store save in local storage for the first time'
-        )
-    }
-    localStorage.setItem('circuitStoreSave', JSON.stringify(get(circuitStore)))
-}
-
+// the info that we will extract from the svelvet save.
 type NodeInfoList = {
     nodeType: string
     uuid: string
@@ -44,6 +70,12 @@ type NodeInfoList = {
 // filters the svelvet library store for the data that we need.
 function filterSvelvetSave(saveJsonText: string) {
     const saveJson: SvelvetSave = JSON.parse(saveJsonText)
+
+    if (saveJson.nodes.length === 0) {
+        console.warn('save json exists but there are no nodes')
+        return null
+    }
+
     const savedNodeNames: NodeInfoList = saveJson.nodes.map(
         (node: SvelvetNode) => {
             let [nodeType, uuid] = node.id.substring(2).split('_')
@@ -53,17 +85,17 @@ function filterSvelvetSave(saveJsonText: string) {
     return savedNodeNames
 }
 
+function hasLocalStorageItem(lsKey: string): string | null {
+    return localStorage.getItem(lsKey) || (console.warn(`No saved "${lsKey}" found in localStorage.`), null)
+}
+
 // saves positions from svelvet save to savePositionsToCircuitStore
 function savePositionsToCircuitStore() {
-    const saveJsonText =
-        localStorage.getItem('state') ||
-        (console.warn('No saved state found in localStorage.'), null)
+    const saveJsonText = hasLocalStorageItem("state")
 
     if (saveJsonText === null) return null
 
-    const savedNodeNames: NodeInfoList | null =
-        filterSvelvetSave(saveJsonText) ||
-        (console.warn('save json exists but there are no nodes'), null)
+    const savedNodeNames: NodeInfoList | null = filterSvelvetSave(saveJsonText)
 
     if (savedNodeNames === null) return null
 
@@ -72,13 +104,21 @@ function savePositionsToCircuitStore() {
         savedNodeNames.forEach(({ nodeType, uuid, position }) => {
             const nodeName = `${nodeType}_${uuid}`
             currCircuit.devices[nodeName].position = position
-            // side effects
-            // find nodeName in devices
-            // newGateCircuitStore(nodeType, uuid, { position })
         })
         return currCircuit
     })
-    // save the state after updating it.
+}
+
+// save the current circuit store to localStorage
+export function saveDigitalJsState() {
+    const circuitStoreSave: string | null =
+        localStorage.getItem('circuitStoreSave')
+    if (circuitStoreSave === null) {
+        console.log(
+            'Setting circuit store save in local storage for the first time'
+        )
+    }
+    localStorage.setItem('circuitStoreSave', JSON.stringify(get(circuitStore)))
 }
 
 export function clickSvelvetSave() {
@@ -92,6 +132,9 @@ export function clickSvelvetSave() {
     svelvetSaveButton?.dispatchEvent(mouseEvent)
 }
 
+// this is essentially a sync with localStorage.
+// Sync svelvet by clicking its button
+// 
 export async function saveCircuit() {
     // click on the hidden svelvet button, the button is in "theme toggle" but I set it to display: none,
     // and now we trigger it with css, after it triggers we use the svelvet json positions to set our digitial js positions
@@ -111,29 +154,35 @@ type OutputAnchorId = string
 type ConnectionTuple = [NodeId, InputAnchorId]
 type SvelvetConnection = Array<ConnectionTuple | NodeId>
 // AnchorId will always be anchorId's for output nodes. all input linkings are dependent on output ones
+// the anchor id's in the generated html are A-{ourId} or B-{ourId}, maybe this
+// is causing issues with reloading output anchors that have multiple edges/wires.
+// Maybe the linking issues could also be solved by passing {connections} directly into anchors.
 type SvelvetConnections = Map<OutputAnchorId, SvelvetConnection>
+
+// I tried out a global solution below, maybe if I could get the links to be null after loading all of the nodes
+// Then set the links, it might trigger a re-render
 // export let savedConnections: Writable<SvelvetConnections | {default: }> = writable({})
 
+// On application mount, translate the saved CircuitStore to a map of stores that can be passed into svelvet nodes. 
 export function translateConnectionsToSvelvet(connections: Connector[] | undefined) {
     let svelvetConnections: SvelvetConnections = new Map<OutputAnchorId, SvelvetConnection>()
 
     if (connections === undefined) {
         console.log("nothing when trying to load saved connections")
-        return { default: undefined }
+        return undefined
     }
 
     if (connections.length === 0) {
         console.log("saved circuit has no connections: when trying to load saved connections")
-        return { default: undefined }
+        return undefined
     }
 
     for (let i = 0; i < connections.length && connections[i] !== undefined; i++) {
         const outId = connections[i].from.id
         const inId = connections[i].to.id
 
+        // there is some issue with this code when it comes to dual outputs.
         // const [outFrom, inTo] = connections[i].name.split["-"]
-        const [outGateType, outUuid] = outId.split("_")
-        const [inGateType, inUuid] = inId.split("_")
         const inputAnchorName = connections[i].to.port + "_" + inId
 
         if (outId in svelvetConnections) {
@@ -149,37 +198,3 @@ export function translateConnectionsToSvelvet(connections: Connector[] | undefin
     return svelvetConnections
 }
 
-export function handleLinkAnchorConnection(connection: Connector) {
-    const pushNewLinking = (connector: Connector) => {
-        circuitStore.update((currentCircuit) => {
-            // Add the new device with a unique ID, e.g., 'newDeviceId'
-            currentCircuit.connectors.push(connector)
-            // Add the new connector
-            // currentCircuit.connectors.push(newConnector)
-
-            // Return the updated circuit
-            return currentCircuit
-        })
-    }
-    pushNewLinking(connection)
-}
-
-// TODO: there is a way to restructure the map so that we can search by device and not have to spend all of this time with searching and inserting + shifting
-export const removeLinking = (inputConnectionId: string) => {
-    circuitStore.update((currentCircuit) => {
-        let foundInputLinking: number = -1
-        currentCircuit.connectors.forEach((item: any, idx: number) => {
-            // ASSUMPTION, 'to' is always input. this function will only run from an input.
-            if (item.to.id == inputConnectionId) {
-                foundInputLinking = idx
-            }
-        })
-
-        // const matchedIndex = currentCircuit.connectors.fi(conn => { console.log(JSON.stringify(connector)); console.log(JSON.stringify(conn)); return JSON.stringify(conn) == JSON.stringify(connection) });
-        if (foundInputLinking !== -1) {
-            // remove 1 element starting from 'matchedIndex'
-            currentCircuit.connectors.splice(foundInputLinking, 1)
-        }
-        return currentCircuit
-    })
-}
