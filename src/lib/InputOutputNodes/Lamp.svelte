@@ -1,7 +1,6 @@
 <script lang="ts">
     import { Node } from 'svelvet'
     import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
-    import { wireSignals } from '../circuitEngine.svelte'
 
     let {
         width = 80,
@@ -27,20 +26,6 @@
 
     const lampOffset: [number, number] = [-5, 35.43]
 
-    wireSignals.subscribe((signal) => {
-        let matchingWire = Object.keys(signal).find((wireId) =>
-            wireId.includes(nodeId)
-        )
-        if (matchingWire) {
-            if (signal[matchingWire] == 1) {
-                signalOn = true
-            } else {
-                signalOn = false
-            }
-        } else {
-            signalOn = false
-        }
-    })
 </script>
 
 <!-- cursor = drop -->
