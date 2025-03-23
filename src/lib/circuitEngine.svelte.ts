@@ -1,13 +1,14 @@
-import { HeadlessCircuit, engines as Engines } from 'custom_digitaljs'
+import { engines as Engines } from 'custom_digitaljs'
 import { circuitStore } from './circuitStore.ts'
 import { Vector3vl } from '3vl'
 import { writable, get, type Writable } from 'svelte/store';
+import { CustomHeadlessCircuit } from './CustomHeadlessCircuit.ts';
 
 //Two Vectors, both 1 bit, one is on (1) and off (0)
 let oneBit: Vector3vl = Vector3vl.ones(1);
 let zeroBit: Vector3vl = Vector3vl.zeros(1);
 
-export let circuitEngine: Writable<HeadlessCircuit | null> = writable<HeadlessCircuit | null>(null); //The null might be a little schizo
+export let circuitEngine: Writable<CustomHeadlessCircuit | null> = writable<CustomHeadlessCircuit | null>(null); //The null might be a little schizo
 
 // this is why we want circuitEngine.svelte.ts
 let running: boolean = $state(false)
@@ -22,7 +23,7 @@ export let wireSignals = writable<Record<string, number>>({}); //Wire signal sto
 let currentTick = $state(0) //This is legit just for the display, if theres a better way to do this tell me
 export const getCurrTick = () => currentTick
 
-Object.defineProperty(HeadlessCircuit.prototype, "running", {
+Object.defineProperty(CustomHeadlessCircuit.prototype, "running", {
     get() {
         //console.warn("Overriding `running` getter at runtime.");
         //This was here to prevent some weird error of it failing to access running
@@ -51,7 +52,7 @@ export function toggleSimulation(tickRate: number) {
         running = true;
         if (get(circuitEngine) === null) {
             console.log(get(circuitStore));
-            circuitEngine.set(new HeadlessCircuit(get(circuitStore)))
+            circuitEngine.set(new CustomHeadlessCircuit(get(circuitStore)))
             // circuitStore.subscribe((currCircuit) => {
             //     circuitEngine = new HeadlessCircuit()
             // })
@@ -75,7 +76,7 @@ function start(tickRate: number) {
     if (running === false) {
         return;
     }
-    const currEngine: HeadlessCircuit | null = get(circuitEngine)
+    const currEngine: CustomHeadlessCircuit | null = get(circuitEngine)
     if (currEngine === null) {
         console.log("impossible");
         return
@@ -134,7 +135,7 @@ export function updateTick() {
         console.log("Circuit is null")
         return;
     }
-    const currEngine: HeadlessCircuit | null = get(circuitEngine)
+    const currEngine: CustomHeadlessCircuit | null = get(circuitEngine)
     if (currEngine === null) {
         console.log("impossible");
         return
@@ -148,7 +149,7 @@ export function updateNext() {
         console.log("Circuit is null")
         return;
     }
-    const currEngine: HeadlessCircuit | null = get(circuitEngine)
+    const currEngine: CustomHeadlessCircuit | null = get(circuitEngine)
     if (currEngine === null) {
         console.log("impossible");
         return
@@ -168,7 +169,7 @@ export function inputSetter(inputName: string) {
         return;
     }
 
-    const currEngine: HeadlessCircuit | null = get(circuitEngine)
+    const currEngine: CustomHeadlessCircuit | null = get(circuitEngine)
     if (currEngine === null) {
         console.log("impossible");
         return

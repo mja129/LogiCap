@@ -1,8 +1,10 @@
 <script lang="ts">
     import { Anchor } from 'svelvet'
-    import CustomAnchor from './CustomAnchor.svelte'
-    import CustomWire from './CustomWire.svelte'
-    import { getRunning } from '../circuitEngine.svelte'
+    import OutputAnchor from './OutputAnchor.svelte'
+    import Wire from './Wire.svelte'
+    import { circuitStore, connectingEdge } from '../circuitStore'
+    import { get } from 'svelte/store'
+
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
@@ -66,7 +68,17 @@
     // I would like to make this and CustomAnchor one file, especially because all of the connection logic is in the child
     // But I cant get the let:linked into the outtermost scope of this file, Im not quite sure why.
     // to figure out how to make this one component, I need to figure out how the 'let:' directive works
-    let connectingMirror: boolean = $state(true)
+
+    // if this was a variable that had 1 per anchor, that kept track of what every anchor's last
+    // connection was, then I could know what the wire should be from either of the nodes, but then I need
+    //
+
+    // an input and output anchor should have the same id.
+    // starts as null, only once
+    // if connecting don't change
+    // if not connecting
+    //
+    let connectionName: any = $state()
 
     // $inspect(connectingMirror).with(console.warn)
     // console.warn($savedConnections[anchorId])
@@ -94,22 +106,20 @@
         direction={location[0] === 'left' ? 'west' : 'east'}
         input={io === 'input'}
         output={io === 'output'}
-        locked = {getRunning()}
+        connections={anchorId in get(circuitStore).connectors
+            ? get(circuitStore).connectors[anchorId as outputAnchorName]
+            : undefined}
     >
-        <CustomAnchor
+        <OutputAnchor
             {io}
             {connecting}
-            bind:connectingMirror
             {linked}
             {portName}
             nodeId={id}
             {anchorId}
             {hovering}
+            bind:connectionWireId={connectionName}
         />
-        <CustomWire
-            sourceAnchorId={anchorId}
-            slot="edge"
-            connecting={connectingMirror}
-        />
+        <Wire wireId={connectionName} initId={anchorId} slot="edge" />
     </Anchor>
 </div>

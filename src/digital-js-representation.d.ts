@@ -1,5 +1,4 @@
 // DIGITAL JS CircuitJson Input Types.
-
 type Button = {
     type: "Button"
     label: string
@@ -72,10 +71,28 @@ type Subcircuit = {
 }
 
 
+type GateType = string
+type UUID = string
+
+// this key will kinda 
+type outputAnchorName = `out_${GateType}_${UUID}`
+type inputGateName = `${GateType}_${UUID}`
+type inputIdentifier = `in${number}` | `in`
+type inputAnchorName =  `${inputIdentifier}_${GateType}_${UUID}`
+
+type ConnectionTuple = [inputGateName, inputAnchorName]
+type ConnectionList = Array<ConnectionTuple>
 // DIGITAL JS Circuit Input Json Type
 // Device manifest
 // Connection manifest
+type SvelvetConnectors = Record<outputAnchorName, ConnectionList>
 type Circuit = {
+    devices: DeviceRecord
+    connectors: SvelvetConnectors
+    subcircuits: Record<string, Subcircuit>
+}
+
+type DefaultCircuit = {
     devices: DeviceRecord
     connectors: Connector[]
     subcircuits: Record<string, Subcircuit>

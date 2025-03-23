@@ -5,17 +5,20 @@ import { writable, get } from 'svelte/store'
 
 const initialCircuit: Circuit = {
     devices: {},
-    connectors: [],
+    connectors: {},
     subcircuits: {},
 }
 
 export let circuitStore = writable<Circuit>(initialCircuit)
 
+// reasonable because there is only 1 'connecting' at a time
+export let connectingEdge = writable<boolean>(false)
+
 export function resetCircuitStore() {
     circuitStore.update((currentCircuit) => {
         currentCircuit = {
             devices: {},
-            connectors: [],
+            connectors: {},
             subcircuits: {},
         }
         return currentCircuit
@@ -23,39 +26,38 @@ export function resetCircuitStore() {
 }
 
 // Link anchor used in customAnchor.svelte mainly
-export function handleLinkAnchorConnection(connection: Connector) {
-    const pushNewLinking = (connector: Connector) => {
-        circuitStore.update((currentCircuit) => {
-            // Add the new device with a unique ID, e.g., 'newDeviceId'
-            currentCircuit.connectors.push(connector)
-            // Add the new connector
-            // currentCircuit.connectors.push(newConnector)
+// we could make it $circuitStore.addLinking -> I would preferthat TBH
+export function addConnection(fromAnchorId: outputAnchorName, toAnchorId: inputAnchorName) {
+    const toNodeId: inputGateName = toAnchorId.substring(toAnchorId.indexOf('_') + 1) as inputGateName
 
-            // Return the updated circuit
-            return currentCircuit
-        })
-    }
-    pushNewLinking(connection)
+    // instead of push try de-structuring
+    circuitStore.update((currCircuit) => {
+        if (!(fromAnchorId in currCircuit.connectors)) {
+            currCircuit.connectors[fromAnchorId] = new Array()
+        }
+        // I wanna check if the full array copy is needed here, I think it is tbh
+        currCircuit.connectors[fromAnchorId] = [...currCircuit.connectors[fromAnchorId], [toNodeId, toAnchorId]]
+        console.log(currCircuit.connectors);
+        return currCircuit
+    })
 }
 
-// Unlink Connection linking in our json representation
-// TODO: there is a way to restructure the map so that we can search by device and not have to spend all of this time with searching and inserting + shifting
-export const removeLinking = (inputConnectionId: string) => {
-    circuitStore.update((currentCircuit) => {
-        let foundInputLinking: number = -1
-        currentCircuit.connectors.forEach((item: Connector, idx: number) => {
-            // ASSUMPTION, 'to' is always input. this function will only run from an input.
-            if (item.to.id == inputConnectionId) {
-                foundInputLinking = idx
-            }
-        })
+export function removeConnection(inputAnchorId: string) {
+    circuitStore.update((currCircuit) => {
+        const newConnectors: SvelvetConnectors = {}
+        for (const fromAnchorId in currCircuit.connectors) {
 
-        if (foundInputLinking !== -1) {
-            // remove 1 element starting from 'matchedIndex'
-            currentCircuit.connectors.splice(foundInputLinking, 1)
+            // Filter out any connections that match the `toAnchorId`
+            // This logic would also remove duplicates, could be good or bad.
+            newConnectors[fromAnchorId as outputAnchorName] = [...currCircuit.connectors[fromAnchorId as outputAnchorName].filter(
+                ([, anchorId]) => { return anchorId !== inputAnchorId }
+            )]
+
         }
-        return currentCircuit
-    })
+        console.log(newConnectors);
+        currCircuit.connectors = newConnectors
+        return currCircuit;
+    });
 }
 
 

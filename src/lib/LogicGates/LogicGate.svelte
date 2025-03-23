@@ -49,12 +49,7 @@
 </script>
 
 <!-- Position property only works if cursor is set to false. -->
-<Node
-    drop={position !== undefined ? false : 'cursor'}
-    {connections}
-    id={nodeId}
-    {position}
->
+<Node drop={position !== undefined ? false : 'cursor'} id={nodeId} {position}>
     <img src={circuitSvg} alt={`${gateType} logic gate`} {width} {height} />
     <SimulationNodeAnchor
         location={['left', 'bot']}

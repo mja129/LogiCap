@@ -18,6 +18,9 @@
     import { deviceFactoryMap } from './lib/makeDigitalJsJson'
     import SimMenu from './lib/SimMenu.svelte'
     import { onMount } from 'svelte'
+    import { HeadlessCircuit } from 'custom_digitaljs'
+    import { circuitEngine } from './lib/circuitEngine.svelte'
+    import { CustomHeadlessCircuit } from './lib/CustomHeadlessCircuit'
 
     // this should probably be it's own file soon.
 
@@ -34,7 +37,6 @@
             localStorage.getItem('circuitStoreSave') ||
             (console.log('No saved state found in localStorage.'), null)
 
-        // sync up here.
         if (saveJsonText === null) {
             return
         }
@@ -42,10 +44,11 @@
         const saveJson = JSON.parse(saveJsonText)
 
         $circuitStore = saveJson
+        $circuitEngine = new CustomHeadlessCircuit($circuitStore)
 
-        existingConnections = translateConnectionsToSvelvet(
-            $circuitStore.connectors
-        )
+        // existingConnections = translateConnectionsToSvelvet(
+        //     $circuitStore.connectors
+        // )
 
         // console.log('circuitStore has devices on init')
         currentDevicesData = $circuitStore.devices
