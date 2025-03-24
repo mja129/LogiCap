@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Node } from 'svelvet'
-    import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
+    import SimulationNodeAnchor from '../CustomAnchors/Anchor.svelte'
     import { inputSetter } from '../circuitEngine.svelte'
 
     let {

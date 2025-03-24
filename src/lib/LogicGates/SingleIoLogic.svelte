@@ -2,7 +2,7 @@
     import { Node } from 'svelvet'
     // export let width: number = 80
     // export let height: number = 50
-    import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
+    import SimulationNodeAnchor from '../CustomAnchors/Anchor.svelte'
 
     // these are different
     import notGate from '../../assets/svg/notgate.svg'

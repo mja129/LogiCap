@@ -2,7 +2,7 @@
     import { Node } from 'svelvet'
     // export let width: number = 80
     // export let height: number = 50
-    import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
+    import SimulationNodeAnchor from '../CustomAnchors/Anchor.svelte'
     import andGate from '../../assets/svg/andgate.svg'
     import nandGate from '../../assets/svg/nandgate.svg'
     import orGate from '../../assets/svg/orgate.svg'
@@ -10,6 +10,7 @@
     import xorGate from '../../assets/svg/xorgate.svg'
     import xnorGate from '../../assets/svg/xnorgate.svg'
     import type { dualInputLogicTypes, logicGateTypes } from '../circuitModel'
+    import { onMount } from 'svelte'
 
     type LogicGateAnchors = 'in1' | 'in2' | 'out'
     const logicGateAnchorOffsets: Record<LogicGateAnchors, [number, number]> = {

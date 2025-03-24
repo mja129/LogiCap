@@ -78,7 +78,7 @@ type UUID = string
 type outputAnchorName = `out_${GateType}_${UUID}`
 type inputGateName = `${GateType}_${UUID}`
 type inputIdentifier = `in${number}` | `in`
-type inputAnchorName =  `${inputIdentifier}_${GateType}_${UUID}`
+type inputAnchorName = `${inputIdentifier}_${GateType}_${UUID}`
 
 type ConnectionTuple = [inputGateName, inputAnchorName]
 type ConnectionList = Array<ConnectionTuple>

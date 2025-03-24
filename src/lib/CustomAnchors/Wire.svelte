@@ -6,18 +6,16 @@
         lastConnected,
     } from '../circuitEngine.svelte.ts'
     import { circuitStore, connectingEdge } from '../circuitStore'
-    import { onDestroy, onMount } from 'svelte'
+    import { onDestroy, onMount, type Component } from 'svelte'
     import { get } from 'svelte/store'
     import type { HeadlessCircuit } from 'custom_digitaljs'
 
     let {
         initId,
         connecting = get(connectingEdge),
-        wireId,
     }: {
         initId: string
         connecting?: boolean
-        wireId: string
     } = $props()
 
     // it won't have a name until the connection is fully made.
@@ -25,6 +23,8 @@
 
     // how can this not be shit why am I blanking on it.
     let monitorFn: any = $state(() => null)
+
+    let wireId: string = $state((!connecting && get(lastConnected)) || '')
     // this global could be soooo problematic.
     // yup.
 
@@ -35,17 +35,22 @@
         monitorFn = () =>
             digitalJsCircuit.monitorWire(currWire, (tick: number) => {
                 const wireChange = onWireChange(wireId, currWire, tick)
-                console.warn(wireChange)
                 setWire(wireChange)
             })
     }
 
+    let edgeWrapper: any
+
     onMount(() => {
         // when we mount wire after reload
-        console.log('WIRE MOUNTED')
+        // Access the path element through the Edge component's method
+        // console.log('Path classes:', pathElement.classList)
+        // fan out
+
         if (!connecting) {
             // but we didnt start or reload
-            wireId = $lastConnected
+            wireId = $lastConnected || ''
+            // $lastConnected = undefined
             // make sure its named? find its linking.
             // if (sourceAnchorId in $circuitStore.connectors) {
             //     // propogate???
@@ -73,7 +78,7 @@
     onDestroy(() => {
         // if you disconnect a connected wire when the simulation is running?
         // if you connect a wire while running ?
-        console.log('the component is being destroyed')
+        // console.log('the component is being destroyed')
     })
     // color is black until there is some signal going through it.
 
@@ -93,7 +98,7 @@
     circuitEngine.subscribe((digitalJsCircuit) => {
         // reset on play/pause
         if (digitalJsCircuit === null) {
-            console.log('circuitEngine has become null set wire to be inactive')
+            // console.log('circuitEngine has become null set wire to be inactive')
             wireActive = -1
             return
         }
@@ -109,17 +114,55 @@
         setMonitor(digitalJsCircuit)
         monitorFn()
     })
+    document.addEventListener('DOMContentLoaded', () => {
+        // we could get rid of the last connected global var
+        // if we got rid of it we would need to get rid of this statement.
+        // its basically -> only make the wireId like this on appMount
+        if ($lastConnected !== undefined) {
+            return null
+        }
+        const allEdgeNodes: HTMLElement[] = Array.from(
+            edgeWrapper.parentElement.childNodes
+        )
+
+        const eleWithId: HTMLElement | undefined = allEdgeNodes.find(
+            (ele: any) => ele.role === 'presentation'
+        )
+
+        const edgeId: string | null =
+            (eleWithId && eleWithId.getAttribute('id')) || null
+
+        if (!edgeId) {
+            console.warn(
+                'No Id found on the edge component when loading in the component'
+            )
+            return null
+        }
+        // example:
+        // A-in2_Nand_R6ecBvquImEbPYoo/N-Nand_R6ecBvquImEbPYoo+A-out_Button_NqRwJIgwMnCkcvwZ/N-Button_NqRwJIgwMnCkcvwZ-target
+        const getInputAnchorId = (edgeId: string) => {
+            const startInputId = edgeId.indexOf('-') + 1
+            const endInputId = edgeId.indexOf('/')
+            return edgeId.substring(startInputId, endInputId)
+        }
+
+        wireId = initId + '-' + getInputAnchorId(edgeId)
+
+        $circuitEngine !== null && setMonitor($circuitEngine)
+        monitorFn()
+        // console.log(Array.from(fullEdgeComponent.childNodes))
+        // const [autoGenClass] =
+    })
 </script>
 
 <Edge let:path let:destroy>
     <div style="font-size: 10px;" slot="label">
-        {#if wireId}
-            {wireId}<span style="color: red">{initId}</span><span
-                style="color: blue">{get(connectingEdge)}</span
-            >
-        {/if}
+        {wireId}<span style="color: red">{initId}</span><span
+            style="color: blue">{get(connectingEdge)}</span
+        >
     </div>
     <path
+        bind:this={edgeWrapper}
         d={path}
         class={wireActive === -1 ? '' : wireActive === 1 ? 'on' : 'off'}
     />

@@ -35,10 +35,8 @@ function checkAnchorRelation(anchor1: string, anchor2: string): 'good_in_to_out'
         return 'good_out_to_in'
     else if (a1.isInput && a2.isInput)
         return 'bad_dual_input'
-    else if (a1.isOutput && a2.isOutput)
-        return 'bad_dual_output'
-    else
-        return "bad"
+
+    return 'bad_dual_output'
 }
 
 function matchAnchors(sourceClass: string, destClass: string): { fromOutputId: string, toInputId: string } {

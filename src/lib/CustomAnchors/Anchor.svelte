@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { Anchor } from 'svelvet'
-    import OutputAnchor from './OutputAnchor.svelte'
+    import { Anchor as SvelvetAnchor } from 'svelvet'
+    import CustomAnchor from './CustomAnchor.svelte'
     import Wire from './Wire.svelte'
     import { circuitStore, connectingEdge } from '../circuitStore'
     import { get } from 'svelte/store'
+    import { onMount } from 'svelte'
 
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -21,29 +22,6 @@
         io: 'input' | 'output'
         offset?: [number, number] | []
     } = $props()
-
-    function onWireChange(
-        wireId: string,
-        wire: any,
-        tick: number,
-        changeWireValue: () => {}
-    ) {
-        let logicValue: number
-        if (wire.attributes.signal) {
-            if (
-                wire.attributes.signal._avec[0] ==
-                wire.attributes.signal._bvec[0]
-            ) {
-                logicValue = wire.attributes.signal._avec[0]
-            } else {
-                logicValue = -1
-            }
-            // console.log(
-            //     `${wireId} has changed signal to ${logicValue} at tick ${tick}`
-            // )
-            changeWireValue()
-        }
-    }
 
     // TODO: deciding the port name should be done with a map and in a more generic way instead of an if statement.
     // Typescript could do some styff.
@@ -64,27 +42,27 @@
     }
     const anchorId = `${portName}_${id}`
 
-    // get state of linked node from child via closure function
-    // I would like to make this and CustomAnchor one file, especially because all of the connection logic is in the child
-    // But I cant get the let:linked into the outtermost scope of this file, Im not quite sure why.
-    // to figure out how to make this one component, I need to figure out how the 'let:' directive works
-
-    // if this was a variable that had 1 per anchor, that kept track of what every anchor's last
-    // connection was, then I could know what the wire should be from either of the nodes, but then I need
-    //
-
-    // an input and output anchor should have the same id.
-    // starts as null, only once
-    // if connecting don't change
-    // if not connecting
-    //
-    let connectionName: any = $state()
-
     // $inspect(connectingMirror).with(console.warn)
     // console.warn($savedConnections[anchorId])
     // $inspect($savedConnections).with(console.warn)
 
     // only for loading in saved
+
+    // the lookup can be made much faster with an interted map
+    // InNodeId : {outputlinkname, selfInputIndex in ouput mapping array}
+
+    // onMount(() => {
+    //     if (io === 'input') {
+    //         console.log('mounted input anchor')
+    //     }
+    // })
+
+    function getSavedAnchors(anchorId: string) {
+        if (anchorId in get(circuitStore).connectors) {
+            return get(circuitStore).connectors[anchorId as outputAnchorName]
+        }
+        return undefined
+    }
 </script>
 
 <!--
@@ -97,20 +75,18 @@
 <!-- This property will automatically set the dragged anchor to the first available io that fits on the node you drag your mouse to -->
 <!-- nodeConnect={true} -->
 <div style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}>
-    <Anchor
+    <SvelvetAnchor
         let:linked
         let:hovering
         let:connecting
         id={anchorId}
         key={anchorId}
         direction={location[0] === 'left' ? 'west' : 'east'}
-        input={io === 'input'}
-        output={io === 'output'}
-        connections={anchorId in get(circuitStore).connectors
-            ? get(circuitStore).connectors[anchorId as outputAnchorName]
-            : undefined}
+        input={(io === 'input' && true) || false}
+        output={(io === 'output' && true) || false}
+        connections={getSavedAnchors(anchorId)}
     >
-        <OutputAnchor
+        <CustomAnchor
             {io}
             {connecting}
             {linked}
@@ -118,8 +94,7 @@
             nodeId={id}
             {anchorId}
             {hovering}
-            bind:connectionWireId={connectionName}
         />
-        <Wire wireId={connectionName} initId={anchorId} slot="edge" />
-    </Anchor>
+        <Wire initId={anchorId} slot="edge" />
+    </SvelvetAnchor>
 </div>

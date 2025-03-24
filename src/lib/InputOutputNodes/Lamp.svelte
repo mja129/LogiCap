@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Node } from 'svelvet'
-    import SimulationNodeAnchor from '../CustomAnchors/SimulationNodeAnchor.svelte'
+    import SimulationNodeAnchor from '../CustomAnchors/Anchor.svelte'
+    import { wireSignals } from '../circuitEngine.svelte'
 
     let {
         width = 80,
@@ -25,7 +26,6 @@
     // Define a new device
 
     const lampOffset: [number, number] = [-5, 35.43]
-
 </script>
 
 <!-- cursor = drop -->
