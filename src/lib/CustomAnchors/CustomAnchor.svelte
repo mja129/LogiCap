@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { lastConnected } from '../circuitEngine.svelte'
+    import { get } from 'svelte/store'
+    import { lastConnected, getRunning } from '../circuitEngine.svelte'
     import { handleLinkAnchorConnection, removeLinking } from '../circuitStore'
 
     let {
@@ -258,7 +259,7 @@
     class:hovering
     class:connecting
     onmousedowncapture={() => {
-        if (linked && io === 'input') {
+        if (getRunning() == false && linked && io === 'input') {
             // make sure we are adding to the end of the list and starting the search from there.
             // Stack order
             removeLinking(nodeId)

@@ -2,6 +2,7 @@
     import { Anchor } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     import CustomWire from './CustomWire.svelte'
+    import { getRunning } from '../circuitEngine.svelte'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
     type LocationTuple = [LocationX, LocationY]
@@ -93,6 +94,7 @@
         direction={location[0] === 'left' ? 'west' : 'east'}
         input={io === 'input'}
         output={io === 'output'}
+        locked = {getRunning()}
     >
         <CustomAnchor
             {io}
