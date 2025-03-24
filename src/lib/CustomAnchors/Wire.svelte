@@ -36,6 +36,46 @@
             digitalJsCircuit.monitorWire(currWire, (tick: number) => {
                 const wireChange = onWireChange(wireId, currWire, tick)
                 setWire(wireChange)
+                let connectedTo: string | null
+                connectedTo = currWire.attributes?.target['id']
+                if (
+                    connectedTo != null &&
+                    digitalJsCircuit.getLabelIndex()['outputs'][connectedTo] !=
+                        null
+                ) {
+                    let curElement: Element | null = document.querySelector(
+                        `#N-${connectedTo}`
+                    )
+                    if (curElement != null) {
+                        let circleElement: SVGCircleElement | null =
+                            curElement.querySelector('circle')
+                        let lineElement: SVGLineElement | null =
+                            curElement.querySelector('line')
+                        if (circleElement != null && lineElement != null) {
+                            if (wireChange == 1) {
+                                circleElement.setAttribute('fill', 'green')
+                                circleElement.setAttribute(
+                                    'stroke',
+                                    'var(--lime-green)'
+                                )
+                                lineElement.setAttribute(
+                                    'stroke',
+                                    'var(--lime-green)'
+                                )
+                            } else {
+                                circleElement.setAttribute('fill', 'red')
+                                circleElement.setAttribute(
+                                    'stroke',
+                                    'var(--lime-red)'
+                                )
+                                lineElement.setAttribute(
+                                    'stroke',
+                                    'var(--lime-red)'
+                                )
+                            }
+                        }
+                    }
+                }
             })
     }
 

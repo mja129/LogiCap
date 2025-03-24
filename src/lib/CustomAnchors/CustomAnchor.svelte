@@ -8,7 +8,6 @@
     import {
         findAnchorTargetClassName,
         attemptLink,
-        setupStickyConnection,
     } from './linkAnchors.svelte.ts'
     import { connectingEdge } from '../circuitStore.ts'
 
@@ -29,6 +28,25 @@
         anchorId: string
         io?: string
     } = $props()
+
+    const makeStickyConnectHandler = (anchorClass: string) => {
+        function handleStickyConnect(event: any) {
+            event.preventDefault()
+            event.stopPropagation()
+            // console.log('Click After sticky edge')
+
+            const statusMsg = attemptLink(anchorClass, event.target.classList)
+
+            document.removeEventListener('mousedown', handleStickyConnect, true)
+        }
+        return handleStickyConnect
+    }
+
+    function setupStickyConnection(sourceAnchorClass: string) {
+        const handleStickyConnect = makeStickyConnectHandler(sourceAnchorClass)
+        // Listen for the mouse down with capture to handle sticky connections
+        document.addEventListener('mousedown', handleStickyConnect, true)
+    }
 
     function handleMouseUp(e: any) {
         const sourceAnchorClass = findAnchorTargetClassName(e.target.classList)

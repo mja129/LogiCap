@@ -54,7 +54,7 @@ export function removeConnection(inputAnchorId: string) {
             )]
 
         }
-        console.log(newConnectors);
+        // console.log(newConnectors);
         currCircuit.connectors = newConnectors
         return currCircuit;
     });
