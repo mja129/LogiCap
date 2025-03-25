@@ -40,7 +40,7 @@
         const saveJson = JSON.parse(saveJsonText)
 
         $circuitStore = saveJson
-        $circuitEngine = new CustomHeadlessCircuit($circuitStore)
+        // $circuitEngine = new CustomHeadlessCircuit($circuitStore)
 
         // existingConnections = translateConnectionsToSvelvet(
         //     $circuitStore.connectors
