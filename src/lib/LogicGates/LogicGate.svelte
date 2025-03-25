@@ -10,7 +10,8 @@
     import xorGate from '../../assets/svg/xorgate.svg'
     import xnorGate from '../../assets/svg/xnorgate.svg'
     import type { dualInputLogicTypes, logicGateTypes } from '../circuitModel'
-    import { onMount } from 'svelte'
+    import { get } from 'svelte/store'
+    import { circuitStore } from '../circuitStore'
 
     type LogicGateAnchors = 'in1' | 'in2' | 'out'
     const logicGateAnchorOffsets: Record<LogicGateAnchors, [number, number]> = {
@@ -67,5 +68,8 @@
         id={nodeId}
         io="output"
         offset={logicGateAnchorOffsets['out']}
+        connections={get(circuitStore).connectors[
+            ('out_' + nodeId) as outputAnchorName
+        ]}
     />
 </Node>

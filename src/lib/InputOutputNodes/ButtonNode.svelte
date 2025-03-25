@@ -2,6 +2,8 @@
     import { Node } from 'svelvet'
     import SimulationNodeAnchor from '../CustomAnchors/Anchor.svelte'
     import { inputSetter } from '../circuitEngine.svelte'
+    import { get } from 'svelte/store'
+    import { circuitStore } from '../circuitStore'
 
     let {
         width = 80,
@@ -106,5 +108,8 @@
         location={['right', 'mid']}
         id={nodeId}
         io="output"
+        connections={get(circuitStore).connectors[
+            ('out_' + nodeId) as outputAnchorName
+        ]}
     />
 </Node>

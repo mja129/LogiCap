@@ -16,11 +16,13 @@
         id,
         io,
         offset = [],
+        connections,
     }: {
         location: LocationTuple
         id: string
         io: 'input' | 'output'
         offset?: [number, number] | []
+        connections?: any
     } = $props()
 
     // TODO: deciding the port name should be done with a map and in a more generic way instead of an if statement.
@@ -79,7 +81,7 @@
         direction={location[0] === 'left' ? 'west' : 'east'}
         input={(io === 'input' && true) || false}
         output={(io === 'output' && true) || false}
-        connections={$circuitStore.connectors[anchorId as outputAnchorName]}
+        {connections}
     >
         <CustomAnchor
             {io}

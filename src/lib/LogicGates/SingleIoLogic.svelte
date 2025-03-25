@@ -8,6 +8,8 @@
     import notGate from '../../assets/svg/notgate.svg'
     import repeaterGate from '../../assets/svg/repeater.svg'
     import type { logicGateTypes, singleIoLogicTypes } from '../circuitModel'
+    import { circuitStore } from '../circuitStore'
+    import { get } from 'svelte/store'
 
     type SingleLogicGateAnchors = 'in' | 'out'
     const singleIoGateAnchorOffests: Record<
@@ -58,5 +60,8 @@
         id={nodeId}
         io="output"
         offset={singleIoGateAnchorOffests['out']}
+        connections={get(circuitStore).connectors[
+            ('out_' + nodeId) as outputAnchorName
+        ]}
     />
 </Node>
