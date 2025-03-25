@@ -134,6 +134,18 @@
             })
             svelvetCanvas.dispatchEvent(eventUp)
         }
+
+        // Wire glitch on dev mode get fucked
+        const hoverAnchor = new MouseEvent('mouseenter', {
+            bubbles: true,
+            cancelable: true,
+        })
+        const allAnchors: NodeListOf<HTMLElement> =
+            document.querySelectorAll('.anchor-wrapper')
+
+        allAnchors.forEach((anc: HTMLElement) => {
+            anc.dispatchEvent(hoverAnchor)
+        })
     })
 
     const clearCanvas = () => (currentDevicesData = {})
