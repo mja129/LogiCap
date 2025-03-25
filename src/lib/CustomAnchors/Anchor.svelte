@@ -5,6 +5,7 @@
     import { circuitStore, connectingEdge } from '../circuitStore'
     import { get } from 'svelte/store'
     import { onMount } from 'svelte'
+    import { getRunning } from '../circuitEngine.svelte'
 
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -81,6 +82,7 @@
         direction={location[0] === 'left' ? 'west' : 'east'}
         input={(io === 'input' && true) || false}
         output={(io === 'output' && true) || false}
+        locked = {getRunning()}
         {connections}
     >
         <CustomAnchor

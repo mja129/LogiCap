@@ -3,7 +3,7 @@
 <!-- </script> -->
 <!---->
 <script lang="ts">
-    import { lastConnected } from '../circuitEngine.svelte.ts'
+    import { lastConnected, getRunning} from '../circuitEngine.svelte.ts'
     import { circuitStore, removeConnection } from '../circuitStore.ts'
     import {
         findAnchorTargetClassName,
@@ -84,7 +84,7 @@
         e.preventDefault()
         // there is a niche bug here
         // click on linked anchor while dragging sticky.
-        if (linked && io === 'input') {
+        if (!getRunning() && linked && io === 'input') {
             console.log('UNLINKING')
             // make sure we are adding to the end of the list and starting the search from there.
             // Stack order
