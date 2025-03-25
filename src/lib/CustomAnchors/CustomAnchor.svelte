@@ -100,7 +100,7 @@
         border: 2px solid black;
         border-radius: 50%;
         height: 12.5px;
-        transform: scale(1.28);
+        transform: scale(1.4);
         width: 12.5px;
     }
     .linked {

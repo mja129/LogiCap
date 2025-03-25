@@ -22,17 +22,16 @@
     let wireActive: number = $state(-1)
 
     // how can this not be shit why am I blanking on it.
-    let monitorFn: any = $state(() => null)
 
     let wireId: string = $state((!connecting && get(lastConnected)) || '')
     // this global could be soooo problematic.
     // yup.
 
-    function setMonitor(digitalJsCircuit: HeadlessCircuit) {
+    function getMonitor(digitalJsCircuit: HeadlessCircuit) {
         const currWire = findWireInEngine(digitalJsCircuit)
         if (currWire === null) return
 
-        monitorFn = () =>
+        const monitorFn = () =>
             digitalJsCircuit.monitorWire(currWire, (tick: number) => {
                 const wireChange = onWireChange(wireId, currWire, tick)
                 setWire(wireChange)
@@ -77,6 +76,7 @@
                     }
                 }
             })
+        return monitorFn
     }
 
     let edgeWrapper: any
@@ -89,16 +89,22 @@
 
         if (!connecting) {
             // but we didnt start or reload
-            wireId = $lastConnected || ''
+            const lastCon = get(lastConnected)
+            if (lastCon) {
+                wireId = lastCon
+            } else {
+                console.log('Nada on Mont')
+            }
             // $lastConnected = undefined
             // make sure its named? find its linking.
             // if (sourceAnchorId in $circuitStore.connectors) {
             //     // propogate???
             //     $circuitStore.connectors[sourceAnchorId as outputAnchorName]
             // }
-            if ($circuitEngine) {
-                setMonitor($circuitEngine)
-            }
+            const monitorFn =
+                ($circuitEngine !== null && getMonitor($circuitEngine)) ||
+                (() => null)
+            monitorFn()
         }
     })
 
@@ -151,9 +157,12 @@
         //     )
         //     return
         // }
-        setMonitor(digitalJsCircuit)
+        const monitorFn =
+            (digitalJsCircuit !== null && getMonitor(digitalJsCircuit)) ||
+            (() => null)
         monitorFn()
     })
+
     document.addEventListener('DOMContentLoaded', () => {
         // we could get rid of the last connected global var
         // if we got rid of it we would need to get rid of this statement.
@@ -188,7 +197,9 @@
 
         wireId = initId + '-' + getInputAnchorId(edgeId)
 
-        $circuitEngine !== null && setMonitor($circuitEngine)
+        const monitorFn =
+            ($circuitEngine !== null && getMonitor($circuitEngine)) ||
+            (() => null)
         monitorFn()
         // console.log(Array.from(fullEdgeComponent.childNodes))
         // const [autoGenClass] =

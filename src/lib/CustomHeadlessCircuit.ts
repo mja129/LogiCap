@@ -26,7 +26,6 @@ export class CustomHeadlessCircuit extends HeadlessCircuit {
     constructor(data: Circuit, options?: CircuitOptions) {
         // Transform the data before passing it to the parent constructor
         const standardDigitalJsJson = transformConnections(data.connectors)
-        console.warn(standardDigitalJsJson)
         const digitalCircuit: DefaultCircuit = { devices: data.devices, connectors: standardDigitalJsJson, subcircuits: data.subcircuits }
         super(digitalCircuit, options)
 

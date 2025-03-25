@@ -219,6 +219,7 @@
     }
 
     :global(.svelvet-node) {
+        transform: scale(1.2) !important;
         background: none !important;
         box-shadow: none !important;
         border: none !important;
