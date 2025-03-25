@@ -90,7 +90,6 @@ function start(tickRate: number) {
 
 export function resetCircuit() {
     circuitEngine.set(null)
-    resetCircuitStore()
     currentTick = 0
     running = false;
 }

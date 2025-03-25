@@ -2,11 +2,7 @@
 <script lang="ts">
     import { Svelvet, Minimap, ThemeToggle, Node, Anchor } from 'svelvet'
 
-    import {
-        circuitStore,
-        saveCircuit,
-        translateConnectionsToSvelvet,
-    } from './lib/circuitStore'
+    import { circuitStore, saveCircuit } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
@@ -38,7 +34,7 @@
             (console.log('No saved state found in localStorage.'), null)
 
         if (saveJsonText === null) {
-            return
+            return null
         }
 
         const saveJson = JSON.parse(saveJsonText)
@@ -166,44 +162,12 @@
                     width: 80,
                     height: 50,
                     position: device.position,
-                    connections:
-                        existingConnections === undefined
-                            ? []
-                            : existingConnections.get(nodeId) || [],
                     nodeId,
                     // Add any other specific props your node components need
                 }}
             />
             <!-- content here -->
         {/each}
-        <!-- <Node id="testNode2" connections={['testNode1', 'in_testNode1']}> -->
-        <!--     <div style="width:300px; background-color: red; height: 100px;"> -->
-        <!--         testNode2 -->
-        <!--     </div> -->
-        <!--     <Anchor -->
-        <!--         let:linked -->
-        <!--         let:hovering -->
-        <!--         let:connecting -->
-        <!--         id={'out_testNode2'} -->
-        <!--         key={'out_testNode2'} -->
-        <!--         direction={'east'} -->
-        <!--         output -->
-        <!--     ></Anchor> -->
-        <!-- </Node> -->
-        <!-- <Node id="testNode1" position={{ x: 40, y: 60 }}> -->
-        <!--     <div style="width:300px; background-color: red; height: 100px;"> -->
-        <!--         testNode1 -->
-        <!--     </div> -->
-        <!--     <Anchor -->
-        <!--         let:linked -->
-        <!--         let:hovering -->
-        <!--         let:connecting -->
-        <!--         id={'in_testNode1'} -->
-        <!--         key={'in_testNode1'} -->
-        <!--         direction={'west'} -->
-        <!--         input -->
-        <!--     ></Anchor> -->
-        <!-- </Node> -->
     </Svelvet>
 </main>
 
@@ -231,7 +195,6 @@
     }
 
     :global(.svelvet-node) {
-        transform: scale(1.2) !important;
         background: none !important;
         box-shadow: none !important;
         border: none !important;

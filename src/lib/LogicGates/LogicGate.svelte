@@ -33,14 +33,12 @@
         height = 50,
         gateType = 'And',
         position = undefined,
-        connections = [],
         nodeId,
     }: {
         width: number
         height: number
         gateType?: logicGateTypes
         position?: { x: number; y: number } | undefined
-        connections: any
         nodeId: string
     } = $props()
 

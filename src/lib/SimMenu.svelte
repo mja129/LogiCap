@@ -51,9 +51,9 @@
         saveCircuit()
     })
 
-    async function backupDelete() {
+    function backupDelete() {
         // what if they clear an empty canvas.
-        await saveCircuit()
+        saveCircuit()
         // save previously deleted.
 
         const saveDeleted = localStorage.getItem('circuitStoreSave')
@@ -72,14 +72,13 @@
             localStorage.setItem('prevCircuitStore', saveDeleted)
         }
         localStorage.removeItem('circuitStoreSave')
-        localStorage.removeItem('state')
-
-        // reset the global store.
-        resetCircuitStore()
+        // localStorage.removeItem('state')
     }
 
-    async function onTrash() {
-        await backupDelete()
+    function onTrash() {
+        backupDelete()
+
+        resetCircuitStore()
 
         // clears the currentDevicesData variable in app.svelte
         clearCanvas()
@@ -126,7 +125,7 @@
             width={40}
         />
     </button>
-    <button onclick={() => onTrash()}>
+    <button onclick={onTrash}>
         <TrashIcon
             style="transform:scale(2.69);margin-right: -9px;"
             width={40}

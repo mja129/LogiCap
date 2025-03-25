@@ -57,12 +57,7 @@
     //     }
     // })
 
-    function getSavedAnchors(anchorId: string) {
-        if (anchorId in get(circuitStore).connectors) {
-            return get(circuitStore).connectors[anchorId as outputAnchorName]
-        }
-        return undefined
-    }
+    // could be undefined
 </script>
 
 <!--
@@ -84,7 +79,7 @@
         direction={location[0] === 'left' ? 'west' : 'east'}
         input={(io === 'input' && true) || false}
         output={(io === 'output' && true) || false}
-        connections={getSavedAnchors(anchorId)}
+        connections={$circuitStore.connectors[anchorId as outputAnchorName]}
     >
         <CustomAnchor
             {io}
