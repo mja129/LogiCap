@@ -28,6 +28,7 @@
     // yup.
 
     function getMonitor(digitalJsCircuit: HeadlessCircuit) {
+        console.log('Getting monitor')
         const currWire = findWireInEngine(digitalJsCircuit)
         if (currWire === null) return
 
@@ -121,11 +122,11 @@
 
     const setWire = (wireChange: number) => (wireActive = wireChange)
 
-    onDestroy(() => {
-        // if you disconnect a connected wire when the simulation is running?
-        // if you connect a wire while running ?
-        // console.log('the component is being destroyed')
-    })
+    // onDestroy(() => {
+    //     // if you disconnect a connected wire when the simulation is running?
+    //     // if you connect a wire while running ?
+    //     // console.log('the component is being destroyed')
+    // })
     // color is black until there is some signal going through it.
 
     // I need to find when, wire is created and connection is also created.
@@ -143,6 +144,7 @@
 
     circuitEngine.subscribe((digitalJsCircuit) => {
         // reset on play/pause
+        console.log('ENGINE UPDATE')
         if (digitalJsCircuit === null) {
             // console.log('circuitEngine has become null set wire to be inactive')
             wireActive = -1

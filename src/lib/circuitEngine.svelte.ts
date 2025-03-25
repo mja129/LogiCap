@@ -1,5 +1,5 @@
 import { engines as Engines } from 'custom_digitaljs'
-import { circuitStore } from './circuitStore.ts'
+import { circuitStore, resetCircuitStore } from './circuitStore.ts'
 import { Vector3vl } from '3vl'
 import { writable, get, type Writable } from 'svelte/store';
 import { CustomHeadlessCircuit } from './CustomHeadlessCircuit.ts';
@@ -20,7 +20,7 @@ export const getRunning = () => running
 // Naurr
 export let wireSignals = writable<Record<string, number>>({}); //Wire signal store
 
-let currentTick = $state(0) //This is legit just for the display, if theres a better way to do this tell me
+let currentTick = $state(0)
 export const getCurrTick = () => currentTick
 
 Object.defineProperty(CustomHeadlessCircuit.prototype, "running", {
@@ -47,8 +47,10 @@ Object.defineProperty(CustomHeadlessCircuit.prototype, "running", {
     Toggles running
 */
 export function toggleSimulation(tickRate: number) {
+
     if (!running) {
         console.log("Simulation Started")
+
         running = true;
         if (get(circuitEngine) === null) {
             console.log(get(circuitStore));
@@ -88,6 +90,7 @@ function start(tickRate: number) {
 
 export function resetCircuit() {
     circuitEngine.set(null)
+    resetCircuitStore()
     currentTick = 0
     running = false;
 }

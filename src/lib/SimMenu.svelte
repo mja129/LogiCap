@@ -14,8 +14,14 @@
         getRunning,
         getCurrTick,
         resetCircuit,
+        circuitEngine,
     } from './circuitEngine.svelte'
-    import { resetCircuitStore, saveCircuit } from './circuitStore'
+    import {
+        circuitStore,
+        resetCircuitStore,
+        saveCircuit,
+    } from './circuitStore'
+    import { CustomHeadlessCircuit } from './CustomHeadlessCircuit'
 
     let { clearCanvas }: { clearCanvas: Function } = $props()
 
