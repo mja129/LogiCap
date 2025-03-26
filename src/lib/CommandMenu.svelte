@@ -1,9 +1,12 @@
 <script lang="ts">
     import { Command } from "cmdk-sv";
-    import { onMount } from 'svelte';
+    import { onMount, afterUpdate } from 'svelte';
 
     let isMenuOpen = false; // local state for toggle menu visibility
-    let search = ''; 
+    let search = ""; 
+    let searchFlag = "";
+
+    let inputRef: HTMLInputElement | null = null;
 
     let pages: string[] = [];
     $: page = pages[pages.length - 1];
@@ -12,6 +15,7 @@
     function changePage(newPage: string) {
       pages = [...pages, newPage];
       search = "";
+      searchFlag = "";
     }
 
     // Pop the last page (go back one level).
@@ -19,6 +23,7 @@
       if (pages.length > 0) {
         pages = pages.slice(0, -1);
         search = "";
+        searchFlag = "";
       }
     }
 
@@ -60,71 +65,59 @@
       });
     });
 
-     // Handlers for selecting an item.
-  function handleGateSelect(gateId: string) {
-    console.log("Selected gate:", gateId);
-    // Custom logic: add gate to your simulation, etc.
-   
-  }
+    afterUpdate(() => {
+      if (isMenuOpen) {
+        // Dynamically locate the input field inside the Command.Input component
+        const realInput = document.querySelector(".cmdk-input");
+        if (realInput instanceof HTMLInputElement) {
+          realInput.focus(); // Explicitly call focus on the native input
+        }
+      }
+    });
 
-  function handleInputSelect(inputId: string) {
-    console.log("Selected input:", inputId);
-    // Custom logic: add input/output component, etc.
-   
-  }
 
-  // Reactive arrays for filtering.
-  $: filteredTopItems = topItems.filter(item =>
-    item.label.toLowerCase().includes(search.toLowerCase())
-  );
-  $: filteredGates = gates.filter(gate =>
-    gate.label.toLowerCase().includes(search.toLowerCase())
-  );
-  $: filteredInputs = inputs.filter(input =>
-    input.label.toLowerCase().includes(search.toLowerCase())
-  );
+    //export let createCanvasNode: (node: {gateType: string}) => void;
+
+    // Handlers for selecting items.
+    function handleSelect(nodeType: string) {
+      //createCanvasNode({ gateType: nodeType });
+    }
+
+    $: if (search !== searchFlag) {
+      searchFlag = search; // Update flag whenever search changes
+    }
 
 </script>
 
 {#if isMenuOpen}
-  <div class="menu">
-    <Command.Root filter={() => 1}>
-      <Command.Input bind:value={search} placeholder="Search..." />
+  {#key `${page}:${searchFlag}`}
+    <div class="menu">
+      <Command.Root filter={() => 1}>
+        <Command.Input class="cmdk-input" bind:value={search} placeholder="Search..." />
 
-        <Command.List>
-          {#if !page}
-            <!-- Top-level list; key the list so it re-renders when search changes -->
-            <Command.List key={"top" + search}>
-              {#each filteredTopItems as item (item.id)}
-                <Command.Item
-                  onSelect={() => changePage(item.id)}>
-                  {item.label}
-                </Command.Item>
-              {/each}
-            </Command.List>
-          {:else if page === "gates"}
-            <!-- Nested page for Gates -->
-            <Command.List key={"gates" + search}>
-              <Command.Group heading="Gates">
-                {#each filteredGates as gate (gate.id)}
+          <Command.List>
+            {#if !page}
+              <!-- Top-level list; key the list so it re-renders when search changes -->
+              <Command.List>
+                {#each topItems.filter(item =>
+                  item.label.toLowerCase().startsWith(search.toLowerCase())
+                ) as item (item.id)}    
                   <Command.Item
-                    onSelect={() => handleGateSelect(gate.id)}>
-                    {gate.label}
+                    onSelect={() => changePage(item.id)}>
+                    {item.label}
                   </Command.Item>
                 {/each}
-              </Command.Group>
-              <Command.Item onSelect={goBack}>
-                ← Back
-              </Command.Item>
-            </Command.List>
-          {:else if page === "inputs"}
-              <!-- Nested page for Inputs/Outputs -->
-              <Command.List key={"inputs" + search}>
-                <Command.Group heading="Inputs/Outputs">
-                  {#each filteredInputs as input (input.id)}
-                    <Command.Item
-                      onSelect={() => handleInputSelect(input.id)}>
-                      {input.label}
+              </Command.List>
+            {:else if page === "gates"}
+              <!-- Nested page for Gates -->
+              <Command.List>
+                <Command.Group heading="Gates">
+                  {#each gates.filter(gate =>
+                    gate.label.toLowerCase().startsWith(search.toLowerCase())
+                  ) as gate (gate.id)}
+                  
+                    <Command.Item onSelect={() => handleSelect(gate.id)}>
+                      {gate.label}
                     </Command.Item>
                   {/each}
                 </Command.Group>
@@ -132,10 +125,28 @@
                   ← Back
                 </Command.Item>
               </Command.List>
-          {/if}
-        </Command.List>  
-    </Command.Root>
-  </div>
+            {:else if page === "inputs"}
+                <!-- Nested page for Inputs/Outputs -->
+                <Command.List>
+                  <Command.Group heading="Inputs/Outputs">
+                    {#each inputs.filter(input =>
+                      input.label.toLowerCase().startsWith(search.toLowerCase())
+                    ) as input (input.id)}
+        
+                      <Command.Item onSelect={() => handleSelect(input.id)}>
+                        {input.label}
+                      </Command.Item>
+                    {/each}
+                  </Command.Group>
+                  <Command.Item onSelect={goBack}>
+                    ← Back
+                  </Command.Item>
+                </Command.List>
+            {/if}
+          </Command.List>  
+      </Command.Root>
+    </div>
+  {/key}
 {/if}
 
 
