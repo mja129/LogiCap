@@ -8,6 +8,7 @@
         translateConnectionsToSvelvet,
     } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
+    import CommandMenu from './lib/CommandMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
     import SimNode from './lib/SimNode.svelte'
@@ -139,6 +140,7 @@
 <main>
     <SideMenu {createCanvasNode} />
     <SimMenu {clearCanvas} />
+    <CommandMenu />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />

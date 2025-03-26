@@ -23,8 +23,11 @@
         "vite": "^6.1.0"
     },
     "dependencies": {
-        "svelvet": "^11.0.5",
+        "3vl": "^1.0.1",
+        "cmdk-sv": "^0.0.19",
         "custom_digitaljs": "./custom_digitaljs",
-        "3vl": "^1.0.1"
+        "logic-web-app": "file:",
+        "mkdirp": "^3.0.1",
+        "svelvet": "^11.0.5"
     }
 }

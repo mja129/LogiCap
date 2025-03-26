@@ -183,3 +183,17 @@ declare module "custom_digitaljs" {
         unalarm(alarmId: any); // probably string or int
     }
 }
+
+declare module "cmdk-sv" {
+    import { SvelteComponentTyped } from "svelte";
+  
+    export class Command extends SvelteComponentTyped<any> {
+      static Input: typeof SvelteComponentTyped<any>; // Typing for Command.Input
+      static List: typeof SvelteComponentTyped<any>;  // Typing for Command.List
+      static Item: typeof SvelteComponentTyped<any>; 
+      static Root: typeof SvelteComponentTyped<any>; // Typing for Command.Item
+      static value: typeof SvelteComponentTyped<any>;  
+      static search: typeof SvelteComponentTyped<any>;
+      static Group: typeof SvelteComponentTyped<any>;
+    }
+  }
