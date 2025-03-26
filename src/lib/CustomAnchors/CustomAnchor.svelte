@@ -3,13 +3,12 @@
 <!-- </script> -->
 <!---->
 <script lang="ts">
-    import { lastConnected, getRunning} from '../circuitEngine.svelte.ts'
+    import { getRunning } from '../circuitEngine.svelte.ts'
     import { circuitStore, removeConnection } from '../circuitStore.ts'
     import {
         findAnchorTargetClassName,
         attemptLink,
     } from './linkAnchors.svelte.ts'
-    import { connectingEdge } from '../circuitStore.ts'
 
     let {
         linked,
@@ -64,7 +63,6 @@
 
     $effect(() => {
         // we don't listen for mousedown because the 'connecting' prop, signals we have already been clicked on.
-        $connectingEdge = true
         if (connecting) {
             document.addEventListener('mouseup', handleMouseUp, true)
         }

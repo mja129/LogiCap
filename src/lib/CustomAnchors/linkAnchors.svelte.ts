@@ -1,6 +1,5 @@
-import { circuitStore, connectingEdge, addConnection } from '../circuitStore'
+import { addConnection } from '../circuitStore'
 import { get } from 'svelte/store'
-import { lastConnected } from '../circuitEngine.svelte'
 
 
 // look in the dom element classList for a class matching 'in' | 'in{number}' | 'out'
@@ -109,22 +108,18 @@ export function attemptLink(sourceClassName: string, destClassList: string[]) {
     console.log(statusMsg);
 
     if (statusMsg.startsWith('bad')) {
-        connectingEdge.set(false)
         return statusMsg
     }
 
 
     const destClassName = findAnchorTargetClassName(destClassList) as string
 
-    connectingEdge.set(false)
 
     const wireName: string = pushConnectionToCircuitStore(
         sourceClassName,
         destClassName
     )
 
-    // console.log(statusMsg);
-    lastConnected.set(wireName)
 
     return wireName
 

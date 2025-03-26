@@ -12,8 +12,6 @@ const initialCircuit: Circuit = {
 export let circuitStore = writable<Circuit>(initialCircuit)
 
 // reasonable because there is only 1 'connecting' at a time
-export let connectingEdge = writable<boolean>(false)
-
 export function resetCircuitStore() {
     circuitStore.update((currentCircuit) => {
         currentCircuit = {
@@ -59,7 +57,6 @@ export function removeConnection(inputAnchorId: string) {
         return currCircuit;
     });
 }
-
 
 // the info that we will extract from the svelvet save.
 type NodeInfoList = {

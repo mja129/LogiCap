@@ -13,7 +13,6 @@ export let circuitEngine: Writable<CustomHeadlessCircuit | null> = writable<Cust
 // this is why we want circuitEngine.svelte.ts
 let running: boolean = $state(false)
 export let monitoredWires: Set<string> = new Set() //For reupping on change
-export let lastConnected: Writable<string | undefined> = writable()
 
 export const getRunning = () => running
 
