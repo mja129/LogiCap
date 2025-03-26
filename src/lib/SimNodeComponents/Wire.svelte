@@ -145,17 +145,27 @@
             return
         }
 
+        // change wire
         const monitorFn =
             (digitalJsCircuit !== null && getMonitor(digitalJsCircuit)) ||
             (() => null)
+        // I guess I could assert here
         monitorFn()
     })
+
+    let wireDestroy = () => null
 </script>
 
-<Edge let:path let:destroy>
-    <div style="font-size: 10px;" slot="label">
-        {wireId}<span style="color: red">{initId}</span>
-    </div>
+<Edge let:path let:destroy let:hovering enableHover={true}>
+    <!--
+    <div
+    style="font-size: 10px;"
+    slot="label"
+>
+    -->
+    <!--     {wireId}<span style="color: red">{initId}</span> -->
+    <!-- </div> -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <path
         bind:this={edgeWrapper}
         d={path}
@@ -165,7 +175,7 @@
 
 <style>
     path {
-        stroke: var(--dark-blue);
+        stroke: black;
         stroke-width: 4px;
     }
     path:hover {

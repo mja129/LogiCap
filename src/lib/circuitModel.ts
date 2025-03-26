@@ -45,10 +45,18 @@ type ButtonInputNodeProps = ComponentProps<typeof ButtonNode>
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
 // when we do we will get them from SideMenuGroupItems.svelte and then spread them in App.svelte
-export type AllNodeProps =
-    | LogicGateProps // this one needs gateType.
-    | OutputResultNodeProps // signalOn, default should be okay always on init
-    | ButtonInputNodeProps // this one outputs a signal, it doesn't need any special inputs.
+
+// I swear I suck at typescript.
+// the nodes need 'nodeID' but I don't want to pass it into nodeProps on SimNode init in app.svelte.
+// I want to pass it as props of SimNode and then pass it through to the component myself.
+export type AllNodePropsWithoutId =
+    | Omit<LogicGateProps, 'nodeId'>
+    | Omit<OutputResultNodeProps, 'nodeId'>
+    | Omit<ButtonInputNodeProps, 'nodeId'>;
+
+// add back in nodeId
+export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
+
 
 // This maybe should be just a json file but I want it to be in this folder and that is maybe problematic
 export const menuJsonData: menuJsonType = {

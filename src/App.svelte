@@ -153,16 +153,16 @@
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
-        {#each Object.entries(currentDevicesData) as [nodeId, device]}
+        {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
             <!-- svelte-ignore svelte_component_deprecated -->
             <SimNode
                 gateType={device.type as logicGateTypes}
+                position={device.position}
+                {nodeId}
                 nodeProps={{
                     gateType: device.type as dualInputLogicTypes,
                     width: 80,
                     height: 50,
-                    position: device.position,
-                    nodeId,
                     // Add any other specific props your node components need
                 }}
             />

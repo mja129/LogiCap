@@ -2,7 +2,7 @@
     import { Node } from 'svelvet'
     // export let width: number = 80
     // export let height: number = 50
-    import SimulationNodeAnchor from '../CustomAnchors/Anchor.svelte'
+    import SimulationNodeAnchor from '../SimNodeComponents/Anchor.svelte'
 
     // these are different
     import notGate from '../../assets/svg/notgate.svg'
@@ -29,39 +29,35 @@
         width = 80,
         height = 50,
         gateType = 'Not',
-        position = undefined,
         nodeId,
     }: {
-        width: number
-        height: number
+        width?: number
+        height?: number
         gateType?: logicGateTypes
-        position?: { x: number; y: number } | undefined
         nodeId: string
     } = $props()
 
     // Define a new device
 </script>
 
-<Node drop={position !== undefined ? false : 'cursor'} {position} id={nodeId}>
-    <img
-        src={circuitSvgs[gateType as singleIoLogicTypes]}
-        alt={`${gateType} logic gate`}
-        {width}
-        {height}
-    />
-    <SimulationNodeAnchor
-        location={['left', 'mid']}
-        id={nodeId}
-        io="input"
-        offset={singleIoGateAnchorOffests['in']}
-    />
-    <SimulationNodeAnchor
-        location={['right', 'mid']}
-        id={nodeId}
-        io="output"
-        offset={singleIoGateAnchorOffests['out']}
-        connections={get(circuitStore).connectors[
-            ('out_' + nodeId) as outputAnchorName
-        ]}
-    />
-</Node>
+<img
+    src={circuitSvgs[gateType as singleIoLogicTypes]}
+    alt={`${gateType} logic gate`}
+    {width}
+    {height}
+/>
+<SimulationNodeAnchor
+    location={['left', 'mid']}
+    id={nodeId}
+    io="input"
+    offset={singleIoGateAnchorOffests['in']}
+/>
+<SimulationNodeAnchor
+    location={['right', 'mid']}
+    id={nodeId}
+    io="output"
+    offset={singleIoGateAnchorOffests['out']}
+    connections={get(circuitStore).connectors[
+        ('out_' + nodeId) as outputAnchorName
+    ]}
+/>

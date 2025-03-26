@@ -2,7 +2,7 @@
     import { Node } from 'svelvet'
     // export let width: number = 80
     // export let height: number = 50
-    import SimulationNodeAnchor from '../CustomAnchors/Anchor.svelte'
+    import SimulationNodeAnchor from '../SimNodeComponents/Anchor.svelte'
     import andGate from '../../assets/svg/andgate.svg'
     import nandGate from '../../assets/svg/nandgate.svg'
     import orGate from '../../assets/svg/orgate.svg'
@@ -33,13 +33,11 @@
         width = 80,
         height = 50,
         gateType = 'And',
-        position = undefined,
         nodeId,
     }: {
-        width: number
-        height: number
+        width?: number
+        height?: number
         gateType?: logicGateTypes
-        position?: { x: number; y: number } | undefined
         nodeId: string
     } = $props()
 
@@ -49,27 +47,25 @@
 </script>
 
 <!-- Position property only works if cursor is set to false. -->
-<Node drop={position !== undefined ? false : 'cursor'} id={nodeId} {position}>
-    <img src={circuitSvg} alt={`${gateType} logic gate`} {width} {height} />
-    <SimulationNodeAnchor
-        location={['left', 'bot']}
-        id={nodeId}
-        io="input"
-        offset={logicGateAnchorOffsets['in2']}
-    />
-    <SimulationNodeAnchor
-        location={['left', 'top']}
-        id={nodeId}
-        io="input"
-        offset={logicGateAnchorOffsets['in1']}
-    />
-    <SimulationNodeAnchor
-        location={['right', 'mid']}
-        id={nodeId}
-        io="output"
-        offset={logicGateAnchorOffsets['out']}
-        connections={get(circuitStore).connectors[
-            ('out_' + nodeId) as outputAnchorName
-        ]}
-    />
-</Node>
+<img src={circuitSvg} alt={`${gateType} logic gate`} {width} {height} />
+<SimulationNodeAnchor
+    location={['left', 'bot']}
+    id={nodeId}
+    io="input"
+    offset={logicGateAnchorOffsets['in2']}
+/>
+<SimulationNodeAnchor
+    location={['left', 'top']}
+    id={nodeId}
+    io="input"
+    offset={logicGateAnchorOffsets['in1']}
+/>
+<SimulationNodeAnchor
+    location={['right', 'mid']}
+    id={nodeId}
+    io="output"
+    offset={logicGateAnchorOffsets['out']}
+    connections={get(circuitStore).connectors[
+        ('out_' + nodeId) as outputAnchorName
+    ]}
+/>
