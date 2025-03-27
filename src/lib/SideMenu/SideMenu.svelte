@@ -96,9 +96,7 @@
 
     // this could also be "instance" data but this is simpler
     // SHOULD ONLY ONE BE OPEN AT A TIME?
-    let showSubMenu: boolean[] = $state(
-        Array(menuGroupNames.length).fill(false)
-    )
+    let showSubMenu: boolean[] = $state(Array(menuGroupNames.length).fill(true))
     // console.log(showSubMenu)
     // click on menu item
     // vs

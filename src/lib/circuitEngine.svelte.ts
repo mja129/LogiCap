@@ -1,5 +1,4 @@
-import { engines as Engines } from 'custom_digitaljs'
-import { circuitStore, resetCircuitStore } from './circuitStore.ts'
+import { circuitStore } from './circuitStore.ts'
 import { Vector3vl } from '3vl'
 import { writable, get, type Writable } from 'svelte/store';
 import { CustomHeadlessCircuit } from './CustomHeadlessCircuit.ts';
@@ -93,6 +92,20 @@ export function resetCircuit() {
     running = false;
 }
 
+export function findWireInEngine(
+    digitalJsCircuit: CustomHeadlessCircuit,
+    wireId: string
+) {
+    let currWire = digitalJsCircuit?.findWireByLabel(wireId)
+    if (!currWire) {
+        console.warn(
+            'Wire not created yet on headless circuit creation or update'
+        )
+        return null
+    }
+    return currWire
+}
+
 /*
     Adds to monitorList
 */
@@ -107,7 +120,7 @@ export function resetCircuit() {
     This is just to make less annoying by passing in id instead of a wire object
 */
 
-export function onWireChange(wireId: string, wire: any, tick: number) {
+export function onWireChange(wire: any) {
     let logicValue: number
     if (wire.attributes.signal) {
         if (

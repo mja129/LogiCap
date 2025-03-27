@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { Node } from 'svelvet'
     import SimulationNodeAnchor from '../SimNodeComponents/Anchor.svelte'
-    import { wireSignals } from '../circuitEngine.svelte'
 
     let {
         width = 80,
@@ -28,8 +26,16 @@
     height="65"
     viewBox="-12 0 95 100"
     xmlns="http://www.w3.org/2000/svg"
+    class={'LampSVG'}
 >
-    <line x1="-50" x2="5" y1="45" y2="45" stroke={'red'} stroke-width="8" />
+    <line
+        x1="-50"
+        x2="5"
+        y1="45"
+        y2="45"
+        stroke={'lightgray'}
+        stroke-width="8"
+    />
 
     <!-- Circle -->
     <circle

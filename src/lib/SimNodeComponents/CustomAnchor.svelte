@@ -1,29 +1,25 @@
-<!-- <script context="module"> -->
+<!-- <script module> -->
 <!--     let persistedState = 0 -->
 <!-- </script> -->
 <!---->
 <script lang="ts">
     import { getRunning } from '../circuitEngine.svelte.ts'
-    import { circuitStore, removeConnection } from '../circuitStore.ts'
     import {
         findAnchorTargetClassName,
         attemptLink,
     } from './linkAnchors.svelte.ts'
+    import { removeConnection } from '../circuitStore.ts'
 
     let {
         linked,
         hovering,
         connecting,
-        portName,
-        nodeId,
         anchorId,
         io = 'output',
     }: {
         linked: boolean
         hovering: boolean
         connecting: boolean
-        portName: string
-        nodeId: string
         anchorId: string
         io?: string
     } = $props()
@@ -67,9 +63,6 @@
             document.addEventListener('mouseup', handleMouseUp, true)
         }
     })
-
-    // TODO, may need to listen to onUnmount
-    // I think on disconnect has a default event from svelvet, try that out also this effect may set state to false many times, but honestly nah.
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -85,9 +78,9 @@
         if (!getRunning() && linked && io === 'input') {
             console.log('UNLINKING')
             // make sure we are adding to the end of the list and starting the search from there.
-            // Stack order
-            removeConnection(anchorId)
+            // Stack order removeConnection(anchorId)
             // now tell the connecting outputnode who you are
+            removeConnection(anchorId)
             // reverse mapping.
         }
     }}
@@ -105,25 +98,42 @@
         background-color: black !important;
     }
     .input.connecting {
-        background-color: var(--lime-red) !important;
+        /* background-color: var(--lime-red) !important; */
+        filter: brightness(180%) !important;
         border: 2px solid black;
     }
     .output.connecting {
-        background-color: var(--lime-green);
+        /* background-color: var(--lime-green); */
+        filter: brightness(130%) !important;
         border: 2px solid black;
     }
     .input.linked {
-        border: 1px solid var(--red);
+        /* border: 1.8px solid red; */
+        border: 1.8px solid var(--pitt-blue);
     }
     .output.linked {
-        border: 1px solid green;
+        /* border: 1.8px solid green; */
+        border: 1.8px solid var(--pitt-yellow);
+    }
+    /* added dynamically in wire.svelte */
+    :global(.running .input) {
+        background-color: var(--pitt-blue) !important;
+    }
+    :global(.running .output) {
+        /* background-color: var(--pitt-yellow) !important; */
+    }
+    :global(.running .input.on, .running .output.on) {
+        border: 1.8px solid green !important;
+    }
+    :global(.running .input.off, .running .output.off) {
+        border: 1.8px solid red !important;
     }
 
     .input {
         background-color: red;
-        background-color: var(--red);
+        background-color: var(--pitt-blue);
     }
     .output {
-        background-color: green;
+        background-color: var(--pitt-yellow);
     }
 </style>

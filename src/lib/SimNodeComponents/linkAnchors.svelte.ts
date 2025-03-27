@@ -1,5 +1,4 @@
 import { addConnection } from '../circuitStore'
-import { get } from 'svelte/store'
 
 
 // look in the dom element classList for a class matching 'in' | 'in{number}' | 'out'

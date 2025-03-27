@@ -1,7 +1,4 @@
 <script lang="ts">
-    import { Node } from 'svelvet'
-    // export let width: number = 80
-    // export let height: number = 50
     import SimulationNodeAnchor from '../SimNodeComponents/Anchor.svelte'
 
     // these are different

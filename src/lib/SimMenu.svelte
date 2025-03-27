@@ -1,11 +1,6 @@
-<script lang="ts">
-    import UpdateGatesNextIcon from '~icons/streamline/button-fast-forward-2'
-    import PlayTickIcon from '~icons/streamline/button-play'
-    import ResetStateIcon from '~icons/streamline/interface-arrows-synchronize-arrows-loading-load-sync-synchronize-arrow-reload'
-    import PauseTickIcon from '~icons/streamline/button-pause-2'
-    import UpdateGatesIcon from '~icons/streamline/entertainment-control-button-next-button-television-buttons-movies-skip-next-video-controls'
-    import SaveIcon from '~icons/lucide/save'
-    import TrashIcon from '~icons/material-symbols/delete-outline'
+<script lang="ts" generics="T">
+    import { CustomHeadlessCircuit } from './CustomHeadlessCircuit'
+    import type { Component } from 'svelte'
 
     import {
         toggleSimulation,
@@ -14,20 +9,44 @@
         getRunning,
         getCurrTick,
         resetCircuit,
-        circuitEngine,
     } from './circuitEngine.svelte'
-    import {
-        circuitStore,
-        resetCircuitStore,
-        saveCircuit,
-    } from './circuitStore'
-    import { CustomHeadlessCircuit } from './CustomHeadlessCircuit'
+    import { resetCircuitStore, saveCircuit } from './circuitStore'
+
+    import UpdateGatesNextIcon from '~icons/streamline/button-fast-forward-2'
+    import PlayTickIcon from '~icons/streamline/button-play'
+    import ResetStateIcon from '~icons/streamline/interface-arrows-synchronize-arrows-loading-load-sync-synchronize-arrow-reload'
+    import PauseTickIcon from '~icons/streamline/button-pause-2'
+    import UpdateGatesIcon from '~icons/streamline/entertainment-control-button-next-button-television-buttons-movies-skip-next-video-controls'
+    import SaveIcon from '~icons/lucide/save'
+    import TrashIcon from '~icons/material-symbols/delete-outline'
+
+    type IconComponentMap = Record<string, Component<any>>
+    // if I could make this a snippet map that would be cool.
+    const iconComponentMap: IconComponentMap = {
+        updateGatesNext: UpdateGatesNextIcon,
+        playTick: PlayTickIcon,
+        resetState: ResetStateIcon,
+        pauseTick: PauseTickIcon,
+        updateGates: UpdateGatesIcon,
+        save: SaveIcon,
+        trash: TrashIcon,
+    }
 
     let { clearCanvas }: { clearCanvas: Function } = $props()
 
-    function runSimulation(
+    function toggleRunSim(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
+        const appMainTag: Element | null =
+            document.querySelector('main#joplysim')
+        if (!appMainTag) return // impossible
+
+        if (appMainTag.classList.contains('running')) {
+            appMainTag.classList.remove('running')
+        } else {
+            appMainTag.classList.add('running')
+        }
+
         toggleSimulation(10)
     }
 
@@ -85,9 +104,23 @@
     }
 </script>
 
+<!-- There is some cool stuff to be done here with snippets. -->
+<!-- {#snippet simMenuIcon(ComponentMap: IconComponentMap, key:string, style: string, width: number)} -->
+<!--     <ComponentMap[key] {style} {width} /> -->
+<!-- {/snippet} -->
+<!---->
+<!-- <!-- This is basically like declaring a function that has html in it -->
+<!-- {#snippet simMenuButton(ComponentMap: IconComponentMap, key: string, iconStyle: string, width: number, onclick: Function)} -->
+<!--     <button onclick> -->
+<!--         <!-- There is no way this syntax is real wtf componentMap[key]??-->
+<!--         <ComponentMap[key] {style} {width} /> -->
+<!--         {@render simMenuIcon(ComponentMap, key, iconStyle, width)} -->
+<!--     </button> -->
+<!-- {/snippet} -->
+
 <div class="menuRunButtons">
     <button
-        onclick={runSimulation}
+        onclick={toggleRunSim}
         style="display:flex;align-items: center;padding-block:1px;"
     >
         <div style="margin-left: -8px">

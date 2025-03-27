@@ -82,15 +82,7 @@
         locked={getRunning()}
         {connections}
     >
-        <CustomAnchor
-            {io}
-            {connecting}
-            {linked}
-            {portName}
-            nodeId={id}
-            {anchorId}
-            {hovering}
-        />
-        <Wire initId={anchorId} slot="edge" />
+        <CustomAnchor {io} {connecting} {linked} {anchorId} {hovering} />
+        <Wire initAncId={anchorId} slot="edge" />
     </SvelvetAnchor>
 </div>

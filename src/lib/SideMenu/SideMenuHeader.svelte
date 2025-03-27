@@ -55,22 +55,12 @@
 </div>
 
 <style>
-    /* span { */
-    /*     /* font-family: 'vcr', sans-serif; */
+    /* .sun_icon { */
+    /*     color:var(--neon-purple); width:28px;height:28px;margin-top: 5px;margin-right: -8px; */
     /* } */
-
-    /* https://codepen.io/gayane-gasparyan/pen/vYmYMeV */
-    /* .side_menu_header img:nth-child(2) {
-        height: 12px;
-        margin-block: -6px;
-        width: 1500px;
-    } */
-    /* :global(.dark .side_menu_header) {
-        background-color: var(--dark-blue);
-    }
-    :global(.light .side_menu_header) {
-        background-color: var(--cream);
-    } */
+    /* .moon_icon { */
+    /*     style="color:grey !important; width:28px;height:28px;margin-top: 5px;margin-right: -8px; */
+    /* } */
     .side_menu_header {
         /* margin-top: -11px; */
         padding-inline: 10px;
@@ -78,28 +68,14 @@
         justify-content: space-between;
         /* margin-bottom: var(--side-menu-spacing); */
     }
-    /* .side_menu_header img {
-        width: 65px;
-        height: 55px;
-        margin-right: -11px;
-        margin-top: 4px;
-    } */
 
     h2 span:nth-child(6n) {
-        color: var(--blue);
+        color: var(--pitt-blue);
     }
     h2 span:nth-child(7n) {
-        color: var(--dark-blue);
+        color: var(--pitt-yellow);
     }
-    /* h2 span:nth-child(4n + 2) { */
-    /*     color: var(--pink); */
-    /* } */
-    /* h2 span:nth-child(4n + 3) { */
-    /*     color: var(--yellow); */
-    /* } */
-    /* h2 span:nth-child(4n + 4) { */
-    /*     color: var(--blue); */
-    /* } */
+
     :global(.dark h2) {
         -webkit-text-stroke: 2px white;
     }

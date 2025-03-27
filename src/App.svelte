@@ -1,6 +1,6 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
-    import { Svelvet, Minimap, ThemeToggle, Node, Anchor } from 'svelvet'
+    import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
     import { circuitStore, saveCircuit } from './lib/circuitStore'
     import SideMenu from './lib/SideMenu/SideMenu.svelte'
@@ -14,9 +14,6 @@
     import { deviceFactoryMap } from './lib/makeDigitalJsJson'
     import SimMenu from './lib/SimMenu.svelte'
     import { onMount } from 'svelte'
-    import { HeadlessCircuit } from 'custom_digitaljs'
-    import { circuitEngine } from './lib/circuitEngine.svelte'
-    import { CustomHeadlessCircuit } from './lib/CustomHeadlessCircuit'
 
     // this should probably be it's own file soon.
 
@@ -40,13 +37,6 @@
         const saveJson = JSON.parse(saveJsonText)
 
         $circuitStore = saveJson
-        // $circuitEngine = new CustomHeadlessCircuit($circuitStore)
-
-        // existingConnections = translateConnectionsToSvelvet(
-        //     $circuitStore.connectors
-        // )
-
-        // console.log('circuitStore has devices on init')
         currentDevicesData = $circuitStore.devices
     })
 
@@ -147,14 +137,13 @@
     const clearCanvas = () => (currentDevicesData = {})
 </script>
 
-<main>
+<main id="joplysim">
     <SideMenu {createCanvasNode} />
     <SimMenu {clearCanvas} />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
-            <!-- svelte-ignore svelte_component_deprecated -->
             <SimNode
                 gateType={device.type as logicGateTypes}
                 position={device.position}
@@ -177,7 +166,7 @@
         --main-app-flex-height: calc(100vh - var(--app-bar-height));
     }
 
-    /*   Hide the svelvet theme toggle button but make a proxy for it in simMenu.svelte */
+    /*   Hide the svelvet theme toggle button but make a proxy for it in simMenu.svelte *note 'has selector in css' is pretty cool*/
     :global(.controls-wrapper:has(.save-button)) {
         display: none !important;
     }

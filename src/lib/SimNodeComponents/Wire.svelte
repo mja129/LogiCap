@@ -1,141 +1,113 @@
 <script lang="ts">
     import { Edge } from 'svelvet'
-    import { circuitEngine, onWireChange } from '../circuitEngine.svelte.ts'
+    import {
+        circuitEngine,
+        onWireChange,
+        findWireInEngine,
+    } from '../circuitEngine.svelte.ts'
     import { onMount } from 'svelte'
-    import { get } from 'svelte/store'
-    import type { HeadlessCircuit } from 'custom_digitaljs'
+    import {
+        setAnchorSimStyles,
+        getWireIdFromDOM,
+        setLamp,
+    } from './wireUtils.ts'
+    import { CustomHeadlessCircuit } from '../CustomHeadlessCircuit.ts'
 
     let {
-        initId,
+        initAncId,
     }: {
-        initId: string
+        initAncId: string
     } = $props()
 
-    // it won't have a name until the connection is fully made.
+    // used for finding the html element with the connectionID
+    let edgeWrapper: SVGPathElement | null = null // I guess its not really a wrapper more of a child piece
+
     let wireActive: number = $state(-1)
 
-    // how can this not be shit why am I blanking on it.
-
     let wireId: string = $state('')
-    // this global could be soooo problematic.
-    // yup.
-    const setWire = (wireChange: number) => (wireActive = wireChange)
+    // let wireConnecting: boolean = $derived(
+    //     (wireId === '' && false) || wireId.includes('cursor')
+    // )
 
-    // used for finding the html element with the connectionID
-    let edgeWrapper: any
-
-    // I don't think this even needs to be on mount, it can be in the component I think.
+    // I tried to get rid of onMount but I couldn't
     onMount(() => {
-        // when we mount wire after reload
-        // Access the path element through the Edge component's method
-        // console.log('Path classes:', pathElement.classList)
-        // fan out
-        const newWireId = getWireIdFromDOM()
-        if (newWireId) {
-            wireId = newWireId
-            // the connecting wire will have 'cursor' in the name instead of the destination anchor
-            if (wireId.includes('cursor')) {
-                console.log('Connecting Wire Mounted')
-            } else {
-                const monitorFn =
-                    ($circuitEngine !== null && getMonitor($circuitEngine)) ||
-                    (() => null)
-                monitorFn()
-            }
-        }
+        let newId = getWireIdFromDOM(edgeWrapper, initAncId)
+        wireMount(newId)
     })
 
-    function getMonitor(digitalJsCircuit: HeadlessCircuit) {
+    // creates a monitor on wireMount
+    // also creates the wire name from the class on the wire that svelvet provides
+    // definitely used when loading in circuits from a save
+    function wireMount(
+        newId: string | null,
+        setWire: Function = (id: string) => (wireId = id)
+    ) {
+        // console.assert(newId !== null, 'wire id does not exist in edgeWrapper sibling nodes')
+        if (!newId) return null
+
+        // in theory the wireConnecting should update
+        setWire(newId)
+
+        const wireConnecting: boolean = newId.includes('cursor')
+
+        wireConnecting && console.log('Connecting wire mounted')
+
+        if (wireConnecting) return null // don't create listeners for connecting wires
+
+        const monitorFn =
+            ($circuitEngine !== null && getMonitor($circuitEngine)) ||
+            (() => null)
+        monitorFn()
+    }
+
+    // I know there is a less convoluted way to do this
+    // I tried removing the inner function and just running monitorFn right away by default
+    // It didn't work, very curious? I want to know why
+    function getMonitor(
+        digitalJsCircuit: CustomHeadlessCircuit,
+        setWireCallback: Function = (newSignal: number) =>
+            (wireActive = newSignal)
+    ) {
         // console.log('Getting monitor')
-        const currWire = findWireInEngine(digitalJsCircuit)
+        const currWire = findWireInEngine(digitalJsCircuit, wireId)
         if (currWire === null) return
 
         const monitorFn = () =>
             digitalJsCircuit.monitorWire(currWire, (tick: number) => {
-                const wireChange = onWireChange(wireId, currWire, tick)
+                const wireChange = onWireChange(currWire)
 
-                setWire(wireChange)
-                let connectedTo: string | null
-                connectedTo = currWire.attributes?.target['id']
+                // wireActive = wireChange // side-effects
+                // external global function that sets this, (like was here b4) is side-effects too
+                setWireCallback(wireChange) // No side-effects basically!
+
+                // get stuff out of the target.
+                const {
+                    id: connectedTo,
+                    port: toPort,
+                    magnet: _,
+                }: Record<
+                    'id' | 'port' | 'magnet',
+                    string | undefined
+                > = currWire.attributes?.target
+
+                if (!connectedTo || !toPort) return
+
+                setAnchorSimStyles(toPort, connectedTo, wireChange)
 
                 const labelOutputTo =
                     connectedTo &&
                     digitalJsCircuit.getLabelIndex()['outputs'][connectedTo]
 
-                if (connectedTo && labelOutputTo !== null) {
-                    setLamp(connectedTo, wireChange)
-                }
+                if (!labelOutputTo) return null
+
+                setLamp(connectedTo, wireChange)
             })
         return monitorFn
     }
 
-    function setLamp(connectedTo: string, wireChange: number) {
-        let curElement: Element | null = document.querySelector(
-            `#N-${connectedTo}`
-        )
-
-        if (curElement === null) return
-
-        const circleElement: SVGCircleElement | null =
-            curElement.querySelector('circle')
-        const lineElement: SVGLineElement | null =
-            curElement.querySelector('line')
-
-        if (circleElement === null || lineElement === null) return
-
-        if (wireChange == 1) {
-            circleElement.setAttribute('fill', 'green')
-            circleElement.setAttribute('stroke', 'var(--lime-green)')
-            lineElement.setAttribute('stroke', 'var(--lime-green)')
-        } else {
-            circleElement.setAttribute('fill', 'red')
-            circleElement.setAttribute('stroke', 'var(--lime-red)')
-            lineElement.setAttribute('stroke', 'var(--lime-red)')
-        }
-    }
-
-    function findWireInEngine(digitalJsCircuit: HeadlessCircuit) {
-        let currWire = digitalJsCircuit?.findWireByLabel(wireId)
-        if (!currWire) {
-            console.warn(
-                'Wire not created yet on headless circuit creation or update'
-            )
-            return null
-        }
-        return currWire
-    }
-
-    // svelvet makes classes on edges, Its much easier to use them.
-    function getWireIdFromDOM() {
-        const allEdgeNodes: HTMLElement[] = Array.from(
-            edgeWrapper.parentElement.childNodes
-        )
-
-        const eleWithId: HTMLElement | undefined = allEdgeNodes.find(
-            (ele: any) => ele.role === 'presentation'
-        )
-
-        const edgeId: string | null =
-            (eleWithId && eleWithId.getAttribute('id')) || null
-
-        if (!edgeId) {
-            console.warn(
-                'No Id found on the edge component when loading in the component'
-            )
-            return null
-        }
-        // example:
-        // A-in2_Nand_R6ecBvquImEbPYoo/N-Nand_R6ecBvquImEbPYoo+A-out_Button_NqRwJIgwMnCkcvwZ/N-Button_NqRwJIgwMnCkcvwZ-target
-        const getInputAnchorId = (edgeId: string) => {
-            const startInputId = edgeId.indexOf('-') + 1
-            const endInputId = edgeId.indexOf('/')
-            return edgeId.substring(startInputId, endInputId)
-        }
-
-        const wireId = initId + '-' + getInputAnchorId(edgeId)
-        return wireId
-    }
-
+    // I don't think this even needs to be on mount, it can be in the component I think.
+    // validate the wrapper and getChildNodes
+    // decent amount of overhead here, new listeners for every wire on circuit update
     circuitEngine.subscribe((digitalJsCircuit) => {
         // reset on play/pause
         // console.log('ENGINE UPDATE')
@@ -145,26 +117,17 @@
             return
         }
 
-        // change wire
         const monitorFn =
             (digitalJsCircuit !== null && getMonitor(digitalJsCircuit)) ||
             (() => null)
-        // I guess I could assert here
         monitorFn()
     })
-
-    let wireDestroy = () => null
 </script>
 
 <Edge let:path let:destroy let:hovering enableHover={true}>
-    <!--
-    <div
-    style="font-size: 10px;"
-    slot="label"
->
-    -->
-    <!--     {wireId}<span style="color: red">{initId}</span> -->
-    <!-- </div> -->
+    <div style="font-size: 10px;" slot="label">
+        {wireId}<span style="color: red">{initAncId}</span>
+    </div>
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <path
         bind:this={edgeWrapper}
