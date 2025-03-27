@@ -140,7 +140,7 @@
 <main>
     <SideMenu {createCanvasNode} />
     <SimMenu {clearCanvas} />
-    <CommandMenu />
+    <CommandMenu {createCanvasNode} />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
