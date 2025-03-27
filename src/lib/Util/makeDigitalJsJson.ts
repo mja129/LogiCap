@@ -71,7 +71,7 @@ function makeLogicNode(
     }
 }
 
-export const deviceFactoryMap: Record<
+export const deviceJsonFactoryMap: Record<
     string,
     (nodeName: string, options?: any) => Device
 > = {

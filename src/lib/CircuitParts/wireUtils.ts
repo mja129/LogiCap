@@ -61,25 +61,27 @@ export function setAnchorSimStyles(port: string, nodeId: string, wireChange: num
     console.assert(anchorElement !== null, 'could not find Anchor class when setting anchor colors while running')
     if (anchorElement === null) return
 
+    const hasClass = (anchor: HTMLElement, className: string) => anchor.classList.contains(className)
+    const isOff = (anchor: HTMLElement) => hasClass(anchor, 'on')
+    const isOn = (anchor: HTMLElement) => hasClass(anchor, 'off')
+
+    const getAnchorStates = (anchor: HTMLElement) => [isOn(anchor), isOff(anchor)]
+
+    const [anchorOn, anchorOff] = getAnchorStates(anchorElement)
 
     // only sets if something changed.
-    if (wireChange === 1 && anchorElement.classList.contains('off')) {
+    if (wireChange === 1 && anchorOn) {
         anchorElement.classList.remove('off')
         anchorElement.classList.add('on')
     }
-    else if (wireChange !== 1 && anchorElement.classList.contains('on')) {
+    else if (wireChange !== 1 && anchorOff) {
         anchorElement.classList.remove('on')
         anchorElement.classList.add('off')
     }
-    else {
-        // on and off have not been set at least once yet
+    else if (!anchorOn && !anchorOff) {
+        // on or off have not been set before, for this anchor
         anchorElement.classList.add(wireChange === 1 ? 'on' : 'off')
     }
-
-    console.log(anchorElement)
-    // const setAnchorOutline = (anchorElement: HTMLElement) => {
-    // }
-    // setAnchorOutline(anchorElement)
 }
 
 // ⭐️  Good Comment ⭐️

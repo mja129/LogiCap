@@ -1,5 +1,5 @@
 <script lang="ts">
-    import SimulationNodeAnchor from '../SimNodeComponents/Anchor.svelte'
+    import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
 
     let {
         width = 80,

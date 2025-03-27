@@ -1,14 +1,16 @@
 <script lang="ts">
-    import SimulationNodeAnchor from '../SimNodeComponents/Anchor.svelte'
-    import andGate from '../../assets/svg/andgate.svg'
-    import nandGate from '../../assets/svg/nandgate.svg'
-    import orGate from '../../assets/svg/orgate.svg'
-    import norGate from '../../assets/svg/norgate.svg'
-    import xorGate from '../../assets/svg/xorgate.svg'
-    import xnorGate from '../../assets/svg/xnorgate.svg'
-    import type { dualInputLogicTypes, logicGateTypes } from '../circuitModel'
     import { get } from 'svelte/store'
-    import { circuitStore } from '../circuitStore'
+
+    import { CircuitStore } from '@CircuitStore'
+    import type { dualInputLogicTypes, logicGateTypes } from '@CircuitModel'
+
+    import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
+    import andGate from '@assets/svg/andgate.svg'
+    import nandGate from '@assets/svg/nandgate.svg'
+    import orGate from '@assets/svg/orgate.svg'
+    import norGate from '@assets/svg/norgate.svg'
+    import xorGate from '@assets/svg/xorgate.svg'
+    import xnorGate from '@assets/svg/xnorgate.svg'
 
     type LogicGateAnchors = 'in1' | 'in2' | 'out'
     const logicGateAnchorOffsets: Record<LogicGateAnchors, [number, number]> = {
@@ -62,7 +64,7 @@
     id={nodeId}
     io="output"
     offset={logicGateAnchorOffsets['out']}
-    connections={get(circuitStore).connectors[
+    connections={get(CircuitStore).connectors[
         ('out_' + nodeId) as outputAnchorName
     ]}
 />

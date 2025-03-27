@@ -32,14 +32,4 @@ export class CustomHeadlessCircuit extends HeadlessCircuit {
         // Additional custom logic can go here
         console.log('CustomHeadlessCircuit Initialized')
     }
-
-    toJSON(): string {
-        // You could customize this method as needed
-        console.log('Custom toJSON method')
-        return super.toJSON()
-    }
-
-    customMethod(): string {
-        return 'This is a custom method!'
-    }
 }

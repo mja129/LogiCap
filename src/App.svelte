@@ -1,19 +1,15 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
+    import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    import { circuitStore, saveCircuit } from './lib/circuitStore'
-    import SideMenu from './lib/SideMenu/SideMenu.svelte'
-    // engines as just to call it with uppercase 'Engines'
+    import { CircuitStore, saveCircuit } from '@CircuitStore'
+    import type { dualInputLogicTypes, logicGateTypes } from '@CircuitModel'
+    import { deviceJsonFactoryMap } from '@Util/makeDigitalJsJson'
 
+    import SideMenu from '@AppComponents/SideMenu/SideMenu.svelte'
     import SimNode from './lib/SimNode.svelte'
-    import type {
-        dualInputLogicTypes,
-        logicGateTypes,
-    } from './lib/circuitModel'
-    import { deviceFactoryMap } from './lib/makeDigitalJsJson'
-    import SimMenu from './lib/SimMenu.svelte'
-    import { onMount } from 'svelte'
+    import SimMenu from '@AppComponents/SimMenu.svelte'
 
     // this should probably be it's own file soon.
 
@@ -36,8 +32,8 @@
 
         const saveJson = JSON.parse(saveJsonText)
 
-        $circuitStore = saveJson
-        currentDevicesData = $circuitStore.devices
+        $CircuitStore = saveJson
+        currentDevicesData = $CircuitStore.devices
     })
 
     // create new node in the global store for circuitStore digital js backend.
@@ -48,14 +44,14 @@
         options?: any
     ) => {
         const nodeName: string = `${gateType}_${uuid}`
-        circuitStore.update((currentCircuit) => {
+        CircuitStore.update((currentCircuit) => {
             // Add the new device with a unique ID, e.g., 'newDeviceId'
             // get function from map
 
             const newDevice: Device =
                 options === undefined
-                    ? deviceFactoryMap[gateType](nodeName)
-                    : deviceFactoryMap[gateType](nodeName, options)
+                    ? deviceJsonFactoryMap[gateType](nodeName)
+                    : deviceJsonFactoryMap[gateType](nodeName, options)
 
             // const nextDeviceNum = Object.keys(currentDevicesData).length
             currentCircuit.devices[nodeName] = newDevice

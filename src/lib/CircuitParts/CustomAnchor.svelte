@@ -3,12 +3,9 @@
 <!-- </script> -->
 <!---->
 <script lang="ts">
-    import { getRunning } from '../circuitEngine.svelte.ts'
-    import {
-        findAnchorTargetClassName,
-        attemptLink,
-    } from './linkAnchors.svelte.ts'
-    import { removeConnection } from '../circuitStore.ts'
+    import { getRunning } from '@CircuitEngine'
+    import { findAnchorTargetClassName, attemptLink } from './linkAnchors'
+    import { removeConnection } from '@CircuitStore'
 
     let {
         linked,
@@ -65,7 +62,6 @@
     })
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
     class="custom_anchor {(io === 'input' && 'input') || 'output'} {anchorId}"
     class:linked
@@ -123,10 +119,11 @@
         /* background-color: var(--pitt-yellow) !important; */
     }
     :global(.running .input.on, .running .output.on) {
-        border: 1.8px solid green !important;
+        border: 2px solid green !important;
+        filter: brightness(85%);
     }
     :global(.running .input.off, .running .output.off) {
-        border: 1.8px solid red !important;
+        border: 2px solid var(--red) !important;
     }
 
     .input {

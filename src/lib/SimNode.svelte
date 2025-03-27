@@ -6,7 +6,7 @@
         type AllNodeProps,
         type AllNodePropsWithoutId,
         type allNodeTypes,
-    } from './circuitModel'
+    } from '@CircuitModel'
 
     // props that all nodes have in common.
     interface SimNodeProps {

@@ -1,27 +1,25 @@
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
-    import SketchyLineWiggle from '../../assets/svg/sketchLineSvg/line_26.svg'
-
-    // Need to import these somehow
-
-    import SketchyLine_15 from '../../assets/svg/sketchLineSvg/line_15.svg'
-    import SketchyLine_23 from '../../assets/svg/sketchLineSvg/line_23.svg'
-    import SketchyLine_24 from '../../assets/svg/sketchLineSvg/line_24.svg'
-    import SketchyLine_25 from '../../assets/svg/sketchLineSvg/line_25.svg'
-    import SketchyLine_27 from '../../assets/svg/sketchLineSvg/line_27.svg'
-    import SketchyLine_17 from '../../assets/svg/sketchLineSvg/line_17.svg'
-    import SketchyLine_19 from '../../assets/svg/sketchLineSvg/line_19.svg'
-    import SketchyLine_21 from '../../assets/svg/sketchLineSvg/line_21.svg'
-    import SketchyLine_29 from '../../assets/svg/sketchLineSvg/line_29.svg'
-
     import SideMenuHeader from './SideMenuHeader.svelte'
     import SideMenuGroupItems from './SideMenuGroupItems.svelte'
+
     import {
         menuJsonData,
         type menuJsonType,
         type NodeMenuGroups,
-    } from '../circuitModel.ts'
-    import { fade, fly } from 'svelte/transition'
+    } from '@CircuitModel'
+
+    import SketchyLineWiggle from '@assets/svg/sketchLineSvg/line_26.svg'
+
+    import SketchyLine_15 from '@assets/svg/sketchLineSvg/line_15.svg'
+    import SketchyLine_23 from '@assets/svg/sketchLineSvg/line_23.svg'
+    import SketchyLine_24 from '@assets/svg/sketchLineSvg/line_24.svg'
+    import SketchyLine_25 from '@assets/svg/sketchLineSvg/line_25.svg'
+    import SketchyLine_27 from '@assets/svg/sketchLineSvg/line_27.svg'
+    import SketchyLine_17 from '@assets/svg/sketchLineSvg/line_17.svg'
+    import SketchyLine_19 from '@assets/svg/sketchLineSvg/line_19.svg'
+    import SketchyLine_21 from '@assets/svg/sketchLineSvg/line_21.svg'
+    import SketchyLine_29 from '@assets/svg/sketchLineSvg/line_29.svg'
 
     let {
         createCanvasNode,

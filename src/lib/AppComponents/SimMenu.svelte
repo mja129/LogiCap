@@ -1,7 +1,7 @@
 <script lang="ts" generics="T">
-    import { CustomHeadlessCircuit } from './CustomHeadlessCircuit'
     import type { Component } from 'svelte'
 
+    import { resetCircuitStore, saveCircuit } from '@CircuitStore'
     import {
         toggleSimulation,
         updateNext,
@@ -9,8 +9,7 @@
         getRunning,
         getCurrTick,
         resetCircuit,
-    } from './circuitEngine.svelte'
-    import { resetCircuitStore, saveCircuit } from './circuitStore'
+    } from '@CircuitEngine'
 
     import UpdateGatesNextIcon from '~icons/streamline/button-fast-forward-2'
     import PlayTickIcon from '~icons/streamline/button-play'

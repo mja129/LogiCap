@@ -1,13 +1,13 @@
-import { circuitStore } from './circuitStore.ts'
+import { CircuitStore } from '@CircuitStore'
 import { Vector3vl } from '3vl'
 import { writable, get, type Writable } from 'svelte/store';
-import { CustomHeadlessCircuit } from './CustomHeadlessCircuit.ts';
+import { CustomHeadlessCircuit } from '@Util/CustomHeadlessCircuit';
 
 //Two Vectors, both 1 bit, one is on (1) and off (0)
 let oneBit: Vector3vl = Vector3vl.ones(1);
 let zeroBit: Vector3vl = Vector3vl.zeros(1);
 
-export let circuitEngine: Writable<CustomHeadlessCircuit | null> = writable<CustomHeadlessCircuit | null>(null); //The null might be a little schizo
+export let CircuitEngine: Writable<CustomHeadlessCircuit | null> = writable<CustomHeadlessCircuit | null>(null); //The null might be a little schizo
 
 // this is why we want circuitEngine.svelte.ts
 let running: boolean = $state(false)
@@ -33,13 +33,6 @@ Object.defineProperty(CustomHeadlessCircuit.prototype, "running", {
     Possibly better way to do this, for now im just reattaching all monitors
     Need to also destroy old monitors in case
 */
-// circuitStore.subscribe((jsonData) => {
-//     circuitEngine = new HeadlessCircuit(jsonData);
-//     monitoredWires.forEach(wire => {
-//         wireMonitoring(wire);
-//     });
-// });
-
 
 /*
     Toggles running
@@ -50,19 +43,16 @@ export function toggleSimulation(tickRate: number) {
         console.log("Simulation Started")
 
         running = true;
-        if (get(circuitEngine) === null) {
-            console.log(get(circuitStore));
-            circuitEngine.set(new CustomHeadlessCircuit(get(circuitStore)))
-            // circuitStore.subscribe((currCircuit) => {
-            //     circuitEngine = new HeadlessCircuit()
-            // })
+        if (get(CircuitEngine) === null) {
+            console.log(get(CircuitStore));
+            CircuitEngine.set(new CustomHeadlessCircuit(get(CircuitStore)))
         }
         start(tickRate)
     }
     else {
         console.log("Simulation Stopped")
         // reset on pause, is not necessarily a move.
-        circuitEngine.set(null)
+        CircuitEngine.set(null)
         currentTick = 0
         running = false;
     }
@@ -76,7 +66,7 @@ function start(tickRate: number) {
     if (running === false) {
         return;
     }
-    const currEngine: CustomHeadlessCircuit | null = get(circuitEngine)
+    const currEngine: CustomHeadlessCircuit | null = get(CircuitEngine)
     if (currEngine === null) {
         console.log("impossible");
         return
@@ -87,7 +77,7 @@ function start(tickRate: number) {
 }
 
 export function resetCircuit() {
-    circuitEngine.set(null)
+    CircuitEngine.set(null)
     currentTick = 0
     running = false;
 }
@@ -145,11 +135,11 @@ export function onWireChange(wire: any) {
 */
 
 export function updateTick() {
-    if (circuitEngine == null) {
+    if (CircuitEngine == null) {
         console.log("Circuit is null")
         return;
     }
-    const currEngine: CustomHeadlessCircuit | null = get(circuitEngine)
+    const currEngine: CustomHeadlessCircuit | null = get(CircuitEngine)
     if (currEngine === null) {
         console.log("impossible");
         return
@@ -159,11 +149,11 @@ export function updateTick() {
 }
 
 export function updateNext() {
-    if (circuitEngine == null) {
+    if (CircuitEngine == null) {
         console.log("Circuit is null")
         return;
     }
-    const currEngine: CustomHeadlessCircuit | null = get(circuitEngine)
+    const currEngine: CustomHeadlessCircuit | null = get(CircuitEngine)
     if (currEngine === null) {
         console.log("impossible");
         return
@@ -178,12 +168,12 @@ Flips 1 bit inputs and takes their name as a string
 */
 export function inputSetter(inputName: string) {
     let currentSig: number;
-    if (circuitEngine == null) {
+    if (CircuitEngine == null) {
         console.log("Circuit is null")
         return;
     }
 
-    const currEngine: CustomHeadlessCircuit | null = get(circuitEngine)
+    const currEngine: CustomHeadlessCircuit | null = get(CircuitEngine)
     if (currEngine === null) {
         console.log("impossible");
         return

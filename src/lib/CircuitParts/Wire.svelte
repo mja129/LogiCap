@@ -1,17 +1,19 @@
 <script lang="ts">
+    import { onMount } from 'svelte'
     import { Edge } from 'svelvet'
+
+    import { CustomHeadlessCircuit } from '@Util/CustomHeadlessCircuit'
     import {
-        circuitEngine,
+        CircuitEngine,
         onWireChange,
         findWireInEngine,
-    } from '../circuitEngine.svelte.ts'
-    import { onMount } from 'svelte'
+    } from '@CircuitEngine'
+
     import {
         setAnchorSimStyles,
         getWireIdFromDOM,
         setLamp,
     } from './wireUtils.ts'
-    import { CustomHeadlessCircuit } from '../CustomHeadlessCircuit.ts'
 
     let {
         initAncId,
@@ -55,7 +57,7 @@
         if (wireConnecting) return null // don't create listeners for connecting wires
 
         const monitorFn =
-            ($circuitEngine !== null && getMonitor($circuitEngine)) ||
+            ($CircuitEngine !== null && getMonitor($CircuitEngine)) ||
             (() => null)
         monitorFn()
     }
@@ -105,10 +107,8 @@
         return monitorFn
     }
 
-    // I don't think this even needs to be on mount, it can be in the component I think.
-    // validate the wrapper and getChildNodes
     // decent amount of overhead here, new listeners for every wire on circuit update
-    circuitEngine.subscribe((digitalJsCircuit) => {
+    CircuitEngine.subscribe((digitalJsCircuit) => {
         // reset on play/pause
         // console.log('ENGINE UPDATE')
         if (digitalJsCircuit === null) {
@@ -124,11 +124,16 @@
     })
 </script>
 
-<Edge let:path let:destroy let:hovering enableHover={true}>
+<Edge
+    let:path
+    let:destroy
+    let:hovering
+    enableHover={true}
+    edgeClick={() => console.log('edge clicked')}
+>
     <div style="font-size: 10px;" slot="label">
         {wireId}<span style="color: red">{initAncId}</span>
     </div>
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <path
         bind:this={edgeWrapper}
         d={path}

@@ -46,15 +46,18 @@
     --light-yellow: rgb(255, 255, 73);
     --blue: #00bbf9;
     --pitt-blue: #003594;
-    --pitt-yellow: #FFB81C;
+    --pitt-yellow: #ffb81c;
     /*    The dark blue is hella out of place      */
     --dark-blue: #242652;
     --cream: #fff0dc;
     --dark-cream: #ffdbac;
 
     --lime-green: #aaff75;
+    --dark-green: #06402b;
+    --green: #005800;
     --lime-red: #ff5f63;
-    --red: #ff073a;
+    --red: #b7001f;
+    --dark-red: #910000;
 
     line-height: 1.5;
     font-weight: 400;

@@ -2,7 +2,7 @@
     import { Anchor as SvelvetAnchor } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     import Wire from './Wire.svelte'
-    import { getRunning } from '../circuitEngine.svelte'
+    import { getRunning } from '@CircuitEngine'
 
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -41,23 +41,6 @@
         portName = 'out'
     }
     const anchorId = `${portName}_${id}`
-
-    // $inspect(connectingMirror).with(console.warn)
-    // console.warn($savedConnections[anchorId])
-    // $inspect($savedConnections).with(console.warn)
-
-    // only for loading in saved
-
-    // the lookup can be made much faster with an interted map
-    // InNodeId : {outputlinkname, selfInputIndex in ouput mapping array}
-
-    // onMount(() => {
-    //     if (io === 'input') {
-    //         console.log('mounted input anchor')
-    //     }
-    // })
-
-    // could be undefined
 </script>
 
 <!--

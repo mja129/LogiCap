@@ -9,11 +9,11 @@ const initialCircuit: Circuit = {
     subcircuits: {},
 }
 
-export let circuitStore = writable<Circuit>(initialCircuit)
+export let CircuitStore = writable<Circuit>(initialCircuit)
 
 // reasonable because there is only 1 'connecting' at a time
 export function resetCircuitStore() {
-    circuitStore.update((currentCircuit) => {
+    CircuitStore.update((currentCircuit) => {
         currentCircuit = {
             devices: {},
             connectors: {},
@@ -24,12 +24,12 @@ export function resetCircuitStore() {
 }
 
 // Link anchor used in customAnchor.svelte mainly
-// we could make it $circuitStore.addLinking -> I would preferthat TBH
+// we could make it $CircuitStore.addLinking -> I would preferthat TBH
 export function addConnection(fromAnchorId: outputAnchorName, toAnchorId: inputAnchorName) {
     const toNodeId: inputGateName = toAnchorId.substring(toAnchorId.indexOf('_') + 1) as inputGateName
 
     // instead of push try de-structuring
-    circuitStore.update((currCircuit) => {
+    CircuitStore.update((currCircuit) => {
         if (!(fromAnchorId in currCircuit.connectors)) {
             currCircuit.connectors[fromAnchorId] = new Array()
         }
@@ -41,7 +41,7 @@ export function addConnection(fromAnchorId: outputAnchorName, toAnchorId: inputA
 }
 
 export function removeConnection(inputAnchorId: string) {
-    circuitStore.update((currCircuit) => {
+    CircuitStore.update((currCircuit) => {
         const newConnectors: SvelvetConnectors = {}
         for (const fromAnchorId in currCircuit.connectors) {
 
@@ -90,7 +90,7 @@ function getLsItem(lsKey: string): string | null {
 }
 
 
-// saves positions from svelvet save to circuitStore, in memory
+// saves positions from svelvet save to CircuitStore, in memory
 function savePositionsToCircuitStore() {
     // this is an arrow function because this function kinda loads -> and saves
     // and it could be a separate function, I want it to be at least named getSvelvetSave
@@ -107,7 +107,7 @@ function savePositionsToCircuitStore() {
     if (savedNodeNames === null) return null
 
     // create saved nodes on canvas.
-    circuitStore.update((currCircuit) => {
+    CircuitStore.update((currCircuit) => {
         savedNodeNames.forEach(({ nodeType, uuid, position }) => {
             const nodeName = `${nodeType}_${uuid}`
             currCircuit.devices[nodeName].position = position
@@ -118,12 +118,12 @@ function savePositionsToCircuitStore() {
 
 // save the current circuit store to localStorage
 function saveCircuitStoreToLS() {
-    const circuitStoreSave: string | null = getLsItem("circuitStoreSave")
+    const CircuitStoreSave: string | null = getLsItem("CircuitStoreSave")
 
-    // getLsItem might warn that circuitStoreSave does not exist, in this case
+    // getLsItem might warn that CircuitStoreSave does not exist, in this case
     // we are creating it for the first time, thats okay
 
-    localStorage.setItem('circuitStoreSave', JSON.stringify(get(circuitStore)))
+    localStorage.setItem('CircuitStoreSave', JSON.stringify(get(CircuitStore)))
 }
 
 export function clickSvelvetSave() {

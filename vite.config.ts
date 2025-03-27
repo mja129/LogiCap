@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import Icons from 'unplugin-icons/vite'
-// external: ['jquery', 'jquery-ui', 'custom_digitaljs'],
+
+// used to automatically create the paths from tsconfig.app.json
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,6 +12,7 @@ export default defineConfig({
         Icons({
             compiler: 'svelte',
         }),
+        tsconfigPaths()
     ],
     base: './', // Use relative paths
     optimizeDeps: {

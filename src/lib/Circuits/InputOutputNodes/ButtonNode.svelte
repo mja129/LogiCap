@@ -1,8 +1,8 @@
 <script lang="ts">
-    import SimulationNodeAnchor from '../SimNodeComponents/Anchor.svelte'
-    import { inputSetter } from '../circuitEngine.svelte'
+    import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
+    import { inputSetter } from '@CircuitEngine'
     import { get } from 'svelte/store'
-    import { circuitStore } from '../circuitStore'
+    import { CircuitStore } from '@CircuitStore'
 
     let {
         width = 80,
@@ -103,7 +103,7 @@
     location={['right', 'mid']}
     id={nodeId}
     io="output"
-    connections={get(circuitStore).connectors[
+    connections={get(CircuitStore).connectors[
         ('out_' + nodeId) as outputAnchorName
     ]}
 />
