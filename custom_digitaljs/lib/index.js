@@ -44,8 +44,6 @@ var _lodash = _interopRequireDefault(require("lodash"));
 var _jquery = _interopRequireDefault(require("jquery"));
 var _backbone = _interopRequireDefault(require("backbone"));
 var _vl = require("3vl");
-require("jquery-ui/ui/widgets/dialog.js");
-require("jquery-ui/themes/base/all.css");
 var cells = _interopRequireWildcard(require("./cells.js"));
 exports.cells = cells;
 var engines = _interopRequireWildcard(require("./engines.js"));
@@ -64,6 +62,9 @@ var _resizeObserverPolyfill = _interopRequireDefault(require("resize-observer-po
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+// import 'jquery-ui/ui/widgets/dialog.js';
+// import 'jquery-ui/themes/base/all.css';
+
 // polyfill ResizeObserver for e.g. Firefox ESR 68.8
 // this line and the node-module might be removed as soon as ResizeObserver is widely supported
 // see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver#Browser_compatibility

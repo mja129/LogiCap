@@ -15,10 +15,6 @@
 
     // the Devices part of the digitalJS json.
     let currentDevicesData: DeviceRecord = $state({})
-    // this is literally not state
-    let existingConnections:
-        | Map<string, Array<[string, string] | string>>
-        | any = $state()
 
     // check if circuitStore is not null when the app starts up.
     onMount(() => {
@@ -151,7 +147,6 @@
                     // Add any other specific props your node components need
                 }}
             />
-            <!-- content here -->
         {/each}
     </Svelvet>
 </main>

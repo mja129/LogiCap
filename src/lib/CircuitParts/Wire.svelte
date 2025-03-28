@@ -124,13 +124,7 @@
     })
 </script>
 
-<Edge
-    let:path
-    let:destroy
-    let:hovering
-    enableHover={true}
-    edgeClick={() => console.log('edge clicked')}
->
+<Edge let:path let:destroy let:hovering>
     <div style="font-size: 10px;" slot="label">
         {wireId}<span style="color: red">{initAncId}</span>
     </div>
@@ -146,10 +140,10 @@
         stroke: black;
         stroke-width: 4px;
     }
-    path:hover {
+    /* path:hover {
         stroke-width: 5px !important;
-    }
-    :global(.light .edges-wrapper path:hover) {
+    } */
+    /* :global(.light .edges-wrapper path:hover) {
         stroke: black !important;
         stroke-width: 6px !important;
         opacity: 100%;
@@ -158,7 +152,7 @@
         stroke: white !important;
         stroke-width: 5px !important;
         opacity: 100%;
-    }
+    } */
 
     .on {
         stroke: green !important;

@@ -16,18 +16,18 @@ export default defineConfig({
     ],
     base: './', // Use relative paths
     optimizeDeps: {
-        include: ['custom_digitaljs'],
+        include: ['custom_digitaljs', 'jquery'],
     },
     build: {
         rollupOptions: {
             output: {
                 globals: {
                     jquery: 'jQuery',
-                },
+                }
             },
         },
         commonjsOptions: {
-            include: [/custom_digitaljs/, /node_modules/],
+            include: [/custom_digitaljs/],
             transformMixedEsModules: true,
         },
     },

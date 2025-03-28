@@ -1,4 +1,4 @@
-<script lang="ts" generics="T">
+<script lang="ts">
     import type { Component } from 'svelte'
 
     import { resetCircuitStore, saveCircuit } from '@CircuitStore'

@@ -8,8 +8,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Backbone from 'backbone';
 import { Vector3vl } from '3vl';
-import 'jquery-ui/ui/widgets/dialog.js';
-import 'jquery-ui/themes/base/all.css';
+// import 'jquery-ui/ui/widgets/dialog.js';
+// import 'jquery-ui/themes/base/all.css';
 import * as cells from './cells.mjs';
 import * as engines from './engines.mjs';
 import * as tools from './tools.mjs';
@@ -79,7 +79,7 @@ const defaultSubcircuitButtons = [
         id: "zoomOut",
         hidden: false,
         buttonText: "–",
-        callback: ({circuit, model, paper}) => {
+        callback: ({ circuit, model, paper }) => {
             const newZoom = model.get('zoomLevel') - 1;
             circuit.scaleAndRefreshPaper(paper, newZoom);
             model.set("zoomLevel", newZoom);
@@ -89,7 +89,7 @@ const defaultSubcircuitButtons = [
         id: "zoomIn",
         hidden: false,
         buttonText: "+",
-        callback: ({circuit, model, paper}) => {
+        callback: ({ circuit, model, paper }) => {
             const newZoom = model.get('zoomLevel') + 1;
             circuit.scaleAndRefreshPaper(paper, newZoom);
             model.set("zoomLevel", newZoom);
@@ -174,8 +174,8 @@ export class Circuit extends HeadlessCircuit {
                     rankDir: "LR",
                     setPosition: (element, position) => {
                         element.setLayoutPosition({
-                            x: position.x - position.width/2,
-                            y: position.y - position.height/2,
+                            x: position.x - position.width / 2,
+                            y: position.y - position.height / 2,
                             width: position.width,
                             height: position.height
                         });
@@ -227,7 +227,7 @@ export class Circuit extends HeadlessCircuit {
             for (const button of this._subcircuitButtons) {
                 $('<button class="btn btn-secondary"></button>')
                     .append($('<strong></strong>').text(button.buttonText))
-                    .on('click', {circuit, model, paper}, (event) => button.callback(event.data))
+                    .on('click', { circuit, model, paper }, (event) => button.callback(event.data))
                     .appendTo(buttonGroup);
             }
             buttonGroup.prependTo(subcircuitModal);
@@ -238,7 +238,7 @@ export class Circuit extends HeadlessCircuit {
         this.listenTo(paper, 'open:fsm', (subcircuitModal, closeCallback) => {
             this._windowCallback('FSM', subcircuitModal, closeCallback);
         });
-        paper.fixed = function(fixed) {
+        paper.fixed = function (fixed) {
             this.setInteractivity(!fixed);
             this.$el.toggleClass('fixed', fixed);
         };

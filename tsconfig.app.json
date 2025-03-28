@@ -20,7 +20,7 @@
         "./src/lib/*"
       ],
       "@AppComponents/*": [
-        "src/lib/AppComponents/*"
+        "./src/lib/AppComponents/*"
       ],
       "@Circuits/*": [
         "./src/lib/Circuits/*"

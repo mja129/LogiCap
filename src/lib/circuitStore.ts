@@ -118,12 +118,12 @@ function savePositionsToCircuitStore() {
 
 // save the current circuit store to localStorage
 function saveCircuitStoreToLS() {
-    const CircuitStoreSave: string | null = getLsItem("CircuitStoreSave")
+    const CircuitStoreSave: string | null = getLsItem("circuitStoreSave")
 
     // getLsItem might warn that CircuitStoreSave does not exist, in this case
     // we are creating it for the first time, thats okay
 
-    localStorage.setItem('CircuitStoreSave', JSON.stringify(get(CircuitStore)))
+    localStorage.setItem('circuitStoreSave', JSON.stringify(get(CircuitStore)))
 }
 
 export function clickSvelvetSave() {
