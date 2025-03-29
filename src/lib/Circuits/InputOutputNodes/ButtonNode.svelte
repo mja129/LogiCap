@@ -23,13 +23,10 @@
 
     const buttonOffset: [number, number] = [95, 40.4]
 
-    // Define a new device
-
-    // pretty simple function
     // after a mouse down, if you start dragging, don't flip the signal
     // if after mousedown you get mouseUp, flip the signal
     // After you get either of them, both listeners are killed and created again on the next mousedown.
-    function handleMouseDown(e: MouseEvent) {
+    function toggleButton(e: MouseEvent) {
         e.preventDefault()
 
         let isDragging = false
@@ -96,7 +93,7 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <circle
-        onmousedowncapture={handleMouseDown}
+        onmousedowncapture={toggleButton}
         cx="50"
         cy="50"
         r="30"

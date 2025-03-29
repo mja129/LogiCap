@@ -96,7 +96,7 @@ export function setAnchor(port: string, nodeId: string, wireChange: number) {
 // svelvet generates a sibling of edge-wrapper, with an id that looks something like this
 // A-in2_Nand_R6ecBvquImEbPYoo/N-Nand_R6ecBvquImEbPYoo+A-out_Button_NqRwJIgwMnCkcvwZ/N-Button_NqRwJIgwMnCkcvwZ-target
 // The element we are looking for has the attribute -> value pairing role="presentation"
-// There are probably less than 5 sibling nodes for edge-wrapper, so the iteration is really no concern O(>5)
+// There are probably less than 5 sibling nodes for edge-wrapper, so the iteration is really no concern: O(>5)
 function getDOMSiblings(edgeWrapper: SVGPathElement | null) {
     console.assert(
         edgeWrapper !== null,

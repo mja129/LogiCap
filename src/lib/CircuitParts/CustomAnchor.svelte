@@ -1,7 +1,3 @@
-<!-- <script module> -->
-<!--     let persistedState = 0 -->
-<!-- </script> -->
-<!---->
 <script lang="ts">
     import { getRunning } from '@CircuitEngine'
     import { findAnchorTargetClassName, attemptLink } from './linkAnchors'

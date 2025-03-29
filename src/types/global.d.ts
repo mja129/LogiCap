@@ -1,4 +1,4 @@
-declare module 'digitaljs' {
+declare module 'custom_digitaljs' {
         // interface Graph {
         //     getElements(): Gate[];
         //     getLinks(): Link[];

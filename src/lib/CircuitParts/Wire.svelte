@@ -23,20 +23,16 @@
     let wireActive: number = $state(-1)
 
     let wireId: string = $state('')
-    // let wireConnecting: boolean = $derived(
-    //     (wireId === '' && false) || wireId.includes('cursor')
-    // )
 
-    // I tried to get rid of onMount but I couldn't
     onMount(() => {
         let newId = getWireIdFromDOM(edgeWrapper, initAncId)
-        wireMount(newId)
+        monitorWire(newId)
     })
 
     // creates a monitor on wireMount
     // also creates the wire name from the class on the wire that svelvet provides
     // definitely used when loading in circuits from a save
-    function wireMount(
+    function monitorWire(
         newId: string | null,
         setWire: Function = (id: string) => (wireId = id)
     ) {
@@ -75,7 +71,7 @@
                 const wireChange = onWireChange(currWire)
 
                 // wireActive = wireChange // side-effects
-                // external global function that sets this, (like was here b4) is side-effects too
+                // external global function that sets this (not param), (like was here b4) is side-effects too
                 setWireCallback(wireChange) // No side-effects basically!
 
                 // get stuff out of the target.

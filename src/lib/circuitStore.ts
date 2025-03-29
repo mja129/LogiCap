@@ -51,6 +51,9 @@ export function addConnection(
 export function removeConnection(inputAnchorId: string) {
     CircuitStore.update((currCircuit) => {
         const newConnectors: SvelvetConnectors = {}
+        // O(N*M) where N is number of output anchors
+        // and M is the number of connections per output anchor
+        // this could be faster.
         for (const fromAnchorId in currCircuit.connectors) {
             // Filter out any connections that match the `toAnchorId`
             // This logic would also remove duplicates, could be good or bad.
@@ -151,7 +154,6 @@ export function clickSvelvetSave() {
 
 // this is essentially a sync with localStorage.
 // Sync svelvet by clicking its button through clickListener, (I could probably find the function they use on this button lol, sounds like a good idea)
-//
 export async function saveCircuit() {
     // click on the hidden svelvet button, the button is in "theme toggle" but I set it to display: none,
     // and now we trigger it with css, after it triggers we use the svelvet json positions to set our digitial js positions
@@ -184,6 +186,7 @@ export function loadCircuit(setDevices: Function = () => null) {
 }
 
 // remove circuitStore save and backup to prevCircuitStore, iff you aren't deleting an empty circuit.
+// backup to LS and delete circuitStoreSave from LS
 export function backupDelete() {
     // what if they clear an empty canvas.
     saveCircuit()

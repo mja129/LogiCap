@@ -11,12 +11,6 @@
         nodeId: string
     } = $props()
 
-    // let buttonColor = $derived({
-    //     color: signalOn ? 'green' : 'red',
-    //     outlineColor: signalOn ? 'var(--lime-green)' : 'var(--lime-red)',
-    // })
-    // Define a new device
-
     const lampOffset: [number, number] = [-5, 35.43]
 </script>
 
