@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Component } from 'svelte'
 
-    import { resetCircuitStore, saveCircuit } from '@CircuitStore'
+    import { resetCircuitStore, saveCircuit, backupDelete } from '@CircuitStore'
     import {
         toggleSimulation,
         updateNext,
@@ -19,23 +19,53 @@
     import SaveIcon from '~icons/lucide/save'
     import TrashIcon from '~icons/material-symbols/delete-outline'
 
-    type IconComponentMap = Record<string, Component<any>>
-    // if I could make this a snippet map that would be cool.
-    const iconComponentMap: IconComponentMap = {
-        updateGatesNext: UpdateGatesNextIcon,
-        playTick: PlayTickIcon,
-        resetState: ResetStateIcon,
-        pauseTick: PauseTickIcon,
-        updateGates: UpdateGatesIcon,
-        save: SaveIcon,
-        trash: TrashIcon,
-    }
+    type Icon = { Component: Component<any>; styles: string; width: number }
+    type IconName = string
+
+    type SimMenuModel = Record<IconName, Icon>
 
     let { clearCanvas }: { clearCanvas: Function } = $props()
 
-    function toggleRunSim(
-        event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-    ) {
+    // if I could make this a snippet map that would be cool.
+    const simMenuModel: SimMenuModel = {
+        playTick: {
+            Component: PlayTickIcon,
+            styles: 'transform:scale(1.8);',
+            width: 40,
+        },
+        pauseTick: {
+            Component: PauseTickIcon,
+            styles: 'transform:scale(1.8);',
+            width: 40,
+        },
+        updateGates: {
+            Component: UpdateGatesIcon,
+            styles: 'transform:scale(2);',
+            width: 40,
+        },
+        updateGatesNext: {
+            Component: UpdateGatesNextIcon,
+            styles: 'transform:scale(2.3);',
+            width: 50,
+        },
+        resetState: {
+            Component: ResetStateIcon,
+            styles: 'transform:scale(2);',
+            width: 40,
+        },
+        save: {
+            Component: SaveIcon,
+            styles: 'transform:scale(2.4);',
+            width: 40,
+        },
+        trash: {
+            Component: TrashIcon,
+            styles: 'transform:scale(2.69);',
+            width: 40,
+        },
+    }
+
+    const toggleRunningClass = () => {
         const appMainTag: Element | null =
             document.querySelector('main#joplysim')
         if (!appMainTag) return // impossible
@@ -45,7 +75,11 @@
         } else {
             appMainTag.classList.add('running')
         }
-
+    }
+    function toggleRunSim(
+        event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+    ) {
+        toggleRunningClass()
         toggleSimulation(10)
     }
 
@@ -60,39 +94,6 @@
         updateTick()
     }
 
-    // don't lose the circuit when reloading the page.
-    // this will save the camera position too.
-
-    // save circuit on page reload.
-    // works greatish
-    window.addEventListener('beforeunload', () => {
-        saveCircuit()
-    })
-
-    function backupDelete() {
-        // what if they clear an empty canvas.
-        saveCircuit()
-        // save previously deleted.
-
-        const saveDeleted = localStorage.getItem('circuitStoreSave')
-        if (!saveDeleted) {
-            console.warn(
-                'we saved before deleting so this should not be possible'
-            )
-        } else if (
-            // only save non empty circuits to previousCircuitStore.
-            saveDeleted === '{"devices":{},"connectors":[],"subcircuits":{}}'
-        ) {
-            console.warn(
-                'EMPTY on delete, do not set prevCircuitStore just empty stores.'
-            )
-        } else {
-            localStorage.setItem('prevCircuitStore', saveDeleted)
-        }
-        localStorage.removeItem('circuitStoreSave')
-        // localStorage.removeItem('state')
-    }
-
     function onTrash() {
         backupDelete()
 
@@ -101,23 +102,30 @@
         // clears the currentDevicesData variable in app.svelte
         clearCanvas()
     }
+
+    // const defaultOptions: any =
 </script>
 
-<!-- There is some cool stuff to be done here with snippets. -->
-<!-- {#snippet simMenuIcon(ComponentMap: IconComponentMap, key:string, style: string, width: number)} -->
-<!--     <ComponentMap[key] {style} {width} /> -->
-<!-- {/snippet} -->
-<!---->
-<!-- <!-- This is basically like declaring a function that has html in it -->
-<!-- {#snippet simMenuButton(ComponentMap: IconComponentMap, key: string, iconStyle: string, width: number, onclick: Function)} -->
-<!--     <button onclick> -->
-<!--         <!-- There is no way this syntax is real wtf componentMap[key]??-->
-<!--         <ComponentMap[key] {style} {width} /> -->
-<!--         {@render simMenuIcon(ComponentMap, key, iconStyle, width)} -->
-<!--     </button> -->
-<!-- {/snippet} -->
+{#snippet simIcon(iconProps: Icon)}
+    <iconProps.Component style={iconProps.styles} width={iconProps.width} />
+{/snippet}
 
-<div class="menuRunButtons">
+{#snippet simMenuBtn(
+    iconProps: Icon,
+    onClickFn: Function,
+    btnStyles: string = '',
+    vlStyles: string = '',
+    includeVL: boolean = true
+)}
+    {#if includeVL}
+        <span style={vlStyles} class="vl"></span>
+    {/if}
+    <button style={btnStyles} onclick={() => onClickFn()}>
+        {@render simIcon(iconProps)}
+    </button>
+{/snippet}
+
+{#snippet playPauseSection()}
     <button
         onclick={toggleRunSim}
         style="display:flex;align-items: center;padding-block:1px;"
@@ -125,9 +133,9 @@
         <div style="margin-left: -8px">
             {#if getRunning()}
                 <!-- content here -->
-                <PauseTickIcon style="transform:scale(1.8);" width={40} />
+                {@render simIcon(simMenuModel['pauseTick'])}
             {:else}
-                <PlayTickIcon style="transform:scale(1.8);" width={40} />
+                {@render simIcon(simMenuModel['playTick'])}
             {/if}
         </div>
         <p
@@ -137,32 +145,28 @@
             {getCurrTick()}
         </p>
     </button>
-    <span class="vl"></span>
-    <button onclick={updateGates}>
-        <UpdateGatesIcon style="transform:scale(2);" width={40} />
-    </button>
-    <span class="vl"></span>
-    <button onclick={updateGatesNext}>
-        <UpdateGatesNextIcon style="transform:scale(2.3);" width={50} />
-    </button>
+{/snippet}
 
-    <span class="vl"></span>
-    <button onclick={resetCircuit}>
-        <ResetStateIcon style="transform:scale(2);" width={40} />
-    </button>
-    <span class="vl" style="margin-right: 7px"></span>
-    <button onclick={() => saveCircuit()}>
-        <SaveIcon
-            style="transform:scale(2.4); margin-right: -9px;"
-            width={40}
-        />
-    </button>
-    <button onclick={onTrash}>
-        <TrashIcon
-            style="transform:scale(2.69);margin-right: -9px;"
-            width={40}
-        />
-    </button>
+<div class="menuRunButtons">
+    {@render playPauseSection()}
+    {@render simMenuBtn(simMenuModel['updateGates'], updateGates)}
+    {@render simMenuBtn(simMenuModel['updateGatesNext'], updateGatesNext)}
+
+    {@render simMenuBtn(simMenuModel['resetState'], resetCircuit)}
+    {@render simMenuBtn(
+        simMenuModel['save'],
+        saveCircuit,
+        '',
+        'margin-right: 7px',
+        true
+    )}
+    {@render simMenuBtn(
+        simMenuModel['trash'],
+        onTrash,
+        'margin-left: -6px',
+        '',
+        false
+    )}
 </div>
 
 <style>

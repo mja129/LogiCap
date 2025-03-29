@@ -36,7 +36,7 @@ type LogicGate = {
 }
 
 type Device = Button | Lamp | LogicGate
-type DeviceRecord = Record<string, Device>
+type Devices = Record<string, Device>
 
 // DIGITALJS link node connection types
 
@@ -66,7 +66,7 @@ type Connector = ConnectorFrom & ConnectorTo & ConnectorName
 
 // DIGITALJS Subcircuit Type
 type Subcircuit = {
-    devices: DeviceRecord
+    devices: Devices
     connectors: Connector[]
 }
 
@@ -87,13 +87,13 @@ type ConnectionList = Array<ConnectionTuple>
 // Connection manifest
 type SvelvetConnectors = Record<outputAnchorName, ConnectionList>
 type Circuit = {
-    devices: DeviceRecord
+    devices: Devices
     connectors: SvelvetConnectors
     subcircuits: Record<string, Subcircuit>
 }
 
 type DefaultCircuit = {
-    devices: DeviceRecord
+    devices: Devices
     connectors: Connector[]
     subcircuits: Record<string, Subcircuit>
 }

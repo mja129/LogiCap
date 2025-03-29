@@ -18,7 +18,6 @@ import { HeadlessCircuit, getCellType } from './circuit.mjs';
 import { BrowserSynchEngine } from './engines/browsersynch.mjs';
 import { MonitorView, Monitor } from './monitor.mjs';
 import { IOPanelView } from './iopanel.mjs';
-import { elk_layout } from './elkjs.mjs';
 import './style.css';
 
 // polyfill ResizeObserver for e.g. Firefox ESR 68.8
@@ -98,7 +97,7 @@ const defaultSubcircuitButtons = [
 ];
 
 export class Circuit extends HeadlessCircuit {
-    constructor(data, { windowCallback = Circuit.prototype._defaultWindowCallback, layoutEngine = "elkjs", subcircuitButtons = [], ...options } = {}) {
+    constructor(data, { windowCallback = Circuit.prototype._defaultWindowCallback, layoutEngine = "dagre", subcircuitButtons = [], ...options } = {}) {
         if (!options.engine) options.engine = BrowserSynchEngine;
         super(data, options);
         this._layoutEngine = layoutEngine
@@ -186,9 +185,7 @@ export class Circuit extends HeadlessCircuit {
                     dagre: dagre,
                     graphlib: graphlib
                 });
-            } else if (this._layoutEngine == "elkjs") {
-                elk_layout(graph);
-            }
+            } 
             graph.set('laid_out', true);
         }
         paper.listenTo(this, 'display:add', () => {

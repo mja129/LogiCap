@@ -1,4 +1,6 @@
 import { addConnection } from '@CircuitStore'
+// @ts-ignore this doesn't even cause err on VScode.
+import { onWireConnection } from '../../App.svelte'
 
 
 // look in the dom element classList for a class matching 'in' | 'in{number}' | 'out'
@@ -96,7 +98,7 @@ export function checkLink(
 }
 
 
-export function attemptLink(sourceClassName: string, destClassList: string[]) {
+export function attemptLink(sourceClassName: string, destClassList: string[], connectionCallback: Function = onWireConnection) {
     // No longer connecting nodes, connection has succeeded
 
     const statusMsg = checkLink(
@@ -104,7 +106,7 @@ export function attemptLink(sourceClassName: string, destClassList: string[]) {
         sourceClassName
     )
 
-    console.log(statusMsg);
+    // console.log(statusMsg);
 
     if (statusMsg.startsWith('bad')) {
         return statusMsg
@@ -113,18 +115,14 @@ export function attemptLink(sourceClassName: string, destClassList: string[]) {
 
     const destClassName = findAnchorTargetClassName(destClassList) as string
 
-
     const wireName: string = pushConnectionToCircuitStore(
         sourceClassName,
         destClassName
     )
 
+    // callback Function in app.svelte
+    connectionCallback()
 
     return wireName
 
 }
-
-
-
-
-

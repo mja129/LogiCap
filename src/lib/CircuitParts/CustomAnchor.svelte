@@ -69,10 +69,8 @@
     class:connecting
     onmousedowncapture={(e: MouseEvent) => {
         e.preventDefault()
-        // there is a niche bug here
-        // click on linked anchor while dragging sticky.
-        if (!getRunning() && linked && io === 'input') {
-            console.log('UNLINKING')
+        if (linked && io === 'input' && !getRunning()) {
+            // console.log('UNLINKING')
             // make sure we are adding to the end of the list and starting the search from there.
             // Stack order removeConnection(anchorId)
             // now tell the connecting outputnode who you are
@@ -111,18 +109,11 @@
         /* border: 1.8px solid green; */
         border: 1.8px solid var(--pitt-yellow);
     }
-    /* added dynamically in wire.svelte */
-    :global(.running .input) {
-        background-color: var(--pitt-blue) !important;
-    }
-    :global(.running .output) {
-        /* background-color: var(--pitt-yellow) !important; */
-    }
-    :global(.running .input.on, .running .output.on) {
+    :global(.running .input.linked.on, .running .output.linked.on) {
         border: 2px solid green !important;
         filter: brightness(85%);
     }
-    :global(.running .input.off, .running .output.off) {
+    :global(.running .input.linked.off, .running .output.linked.off) {
         border: 2px solid var(--red) !important;
     }
 

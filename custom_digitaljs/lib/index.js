@@ -56,7 +56,6 @@ var _circuit = require("./circuit.js");
 var _browsersynch = require("./engines/browsersynch.js");
 var _monitor = require("./monitor.js");
 var _iopanel = require("./iopanel.js");
-var _elkjs = require("./elkjs.js");
 require("./style.css.js");
 var _resizeObserverPolyfill = _interopRequireDefault(require("resize-observer-polyfill"));
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
@@ -145,7 +144,7 @@ const defaultSubcircuitButtons = [{
 class Circuit extends _circuit.HeadlessCircuit {
   constructor(data, {
     windowCallback = Circuit.prototype._defaultWindowCallback,
-    layoutEngine = "elkjs",
+    layoutEngine = "dagre",
     subcircuitButtons = [],
     ...options
   } = {}) {
@@ -238,8 +237,6 @@ class Circuit extends _circuit.HeadlessCircuit {
           dagre: _dagre.default,
           graphlib: _graphlib.default
         });
-      } else if (this._layoutEngine == "elkjs") {
-        (0, _elkjs.elk_layout)(graph);
       }
       graph.set('laid_out', true);
     }

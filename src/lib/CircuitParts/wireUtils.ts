@@ -52,7 +52,7 @@ export function setLamp(connectedTo: string, wireChange: number) {
     )
 }
 
-export function setAnchorSimStyles(port: string, nodeId: string, wireChange: number) {
+export function setAnchor(port: string, nodeId: string, wireChange: number) {
     const anchorClassName = '.' + port + "_" + nodeId
 
 
@@ -67,18 +67,25 @@ export function setAnchorSimStyles(port: string, nodeId: string, wireChange: num
 
     const getAnchorStates = (anchor: HTMLElement) => [isOn(anchor), isOff(anchor)]
 
-    const [anchorOn, anchorOff] = getAnchorStates(anchorElement)
+    const [anchorWasOn, anchorWasOff] = getAnchorStates(anchorElement)
 
     // only sets if something changed.
-    if (wireChange === 1 && anchorOn) {
+    // will this code even rerun if change from 1 -> 1
+    // yes on run and rerun circuit.
+    if (wireChange === 1 && anchorWasOn) {
+        // make sure that if we are on, that we 
         anchorElement.classList.remove('off')
         anchorElement.classList.add('on')
     }
-    else if (wireChange !== 1 && anchorOff) {
+    else if (wireChange === 0 && anchorWasOff) {
         anchorElement.classList.remove('on')
         anchorElement.classList.add('off')
     }
-    else if (!anchorOn && !anchorOff) {
+    else if (wireChange === -1) {
+        anchorElement.classList.remove('on')
+        anchorElement.classList.remove('off')
+    }
+    else if (!anchorWasOn && !anchorWasOff) {
         // on or off have not been set before, for this anchor
         anchorElement.classList.add(wireChange === 1 ? 'on' : 'off')
     }

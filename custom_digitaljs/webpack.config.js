@@ -1,8 +1,8 @@
-const path = require('path');
+const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CleanWebpackPlugin = require("clean-webpack-plugin");
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
-const outputDirectory = 'dist';
+const outputDirectory = 'dist'
 
 const tests = [
     { name: 'fulladder', title: 'Full Adder' },
@@ -20,52 +20,53 @@ const tests = [
     { name: 'io', title: 'Input/Output types' },
     { name: 'horner', title: 'Benchmark example' },
     { name: 'latch', title: 'Level-triggered D-latch example' },
-    { name: 'warnings', title: 'Warnings example' }
-];
+    { name: 'warnings', title: 'Warnings example' },
+]
 
 module.exports = {
     output: {
         path: path.resolve(__dirname, outputDirectory),
         filename: 'main.mjs',
         library: {
-            type: "module"
+            type: 'module',
         },
     },
-    entry: "./src/circuit.mjs",
-    devtool: "source-map",
+    entry: './src/index.mjs',
+    devtool: 'source-map',
     module: {
         rules: [
             {
                 test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
+                use: ['style-loader', 'css-loader'],
             },
             {
                 test: /\.svg|\.png/,
-                type: 'asset'
+                type: 'asset',
             },
             {
                 test: require.resolve('jquery'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: ['$']
-                }
-            }
-        ]
+                    exposes: ['$'],
+                },
+            },
+        ],
     },
     experiments: {
         outputModule: true, // Allows Webpack to output in module format
     },
-    plugins: [
-        new CleanWebpackPlugin(),
-    ].concat(tests.map(t => new HtmlWebpackPlugin({
-        title: t.title,
-        template: 'examples/template.html',
-        test: JSON.stringify(require('./examples/' + t.name + '.json')),
-        filename: 'test/' + t.name + '.html',
-        inject: 'head'
-    })))
+    plugins: [new CleanWebpackPlugin()].concat(
+        tests.map(
+            (t) =>
+                new HtmlWebpackPlugin({
+                    title: t.title,
+                    template: 'examples/template.html',
+                    test: JSON.stringify(
+                        require('./examples/' + t.name + '.json')
+                    ),
+                    filename: 'test/' + t.name + '.html',
+                    inject: 'head',
+                })
+        )
+    ),
 }
-

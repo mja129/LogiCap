@@ -9,11 +9,7 @@
         findWireInEngine,
     } from '@CircuitEngine'
 
-    import {
-        setAnchorSimStyles,
-        getWireIdFromDOM,
-        setLamp,
-    } from './wireUtils.ts'
+    import { setAnchor, getWireIdFromDOM, setLamp } from './wireUtils.ts'
 
     let {
         initAncId,
@@ -94,7 +90,7 @@
 
                 if (!connectedTo || !toPort) return
 
-                setAnchorSimStyles(toPort, connectedTo, wireChange)
+                setAnchor(toPort, connectedTo, wireChange)
 
                 const labelOutputTo =
                     connectedTo &&

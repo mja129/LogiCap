@@ -1,44 +1,49 @@
-<!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
+<!-- https://coolorgS.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
+<script module>
+    export function onWireConnection() {
+        console.log('CONNECTED IN APP')
+        // saveCircuit() // we could auto-save on wire linking
+        return null
+    }
+</script>
+
 <script lang="ts">
     import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    import { CircuitStore, saveCircuit } from '@CircuitStore'
-    import type { dualInputLogicTypes, logicGateTypes } from '@CircuitModel'
+    import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
+    import type { logicGateTypes } from '@CircuitModel'
     import { deviceJsonFactoryMap } from '@Util/makeDigitalJsJson'
 
     import SideMenu from '@AppComponents/SideMenu/SideMenu.svelte'
-    import SimNode from './lib/SimNode.svelte'
+
+    // I could call this 'generic' circuit or something
+    import Circuit from './lib/Circuit.svelte'
     import SimMenu from '@AppComponents/SimMenu.svelte'
+    import { fixSvelvetBugs, generateNonce } from './app'
 
-    // this should probably be it's own file soon.
-
-    // the Devices part of the digitalJS json.
-    let currentDevicesData: DeviceRecord = $state({})
+    // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
+    let currentDevicesData: Devices = $state({})
+    const clearDeviceData = () => (currentDevicesData = {})
+    const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
 
     // check if circuitStore is not null when the app starts up.
     onMount(() => {
-        const saveJsonText =
-            localStorage.getItem('circuitStoreSave') ||
-            (console.log('No saved state found in localStorage.'), null)
+        // All three of these ways work
+        // loadCircuit((newData: Devices) => setDeviceData(newData))
+        // loadCircuit((newData: Devices) => (currentDevicesData = newData))
+        loadCircuit(setDeviceData) // load circuit from LS into CircuitStore, provide callback to set DeviceData
+        fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
+    })
 
-        if (saveJsonText === null) {
-            return null
-        }
-
-        const saveJson = JSON.parse(saveJsonText)
-
-        $CircuitStore = saveJson
-        currentDevicesData = $CircuitStore.devices
+    // save circuit on page reload.
+    window.addEventListener('beforeunload', () => {
+        saveCircuit()
     })
 
     // create new node in the global store for circuitStore digital js backend.
     // sync the devices list with the currentDevicesData variable.
-    const newGateCircuitStore = (
-        gateType: string,
-        uuid: string,
-        options?: any
-    ) => {
+    function storeCircuitNode(gateType: string, uuid: string, options?: any) {
         const nodeName: string = `${gateType}_${uuid}`
         CircuitStore.update((currentCircuit) => {
             // Add the new device with a unique ID, e.g., 'newDeviceId'
@@ -52,33 +57,12 @@
             // const nextDeviceNum = Object.keys(currentDevicesData).length
             currentCircuit.devices[nodeName] = newDevice
 
-            // sync new Device data with currentDevicesData
-            // I guess this could also just be currentDevicesData =
-            // $circuitStore.devices, but it may update more frequently than we need.
-            // makes more sense for it to be here.
-            currentDevicesData = currentCircuit.devices
-            // Add the new connector
-            // currentCircuit.connectors.push(newConnector)
-
-            // Return the updated circuit
+            setDeviceData(currentCircuit.devices) //side effects
             return currentCircuit
         })
         return nodeName
     }
 
-    // this happens on every connection
-    // ON change of global JSON circuit DATA, Run this.
-    function generateNonce(length: number = 16): string {
-        const charset =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-        const values = crypto.getRandomValues(new Uint8Array(length))
-        return Array.from(
-            values,
-            (byte) => charset[byte % charset.length]
-        ).join('')
-    }
-
-    // $inspect($circuitStore).with(console.log)
     // called on "drop" in sidemenugroupitems.svelte
     function createCanvasNode(e: any) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
@@ -87,61 +71,28 @@
 
         // saves state to local storage on node add.
         const uuid = generateNonce()
-        newGateCircuitStore(gateType, uuid)
+
+        // create new gate on global circuit store on drop
+        storeCircuitNode(gateType, uuid)
 
         // save on every addition of a new node.
         saveCircuit()
     }
-
-    // TELEPORT BUG GET FUCKED
-    // try to fix the teleport bug.
-    document.addEventListener('DOMContentLoaded', () => {
-        const svelvetCanvas = document.querySelector('.svelvet-wrapper')
-        if (svelvetCanvas) {
-            // Create a MouseEvent with additional options
-            const event = new MouseEvent('mousedown', {
-                bubbles: true,
-                cancelable: true,
-            })
-
-            // Dispatch the event on the canvas
-            svelvetCanvas.dispatchEvent(event)
-            const eventUp = new MouseEvent('mouseup', {
-                bubbles: true,
-                cancelable: true,
-            })
-            svelvetCanvas.dispatchEvent(eventUp)
-        }
-
-        // Wire glitch on dev mode get fucked
-        const hoverAnchor = new MouseEvent('mouseenter', {
-            bubbles: true,
-            cancelable: true,
-        })
-        const allAnchors: NodeListOf<HTMLElement> =
-            document.querySelectorAll('.anchor-wrapper')
-
-        allAnchors.forEach((anc: HTMLElement) => {
-            anc.dispatchEvent(hoverAnchor)
-        })
-    })
-
-    const clearCanvas = () => (currentDevicesData = {})
 </script>
 
 <main id="joplysim">
     <SideMenu {createCanvasNode} />
-    <SimMenu {clearCanvas} />
+    <SimMenu clearCanvas={clearDeviceData} />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
-            <SimNode
+            <Circuit
                 gateType={device.type as logicGateTypes}
                 position={device.position}
                 {nodeId}
                 nodeProps={{
-                    gateType: device.type as dualInputLogicTypes,
+                    ...(device.type && { gateType: device.type }),
                     width: 80,
                     height: 50,
                     // Add any other specific props your node components need

@@ -29,20 +29,29 @@
     // after a mouse down, if you start dragging, don't flip the signal
     // if after mousedown you get mouseUp, flip the signal
     // After you get either of them, both listeners are killed and created again on the next mousedown.
-    function handleMouseDown(e: any) {
+    function handleMouseDown(e: MouseEvent) {
         e.preventDefault()
 
         let isDragging = false
+        const startX = e.clientX
+        const startY = e.clientY
+        const dragThreshold = 5 // Allow for small movements while clicking
 
-        function handleMouseMove() {
-            isDragging = true
-            cleanup()
+        function handleMouseMove(moveEvent: MouseEvent) {
+            const distanceX = moveEvent.clientX - startX
+            const distanceY = moveEvent.clientY - startY
+            // euclidian distance
+            const distance = Math.sqrt(distanceX ** 2 + distanceY ** 2)
+
+            if (distance > dragThreshold) {
+                isDragging = true
+                cleanup()
+            }
         }
 
         function handleMouseUp() {
             if (!isDragging) {
                 // Flip the signal only if it was a click, not a drag
-                // Side Effects!!
                 signalOn = !signalOn
                 inputSetter(nodeId)
             }

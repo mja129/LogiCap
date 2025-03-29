@@ -40,6 +40,7 @@
     ): void {
         ghostElement = document.createElement('div')
         ghostElement.className = 'drag-ghost'
+
         ghostElement.style.position = 'fixed'
         ghostElement.style.pointerEvents = 'none'
         ghostElement.style.left = pageX + 'px'

@@ -48,7 +48,6 @@
     />
 </svg>
 
-<!-- FEATURE: Make the line draggable around the whole circle  -->
 <SimulationNodeAnchor
     offset={lampOffset}
     location={['left', 'mid']}

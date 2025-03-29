@@ -7,17 +7,14 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "paths": {
-      "@DigitalJs/*": [
-        "./custom_digitaljs/*"
+      "@src/*": [
+        "./src/*"
       ],
       "@assets/*": [
         "./src/assets/*"
       ],
       "@icons/*": [
         "./src/assets/icons/*"
-      ],
-      "@Lib/*": [
-        "./src/lib/*"
       ],
       "@AppComponents/*": [
         "./src/lib/AppComponents/*"
@@ -32,13 +29,13 @@
         "./src/lib/Util/*"
       ],
       "@CircuitModel": [
-        "./src/lib/CircuitModel.ts"
+        "./src/lib/circuitModel.ts"
       ],
       "@CircuitStore": [
-        "./src/lib/CircuitStore.ts"
+        "./src/lib/circuitStore.ts"
       ],
       "@CircuitEngine": [
-        "./src/lib/CircuitEngine.svelte.ts"
+        "./src/lib/circuitEngine.svelte.ts"
       ],
     },
     "emitDeclarationOnly": true,

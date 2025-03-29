@@ -1,4 +1,4 @@
-import { HeadlessCircuit, type CircuitOptions } from "custom_digitaljs"
+import { HeadlessCircuit, type CircuitOptions } from 'custom_digitaljs'
 
 function transformConnections(data: SvelvetConnectors): Connector[] {
     let connectorsDigital: Connector[] = new Array<Connector>()
