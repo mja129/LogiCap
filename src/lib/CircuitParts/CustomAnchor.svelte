@@ -105,16 +105,18 @@
         /* border: 1.8px solid green; */
         border: 1.8px solid var(--pitt-yellow);
     }
-    :global(.running .input.linked.on, .running .output.linked.on) {
+    :global(.running .input) {
+        background-color: var(--pitt-blue) !important;
+    }
+    :global(.running .input.linked.on) {
         border: 2px solid green !important;
         filter: brightness(85%);
     }
-    :global(.running .input.linked.off, .running .output.linked.off) {
+    :global(.running .input.linked.off) {
         border: 2px solid var(--red) !important;
     }
 
     .input {
-        background-color: red;
         background-color: var(--pitt-blue);
     }
     .output {
