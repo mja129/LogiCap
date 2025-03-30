@@ -161,7 +161,7 @@ function savePositionsToCircuitStore() {
 function saveCircuitStoreToLS() {
     const CircuitStoreSave: string | null = getLsItem('circuitStoreSave')
 
-    // getLsItem might warn that CircuitStoreSave does not exist, in this case
+    // getLsItem might warn that circuitStoreSave does not exist, in this case
     // we are creating it for the first time, thats okay
 
     localStorage.setItem('circuitStoreSave', JSON.stringify(get(CircuitStore)))

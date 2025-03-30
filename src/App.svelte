@@ -46,7 +46,7 @@
     // sync the devices list with the currentDevicesData variable.
 
     // called on "drop" in sidemenugroupitem.svelte
-    function createCanvasNode(e: any) {
+    function createCanvasDevice(e: MouseEvent & { gateType: string }) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         // this gate will update the store and then the subscribe will update the
         // list of circuits currently active on the screen
@@ -67,7 +67,7 @@
 </script>
 
 <main id="logicap">
-    <SideMenu {createCanvasNode} />
+    <SideMenu {createCanvasDevice} />
     <SimMenu clearCanvas={clearDeviceData} />
     <Svelvet theme="LogiCap" disableSelection={false} controls>
         <Minimap width={100} corner="NE" slot="minimap" />

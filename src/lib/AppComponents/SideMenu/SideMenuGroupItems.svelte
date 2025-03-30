@@ -7,12 +7,11 @@
     // this will be a required prop but it is optional right now.
     let {
         zIndex = 0,
-        createCanvasNode,
+        createCanvasDevice,
         subMenuHeader = 'Logic Gates',
     }: {
-        showSubMenu?: boolean
         zIndex: number
-        createCanvasNode: (e: any) => void
+        createCanvasDevice: (e: MouseEvent & { gateType: string }) => void
         subMenuHeader?: string
     } = $props()
 
@@ -103,10 +102,11 @@
             const droppedOnCanvas = sideMenu?.contains(dropTarget)
 
             if (droppedOnCanvas) {
-                let e: any = {
+                const e: MouseEvent & { gateType: string } = {
+                    ...event,
                     gateType: draggingItem.nodeType,
                 }
-                createCanvasNode(e)
+                createCanvasDevice(e)
             }
 
             draggingItem = null
@@ -116,13 +116,13 @@
     }
 
     onMount(() => {
-        window.addEventListener('mousemove', handleMouseMove)
-        window.addEventListener('click', handleGlobalClick)
+        document.addEventListener('mousemove', handleMouseMove)
+        document.addEventListener('click', handleGlobalClick)
     })
 
     onDestroy(() => {
-        window.removeEventListener('mousemove', handleMouseMove)
-        window.removeEventListener('click', handleGlobalClick)
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('click', handleGlobalClick)
         removeGhost()
     })
     // This component really shouldn't be an ordered list that's so stupid

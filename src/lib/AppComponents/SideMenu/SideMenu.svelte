@@ -21,10 +21,12 @@
     import SketchyLine_21 from '@assets/svg/sketchLineSvg/line_21.svg'
     import SketchyLine_29 from '@assets/svg/sketchLineSvg/line_29.svg'
 
+    // function passed down from app.svelte that will run after circuit is dropped on the canvas
+    // passed further down to the SideMenuGroupItems.svelte
     let {
-        createCanvasNode,
+        createCanvasDevice,
     }: {
-        createCanvasNode: (e: any) => void
+        createCanvasDevice: (e: MouseEvent & { gateType: string }) => void
     } = $props()
 
     // import CollapseIcon from '../assets/icons/collapse.webp'
@@ -51,6 +53,7 @@
     function rng(maxInt: number): number {
         return Math.floor(Math.random() * maxInt) + 1
     }
+
     let randomLineSelectionStore = localStorage.getItem(
         'randomLineSelectionStore'
     )
@@ -92,14 +95,10 @@
         })
     }
 
-    // this could also be "instance" data but this is simpler
-    // SHOULD ONLY ONE BE OPEN AT A TIME?
+    // this could also be "instance" data for each component but this is simpler
+    // if we did it the other way, we would need a $bindable() prop in groupItems
+    // because the animations have to be done in this component
     let showSubMenu: boolean[] = $state(Array(menuGroupNames.length).fill(true))
-    // console.log(showSubMenu)
-    // click on menu item
-    // vs
-    // drag menu item and drop on svelvet canvas
-    // showAnimation = 'transition: min-height 1s ease'
 
     function getAnimationStyle(showMenuMap: boolean[], index: number) {
         if (!showMenuMap[index]) {
@@ -147,10 +146,9 @@
                     />
                 </div>
                 <SideMenuGroupItems
-                    {createCanvasNode}
+                    {createCanvasDevice}
                     zIndex={index}
                     subMenuHeader={groupName}
-                    showSubMenu={showSubMenu[index]}
                 />
             </li>
         {/each}
