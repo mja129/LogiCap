@@ -117,9 +117,6 @@
 </script>
 
 <Edge let:path let:destroy let:hovering>
-    <div style="font-size: 10px;" slot="label">
-        {wireId}<span style="color: red">{initAncId}</span>
-    </div>
     <path
         bind:this={edgeWrapper}
         d={path}

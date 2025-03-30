@@ -11,9 +11,13 @@
     import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
+    import {
+        CircuitStore,
+        loadCircuit,
+        saveCircuit,
+        storeCircuitNode,
+    } from '@CircuitStore'
     import type { logicGateTypes } from '@CircuitModel'
-    import { deviceJsonFactoryMap } from '@Util/makeDigitalJsJson'
 
     import SideMenu from '@AppComponents/SideMenu/SideMenu.svelte'
 
@@ -23,16 +27,17 @@
     import { fixSvelvetBugs, generateNonce } from './app'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
-    let currentDevicesData: Devices = $state({})
+    let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
     const clearDeviceData = () => (currentDevicesData = {})
-    const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
+    // const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
 
     // check if circuitStore is not null when the app starts up.
     onMount(() => {
         // All three of these ways work
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
-        loadCircuit(setDeviceData) // load circuit from LS into CircuitStore, provide callback to set DeviceData
+        loadCircuit() // load circuit from LS into CircuitStore,
+        currentDevicesData = $CircuitStore.devices
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
     })
 
@@ -43,25 +48,6 @@
 
     // create new node in the global store for circuitStore digital js backend.
     // sync the devices list with the currentDevicesData variable.
-    function storeCircuitNode(gateType: string, uuid: string, options?: any) {
-        const nodeName: string = `${gateType}_${uuid}`
-        CircuitStore.update((currentCircuit) => {
-            // Add the new device with a unique ID, e.g., 'newDeviceId'
-            // get function from map
-
-            const newDevice: Device =
-                options === undefined
-                    ? deviceJsonFactoryMap[gateType](nodeName)
-                    : deviceJsonFactoryMap[gateType](nodeName, options)
-
-            // const nextDeviceNum = Object.keys(currentDevicesData).length
-            currentCircuit.devices[nodeName] = newDevice
-
-            setDeviceData(currentCircuit.devices) //side effects
-            return currentCircuit
-        })
-        return nodeName
-    }
 
     // called on "drop" in sidemenugroupitems.svelte
     function createCanvasNode(e: any) {
@@ -74,13 +60,14 @@
 
         // create new gate on global circuit store on drop
         storeCircuitNode(gateType, uuid)
+        currentDevicesData = $CircuitStore.devices
 
         // save on every addition of a new node.
         saveCircuit()
     }
 </script>
 
-<main id="joplysim">
+<main id="logicap">
     <SideMenu {createCanvasNode} />
     <SimMenu clearCanvas={clearDeviceData} />
     <Svelvet theme="LogiCap" disableSelection={false} controls>

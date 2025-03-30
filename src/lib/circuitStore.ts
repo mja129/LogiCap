@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store'
+import { deviceJsonFactoryMap } from './Util/makeDigitalJsJson'
 
 // Explains the json representation
 // https://github.com/tilk/digitaljs
@@ -69,6 +70,30 @@ export function removeConnection(inputAnchorId: string) {
         currCircuit.connectors = newConnectors
         return currCircuit
     })
+}
+
+// create a node on 'Drop' in app.svelte
+// App.svelte passes a callback function 'createCanvasNode' 
+// 2 levels: -> sideMenu.svelte -> sidemenugroupitems.svelte 
+// createCanvas node -> will get the gate type from sidemenugroupitems
+export function storeCircuitNode(gateType: string, uuid: string, options?: any) {
+    const nodeName: string = `${gateType}_${uuid}`
+    // I could move this function into circuit store now if this works
+    CircuitStore.update((currentCircuit) => {
+        // Add the new device with a unique ID, e.g., 'newDeviceId'
+        // get function from map
+
+        const newDevice: Device =
+            options === undefined
+                ? deviceJsonFactoryMap[gateType](nodeName)
+                : deviceJsonFactoryMap[gateType](nodeName, options)
+
+        // const nextDeviceNum = Object.keys(currentDevicesData).length
+        currentCircuit.devices[nodeName] = newDevice
+
+        return currentCircuit
+    })
+    return nodeName
 }
 
 // the info that we will extract from the svelvet save.
@@ -170,19 +195,16 @@ export async function saveCircuit() {
 // but the 'currentDevicesData' state variable in App.svelte
 // needs to sync with the CircuitStore.devices on loadCircuit, and this is why we pass in a function
 // to set that state 'remotely' lets say
-export function loadCircuit(setDevices: Function = () => null) {
-    const savedCircuitText =
-        localStorage.getItem('circuitStoreSave') ||
-        (console.log('No saved state found in localStorage.'), null)
+// default is local storage
+export function loadCircuit(circuitText = 'default') {
 
-    if (savedCircuitText === null) {
-        return null
-    }
+    let savedCircuitText = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
+    if (!savedCircuitText) return
 
     const savedCircuit = JSON.parse(savedCircuitText)
 
     CircuitStore.set(savedCircuit)
-    setDevices(savedCircuit.devices)
+    // setDevices(savedCircuit.devices)
 }
 
 // remove circuitStore save and backup to prevCircuitStore, iff you aren't deleting an empty circuit.

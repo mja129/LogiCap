@@ -26,7 +26,6 @@
 
     let { clearCanvas }: { clearCanvas: Function } = $props()
 
-    // if I could make this a snippet map that would be cool.
     const simMenuModel: SimMenuModel = {
         playTick: {
             Component: PlayTickIcon,
@@ -66,8 +65,7 @@
     }
 
     const toggleRunningClass = () => {
-        const appMainTag: Element | null =
-            document.querySelector('main#joplysim')
+        const appMainTag: Element | null = document.querySelector('#logicap')
         if (!appMainTag) return // impossible
 
         if (appMainTag.classList.contains('running')) {
@@ -106,33 +104,28 @@
     // const defaultOptions: any =
 </script>
 
-{#snippet simIcon(iconProps: Icon)}
+{#snippet simIcon({ ...iconProps })}
     <iconProps.Component style={iconProps.styles} width={iconProps.width} />
 {/snippet}
 
+<!-- Render  -->
 {#snippet simMenuBtn(
     iconProps: Icon,
     onClickFn: Function,
-    btnStyles: string = '',
-    vlStyles: string = '',
-    includeVL: boolean = true
+    btnStyles: string = ''
 )}
-    {#if includeVL}
-        <span style={vlStyles} class="vl"></span>
-    {/if}
     <button style={btnStyles} onclick={() => onClickFn()}>
         {@render simIcon(iconProps)}
     </button>
 {/snippet}
 
-{#snippet playPauseSection()}
+{#snippet playPauseSection(simToggle: Function)}
     <button
-        onclick={toggleRunSim}
+        onclick={() => simToggle()}
         style="display:flex;align-items: center;padding-block:1px;"
     >
         <div style="margin-left: -8px">
             {#if getRunning()}
-                <!-- content here -->
                 {@render simIcon(simMenuModel['pauseTick'])}
             {:else}
                 {@render simIcon(simMenuModel['playTick'])}
@@ -148,25 +141,17 @@
 {/snippet}
 
 <div class="menuRunButtons">
-    {@render playPauseSection()}
+    {@render playPauseSection(toggleRunSim)}
+    <span class="vl"></span>
     {@render simMenuBtn(simMenuModel['updateGates'], updateGates)}
+    <span class="vl"></span>
     {@render simMenuBtn(simMenuModel['updateGatesNext'], updateGatesNext)}
 
+    <span class="vl"></span>
     {@render simMenuBtn(simMenuModel['resetState'], resetCircuit)}
-    {@render simMenuBtn(
-        simMenuModel['save'],
-        saveCircuit,
-        '',
-        'margin-right: 7px',
-        true
-    )}
-    {@render simMenuBtn(
-        simMenuModel['trash'],
-        onTrash,
-        'margin-left: -6px',
-        '',
-        false
-    )}
+    <span style="margin-right: 7px" class="vl"></span>
+    {@render simMenuBtn(simMenuModel['save'], saveCircuit)}
+    {@render simMenuBtn(simMenuModel['trash'], onTrash, 'margin-left: -6px')}
 </div>
 
 <style>
