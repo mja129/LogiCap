@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Component } from 'svelte'
 
-    import { resetCircuitStore, saveCircuit, backupDelete } from '@CircuitStore'
+    import { CircuitStore, saveCircuit, backupDelete } from '@CircuitStore'
     import {
         toggleSimulation,
         updateNext,
@@ -95,7 +95,7 @@
     function onTrash() {
         backupDelete()
 
-        resetCircuitStore()
+        CircuitStore.reset()
 
         // clears the currentDevicesData variable in app.svelte
         clearCanvas()

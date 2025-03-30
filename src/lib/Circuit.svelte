@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Node } from 'svelvet'
-    import type { Component, SvelteComponent } from 'svelte'
+    import type { Component } from 'svelte'
     import {
         getComponent,
         type AllNodeProps,

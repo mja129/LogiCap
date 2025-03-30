@@ -1,100 +1,101 @@
-import { writable, get } from 'svelte/store'
+import { writable, get, type Writable } from 'svelte/store'
 import { deviceJsonFactoryMap } from './Util/makeDigitalJsJson'
 
 // Explains the json representation
 // https://github.com/tilk/digitaljs
 
-const initialCircuit: Circuit = {
-    devices: {},
-    connectors: {},
-    subcircuits: {},
+interface CircuitStoreType extends Writable<Circuit> {
+    reset(): void;
+    addConnection(fromAnchorId: outputAnchorName, toAnchorId: inputAnchorName): void;
+    removeConnection(inputAnchorId: string): void;
+    addCircuitDevice(gateType: string, uuid: string, options?: any): Devices;
 }
 
-export let CircuitStore = writable<Circuit>(initialCircuit)
 
-// reasonable because there is only 1 'connecting' at a time
-export function resetCircuitStore() {
-    CircuitStore.update((currentCircuit) => {
-        currentCircuit = {
-            devices: {},
-            connectors: {},
-            subcircuits: {},
+
+// create a custom svelte store
+const createCircuitStore = (): CircuitStoreType => {
+    const initialCircuit: Circuit = {
+        devices: {},
+        connectors: {},
+        subcircuits: {},
+    }
+    const { subscribe, set, update } = writable<Circuit>(initialCircuit)
+
+    return {
+        subscribe,
+        set,
+        update,
+        reset: () => update(() => {
+            return {
+                devices: {},
+                connectors: {},
+                subcircuits: {},
+            }
+        }),
+        addConnection: (fromId: outputAnchorName, toId: inputAnchorName) => {
+
+            const toNodeId: inputGateName = toId.substring(toId.indexOf('_') + 1) as inputGateName
+            update((currCircuit) => {
+                if (!(fromId in currCircuit.connectors)) {
+                    currCircuit.connectors[fromId] = new Array()
+                }
+                // I wanna check if the full array copy is needed here, I think it is tbh
+                currCircuit.connectors[fromId] = [
+                    ...currCircuit.connectors[fromId],
+                    [toNodeId, toId],
+                ]
+                console.log(currCircuit.connectors)
+                return currCircuit
+            })
+        },
+        removeConnection: (inputAnchorId: string) => {
+            update((currCircuit) => {
+                const newConnectors: SvelvetConnectors = {}
+                // O(N*M) where N is number of output anchors
+                // and M is the number of connections per output anchor
+                // this could be faster.
+                for (const fromAnchorId in currCircuit.connectors) {
+                    // Filter out any connections that match the `toAnchorId`
+                    // This logic would also remove duplicates, could be good or bad.
+                    newConnectors[fromAnchorId as outputAnchorName] = [
+                        ...currCircuit.connectors[
+                            fromAnchorId as outputAnchorName
+                        ].filter(([, anchorId]) => {
+                            return anchorId !== inputAnchorId
+                        }),
+                    ]
+                }
+                // console.log(newConnectors);
+                currCircuit.connectors = newConnectors
+                return currCircuit
+            })
+        },
+        addCircuitDevice: (gateType: string, uuid: string, options?: any) => {
+            const nodeName: string = `${gateType}_${uuid}`
+            let newDevices: Devices | null = null
+            update((currCircuit) => {
+
+                const newDevice: Device =
+                    options === undefined
+                        ? deviceJsonFactoryMap[gateType](nodeName)
+                        : deviceJsonFactoryMap[gateType](nodeName, options)
+
+                currCircuit.devices[nodeName] = newDevice
+                newDevices = currCircuit.devices
+
+                return currCircuit
+            })
+            if (newDevices === null) {
+                throw new Error('devices null on set device')
+            }
+            return newDevices
         }
-        return currentCircuit
-    })
+
+    }
 }
 
-// Link anchor used in customAnchor.svelte mainly
-// we could make it $CircuitStore.addLinking -> I would preferthat TBH
-export function addConnection(
-    fromAnchorId: outputAnchorName,
-    toAnchorId: inputAnchorName
-) {
-    const toNodeId: inputGateName = toAnchorId.substring(
-        toAnchorId.indexOf('_') + 1
-    ) as inputGateName
-
-    // instead of push try de-structuring
-    CircuitStore.update((currCircuit) => {
-        if (!(fromAnchorId in currCircuit.connectors)) {
-            currCircuit.connectors[fromAnchorId] = new Array()
-        }
-        // I wanna check if the full array copy is needed here, I think it is tbh
-        currCircuit.connectors[fromAnchorId] = [
-            ...currCircuit.connectors[fromAnchorId],
-            [toNodeId, toAnchorId],
-        ]
-        console.log(currCircuit.connectors)
-        return currCircuit
-    })
-}
-
-export function removeConnection(inputAnchorId: string) {
-    CircuitStore.update((currCircuit) => {
-        const newConnectors: SvelvetConnectors = {}
-        // O(N*M) where N is number of output anchors
-        // and M is the number of connections per output anchor
-        // this could be faster.
-        for (const fromAnchorId in currCircuit.connectors) {
-            // Filter out any connections that match the `toAnchorId`
-            // This logic would also remove duplicates, could be good or bad.
-            newConnectors[fromAnchorId as outputAnchorName] = [
-                ...currCircuit.connectors[
-                    fromAnchorId as outputAnchorName
-                ].filter(([, anchorId]) => {
-                    return anchorId !== inputAnchorId
-                }),
-            ]
-        }
-        // console.log(newConnectors);
-        currCircuit.connectors = newConnectors
-        return currCircuit
-    })
-}
-
-// create a node on 'Drop' in app.svelte
-// App.svelte passes a callback function 'createCanvasNode' 
-// 2 levels: -> sideMenu.svelte -> sidemenugroupitems.svelte 
-// createCanvas node -> will get the gate type from sidemenugroupitems
-export function storeCircuitNode(gateType: string, uuid: string, options?: any) {
-    const nodeName: string = `${gateType}_${uuid}`
-    // I could move this function into circuit store now if this works
-    CircuitStore.update((currentCircuit) => {
-        // Add the new device with a unique ID, e.g., 'newDeviceId'
-        // get function from map
-
-        const newDevice: Device =
-            options === undefined
-                ? deviceJsonFactoryMap[gateType](nodeName)
-                : deviceJsonFactoryMap[gateType](nodeName, options)
-
-        // const nextDeviceNum = Object.keys(currentDevicesData).length
-        currentCircuit.devices[nodeName] = newDevice
-
-        return currentCircuit
-    })
-    return nodeName
-}
+export const CircuitStore: CircuitStoreType = createCircuitStore();
 
 // the info that we will extract from the svelvet save.
 type NodeInfoList = {

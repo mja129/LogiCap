@@ -1,4 +1,4 @@
-import { addConnection } from '@CircuitStore'
+import { CircuitStore } from '@CircuitStore'
 // @ts-ignore this doesn't even cause err on VScode.
 import { onWireConnection } from '../../App.svelte'
 
@@ -57,7 +57,7 @@ function pushConnectionToCircuitStore(sourceClass: string, destClass: string) {
     const { fromOutputId, toInputId } = matchAnchors(sourceClass, destClass)
     // addLinking(<outputAnchorName>fromOutputId, <inputAnchorName>toInputId)
     console.log("adding connection", fromOutputId, toInputId)
-    addConnection(fromOutputId as outputAnchorName, toInputId as inputAnchorName)
+    CircuitStore.addConnection(fromOutputId as outputAnchorName, toInputId as inputAnchorName)
 
     return makeWireId(fromOutputId, toInputId)
 }

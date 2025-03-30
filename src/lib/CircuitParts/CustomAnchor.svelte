@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getRunning } from '@CircuitEngine'
     import { findAnchorTargetClassName, attemptLink } from './linkAnchors'
-    import { removeConnection } from '@CircuitStore'
+    import { CircuitStore } from '@CircuitStore'
 
     let {
         linked,
@@ -70,7 +70,7 @@
             // make sure we are adding to the end of the list and starting the search from there.
             // Stack order removeConnection(anchorId)
             // now tell the connecting outputnode who you are
-            removeConnection(anchorId)
+            CircuitStore.removeConnection(anchorId)
             // reverse mapping.
         }
     }}

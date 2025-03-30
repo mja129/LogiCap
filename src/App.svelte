@@ -11,12 +11,8 @@
     import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    import {
-        CircuitStore,
-        loadCircuit,
-        saveCircuit,
-        storeCircuitNode,
-    } from '@CircuitStore'
+    import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
+
     import type { logicGateTypes } from '@CircuitModel'
 
     import SideMenu from '@AppComponents/SideMenu/SideMenu.svelte'
@@ -49,7 +45,7 @@
     // create new node in the global store for circuitStore digital js backend.
     // sync the devices list with the currentDevicesData variable.
 
-    // called on "drop" in sidemenugroupitems.svelte
+    // called on "drop" in sidemenugroupitem.svelte
     function createCanvasNode(e: any) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         // this gate will update the store and then the subscribe will update the
@@ -59,8 +55,11 @@
         const uuid = generateNonce()
 
         // create new gate on global circuit store on drop
-        storeCircuitNode(gateType, uuid)
-        currentDevicesData = $CircuitStore.devices
+        const newDeviceList = CircuitStore.addCircuitDevice(
+            gateType,
+            uuid
+        ) as Devices
+        currentDevicesData = newDeviceList
 
         // save on every addition of a new node.
         saveCircuit()
