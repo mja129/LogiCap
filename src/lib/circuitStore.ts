@@ -87,7 +87,7 @@ const createCircuitStore = (): CircuitStoreType => {
                 return currCircuit
             })
             if (newDevices === null) {
-                throw new Error('devices null on set device')
+                throw new Error('devices null after setting devices')
             }
             return newDevices
         }
@@ -197,12 +197,24 @@ export async function saveCircuit() {
 // needs to sync with the CircuitStore.devices on loadCircuit, and this is why we pass in a function
 // to set that state 'remotely' lets say
 // default is local storage
+function validateSavedCircuit(savedCircuit: any) {
+    if (!savedCircuit?.devices || !savedCircuit?.connectors || !savedCircuit?.subcircuits) {
+      throw new Error('Parsed circuit object is missing required properties');
+    }
+    else if (Object.keys(savedCircuit.devices).length === 0) {
+      console.log('Loaded in a valid circuit with empty devices');
+    }
+}
+
 export function loadCircuit(circuitText = 'default') {
 
     let savedCircuitText = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
     if (!savedCircuitText) return
 
-    const savedCircuit = JSON.parse(savedCircuitText)
+    const savedCircuit = JSON.parse(savedCircuitText) as { devices: {}; connectors: {}; subcircuits: {} };
+
+    validateSavedCircuit(savedCircuit)
+    
 
     CircuitStore.set(savedCircuit)
     // setDevices(savedCircuit.devices)
@@ -213,7 +225,6 @@ export function loadCircuit(circuitText = 'default') {
 export function backupDelete() {
     // what if they clear an empty canvas.
     saveCircuit()
-    // save previously deleted.
 
     const saveDeleted = localStorage.getItem('circuitStoreSave')
     if (!saveDeleted) {
@@ -229,5 +240,4 @@ export function backupDelete() {
         localStorage.setItem('prevCircuitStore', saveDeleted)
     }
     localStorage.removeItem('circuitStoreSave')
-    // localStorage.removeItem('state')
 }

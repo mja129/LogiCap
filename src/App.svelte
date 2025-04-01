@@ -3,6 +3,7 @@
     export function onWireConnection() {
         console.log('CONNECTED IN APP')
         // saveCircuit() // we could auto-save on wire linking
+        // but save on reload pretty much covers us.
         return null
     }
 </script>
@@ -20,11 +21,14 @@
     // I could call this 'generic' circuit or something
     import Circuit from './lib/Circuit.svelte'
     import SimMenu from '@AppComponents/SimMenu.svelte'
-    import { fixSvelvetBugs, generateNonce } from './app'
+    import { fixSvelvetBugs, generateNonce, captureCurrentZoom } from './app'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
     const clearDeviceData = () => (currentDevicesData = {})
+
+    let initialScale: number = $state(1)
+
     // const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
 
     // check if circuitStore is not null when the app starts up.
@@ -32,14 +36,19 @@
         // All three of these ways work
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
+        initialScale = parseFloat(localStorage.getItem('SavedScale') || '1')
+
         loadCircuit() // load circuit from LS into CircuitStore,
         currentDevicesData = $CircuitStore.devices
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
+
+        // restrictFitViewZoom()
     })
 
     // save circuit on page reload.
     window.addEventListener('beforeunload', () => {
         saveCircuit()
+        captureCurrentZoom() // sets 'SavedScale' in localStorage
     })
 
     // create new node in the global store for circuitStore digital js backend.
@@ -64,12 +73,19 @@
         // save on every addition of a new node.
         saveCircuit()
     }
+    // fitView={true}
 </script>
 
 <main id="logicap">
     <SideMenu {createCanvasDevice} />
     <SimMenu clearCanvas={clearDeviceData} />
-    <Svelvet theme="LogiCap" disableSelection={false} controls>
+    <Svelvet
+        theme="LogiCap"
+        zoom={initialScale}
+        editable={false}
+        disableSelection={false}
+        controls
+    >
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}

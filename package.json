@@ -8,6 +8,7 @@
         "build": "vite build",
         "preview": "vite preview",
         "deploy": "npx gh-pages -d dist",
+        "dev-reload": "rm -rf node_modules/.vite && vite",
         "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
     },
     "devDependencies": {

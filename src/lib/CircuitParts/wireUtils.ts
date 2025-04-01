@@ -128,7 +128,7 @@ const inputAncIdFromEleId = (edgeId: string) => {
 export function getWireIdFromDOM(
     edgeWrapper: SVGPathElement | null,
     sourceAncId: string
-): string | null {
+): [string, string] {
     const siblings = getDOMSiblings(edgeWrapper) as NodeListOf<HTMLElement>
 
     // okay  this is super ugly
@@ -139,11 +139,10 @@ export function getWireIdFromDOM(
                 ?.getAttribute('id')) ||
         null
 
-    console.assert(edgeId !== null, 'No ID found on the edgeNode')
-    if (!edgeId) return null
+    if (!edgeId) throw new Error('No ID found on the edgeNode')
 
     // we could also get initId from the class itself.
     // I don't this this keeps a strict input-output ordering.
     const wireId = sourceAncId + '-' + inputAncIdFromEleId(edgeId)
-    return wireId
+    return [wireId, edgeId]
 }

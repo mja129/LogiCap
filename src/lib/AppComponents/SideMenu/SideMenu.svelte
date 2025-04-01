@@ -234,7 +234,7 @@
         /* translate: height 5s; */
 
         /* Hide scrollbar but still scroll crome+firefox   */
-        overflow: scroll;
+        overflow: hidden;
         -ms-overflow-style: none; /* IE and Edge */
         scrollbar-width: none; /* Firefox */
     }

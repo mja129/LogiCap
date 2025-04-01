@@ -3,6 +3,7 @@
     import { Edge } from 'svelvet'
 
     import { CustomHeadlessCircuit } from '@Util/CustomHeadlessCircuit'
+
     import {
         CircuitEngine,
         onWireChange,
@@ -25,8 +26,8 @@
     let wireId: string = $state('')
 
     onMount(() => {
-        let newId = getWireIdFromDOM(edgeWrapper, initAncId)
-        monitorWire(newId)
+        let [wireId, domWireId] = getWireIdFromDOM(edgeWrapper, initAncId)
+        monitorWire(wireId)
     })
 
 
