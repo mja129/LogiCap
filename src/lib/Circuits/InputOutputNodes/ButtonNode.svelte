@@ -1,6 +1,6 @@
 <script lang="ts">
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
-    import { inputSetter } from '@CircuitEngine'
+    import { CircuitEngine, inputSetter, getRunning } from '@CircuitEngine'
     import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
 
@@ -14,7 +14,10 @@
         nodeId: string
     } = $props()
 
+
     let signalOn: boolean = $state(false)
+
+    
 
     let buttonColor = $derived({
         color: signalOn ? 'green' : 'red',
@@ -47,8 +50,9 @@
         }
 
         function handleMouseUp() {
-            if (!isDragging) {
-                // Flip the signal only if it was a click, not a drag
+            if (!isDragging && getRunning()) {
+                // Flip the signal only if it was a click, not a drag, and its on
+                console.log(getRunning())
                 signalOn = !signalOn
                 inputSetter(nodeId)
             }
@@ -63,6 +67,16 @@
         window.addEventListener('mousemove', handleMouseMove)
         window.addEventListener('mouseup', handleMouseUp)
     }
+
+    CircuitEngine.subscribe((digitalJsCircuit) => {
+        //Turn off buttons on stop
+        console.log(digitalJsCircuit)
+        if (digitalJsCircuit === null) {
+            signalOn = false
+            return
+        }
+    })
+
 </script>
 
 <svg

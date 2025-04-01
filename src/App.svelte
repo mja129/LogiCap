@@ -118,6 +118,8 @@
         padding: 0 !important;
         width: auto !important;
         height: auto !important;
+        min-width: 80px;
+        min-height: 50px;
     }
     :global(
         .svelvet-wrapper,

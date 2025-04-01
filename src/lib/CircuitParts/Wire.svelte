@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from 'svelte'
+    import { onMount, onDestroy } from 'svelte'
     import { Edge } from 'svelvet'
 
     import { CustomHeadlessCircuit } from '@Util/CustomHeadlessCircuit'
@@ -28,6 +28,7 @@
         let newId = getWireIdFromDOM(edgeWrapper, initAncId)
         monitorWire(newId)
     })
+
 
     // creates a monitor on wireMount
     // also creates the wire name from the class on the wire that svelvet provides
@@ -114,6 +115,17 @@
             (() => null)
         monitorFn()
     })
+
+    function removeWireFromCircuit()
+    {
+        let digitalJsCircuit: CustomHeadlessCircuit | null = get(CircuitEngine)
+        if(digitalJsCircuit == null) {
+            console.log("Circuit is null")
+            return;
+        }
+        console.log(digitalJsCircuit.getLabelIndex())
+    }
+
 </script>
 
 <Edge let:path let:destroy let:hovering>
@@ -123,6 +135,8 @@
         class={wireActive === -1 ? '' : wireActive === 1 ? 'on' : 'off'}
     />
 </Edge>
+
+
 
 <style>
     path {

@@ -18,6 +18,7 @@
     import UpdateGatesIcon from '~icons/streamline/entertainment-control-button-next-button-television-buttons-movies-skip-next-video-controls'
     import SaveIcon from '~icons/lucide/save'
     import TrashIcon from '~icons/material-symbols/delete-outline'
+    import ButtonNode from '../Circuits/InputOutputNodes/ButtonNode.svelte'
 
     type Icon = { Component: Component<any>; styles: string; width: number }
     type IconName = string
@@ -74,6 +75,7 @@
             appMainTag.classList.add('running')
         }
     }
+
     function toggleRunSim(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
