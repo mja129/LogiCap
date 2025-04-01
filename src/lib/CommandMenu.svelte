@@ -1,13 +1,14 @@
 <script lang="ts">
     import { Command } from "cmdk-sv";
+    import { menuJsonData, type NodeMenuGroups, type menuJsonElement } from './circuitModel.ts';
     import { onMount, afterUpdate } from 'svelte';
 
     let isMenuOpen = false; // local state for toggle menu visibility
     let search = ""; 
     let searchFlag = "";
 
-    let pages: string[] = [];
-    $: page = pages[pages.length - 1];
+    let pages: NodeMenuGroups[] = [];
+    $: page = pages.length > 0 ? pages[pages.length - 1] : undefined; // current page based on stack
 
     // menu toggle function
     function toggleMenu() {
@@ -19,7 +20,7 @@
     }
 
     // Push a new page onto the stack.
-    function changePage(newPage: string) {
+    function changePage(newPage: NodeMenuGroups) {
       pages = [...pages, newPage];
       search = "";
       searchFlag = "";
@@ -51,24 +52,8 @@
     });
 
     // top-level items:
-    const topItems = [
-      { id: "gates", label: "Gates" },
-      { id: "inputs", label: "Inputs/Outputs" }
-    ];
+    const topItems = Object.keys(menuJsonData).filter(group => group !== "GhostElement").map(group => ({ id: group, label: group }));
 
-    // Data for gate group:
-    const gates = [
-      { id: "and", label: "AND Gate", nodeType: "And" },
-      { id: "or", label: "OR Gate",  nodeType: "Or" },
-      { id: "not", label: "NOT Gate", nodeType: "Not" }
-    ];
-
-    // Data for input group:
-    const inputs = [
-      { id: "button", label: "Button", nodeType: "Button" },
-      { id: "lamp", label: "Lamp", nodeType: "Lamp" }
-    ];
-    
     // global key listen. Set to - for the moment 
     onMount(() =>{
       window.addEventListener("keydown", (event) => {
@@ -88,6 +73,20 @@
       createCanvasNode({ gateType: nodeType });
     }
 
+    // Keydown handling for toggling and backspace navigation
+    onMount(() => {
+      window.addEventListener("keydown", handleKeyDown);
+    });
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Backspace" && !search) {
+        if (pages.length > 0) {
+          event.preventDefault();
+          goBack();
+        }
+      }
+    }
+
 </script>
 
 <main>
@@ -98,7 +97,6 @@
       <div class="menu">
         <Command.Root filter={() => 1}>
           <Command.Input class="cmdk-input" bind:value={search} placeholder="Search..." />
-
             <Command.List>
               {#if !page}
                 <!-- Top-level list; key the list so it re-renders when search changes -->
@@ -107,45 +105,31 @@
                     item.label.toLowerCase().startsWith(search.toLowerCase())
                   ) as item (item.id)}    
                     <Command.Item
-                      onSelect={() => changePage(item.id)}>
+                      onSelect={() => changePage(item.id as NodeMenuGroups)}
+                      class="menu-item"
+                    >
                       {item.label}
                     </Command.Item>
                   {/each}
                 </Command.List>
-              {:else if page === "gates"}
-                <!-- Nested page for Gates -->
+              {:else}
+                <!-- Subpage Menu -->
                 <Command.List>
-                  <Command.Group heading="Gates">
-                    {#each gates.filter(gate =>
-                      gate.label.toLowerCase().startsWith(search.toLowerCase())
-                    ) as gate (gate.id)}
-                    
-                      <Command.Item onSelect={() => handleSelect(gate.nodeType)}>
-                        {gate.label}
+                  <Command.Group heading={page}>
+                    {#each menuJsonData[page as NodeMenuGroups].groupElements.filter((el: menuJsonElement) =>
+                      el.name.toLowerCase().startsWith(search.toLowerCase())
+                    ) as element (element.nodeType)}
+                      <Command.Item
+                        onSelect={() => handleSelect(element.nodeType)}
+                        class="menu-item"
+                      >
+                        {element.name}
+                        <img src={element.icon} alt="{element.name}" class="menu-item-icon" />
                       </Command.Item>
-                    {/each}
+                    {/each}                    
                   </Command.Group>
-                  <Command.Item onSelect={goBack}>
-                    ← Back
-                  </Command.Item>
+                  <Command.Item onSelect={goBack} class="menu-item">← Back</Command.Item>
                 </Command.List>
-              {:else if page === "inputs"}
-                  <!-- Nested page for Inputs/Outputs -->
-                  <Command.List>
-                    <Command.Group heading="Inputs/Outputs">
-                      {#each inputs.filter(input =>
-                        input.label.toLowerCase().startsWith(search.toLowerCase())
-                      ) as input (input.id)}
-          
-                        <Command.Item onSelect={() => handleSelect(input.nodeType)}>
-                          {input.label}
-                        </Command.Item>
-                      {/each}
-                    </Command.Group>
-                    <Command.Item onSelect={goBack}>
-                      ← Back
-                    </Command.Item>
-                  </Command.List>
               {/if}
             </Command.List>  
         </Command.Root>
@@ -155,7 +139,7 @@
 </main>
 
 <style>
-    .menu-toggle-button {
+  .menu-toggle-button {
     position: absolute;
     top: 7rem; /* Adjust to position it under the minimap */
     right: 0.5rem;
@@ -168,16 +152,34 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
   }
+
+  :global(.menu-item-icon) {
+    width: 20px; /* Set image width */
+    height: auto; /* Maintain aspect ratio */
+    margin-left: 10px; /* Add spacing between text and image */
+  }
+
+  :global(.menu-item) {
+    display: flex; /* Align text and image in a row */
+    justify-content: space-between; /* Push the image to the right */
+    align-items: center; /* Vertically align text and image */
+    cursor: pointer;
+  }
+
+  :global(.menu-item:hover) {
+  background-color: #f0f0f0;
+}
+
   .menu {
-      position: fixed;
-      bottom: 1rem; /* Adjust the distance from the bottom */
-      right: 1rem;  /* Adjust the distance from the right */
-      background-color: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
-      width: 175px;
-      padding: 16px;
-      z-index: 10;
-      border-color: black;
+    position: fixed;
+    bottom: 1rem; /* Adjust the distance from the bottom */
+    right: 1rem;  /* Adjust the distance from the right */
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 175px;
+    padding: 16px;
+    z-index: 10;
+    border-color: black;
   }
 </style>
