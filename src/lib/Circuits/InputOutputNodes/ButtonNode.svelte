@@ -70,7 +70,6 @@
 
     CircuitEngine.subscribe((digitalJsCircuit) => {
         //Turn off buttons on stop
-        console.log(digitalJsCircuit)
         if (digitalJsCircuit === null) {
             signalOn = false
             return

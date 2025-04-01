@@ -116,15 +116,6 @@
         monitorFn()
     })
 
-    function removeWireFromCircuit()
-    {
-        let digitalJsCircuit: CustomHeadlessCircuit | null = get(CircuitEngine)
-        if(digitalJsCircuit == null) {
-            console.log("Circuit is null")
-            return;
-        }
-        console.log(digitalJsCircuit.getLabelIndex())
-    }
 
 </script>
 
