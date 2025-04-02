@@ -91,31 +91,28 @@ export function setAnchor(port: string, nodeId: string, wireChange: number) {
     }
 }
 
+export function getDOMParent(edgeWrapper: SVGPathElement | null) {
+    console.assert(
+        edgeWrapper !== null,
+        "A wire was mounted with an empty edgeWrapper binding, maybe it hasn't loaded yet"
+    )
+    return edgeWrapper?.parentElement
+}
 // ⭐️  Good Comment ⭐️
 // edge-wrapper is a child element of the DOM element that we are looking for
 // svelvet generates a sibling of edge-wrapper, with an id that looks something like this
 // A-in2_Nand_R6ecBvquImEbPYoo/N-Nand_R6ecBvquImEbPYoo+A-out_Button_NqRwJIgwMnCkcvwZ/N-Button_NqRwJIgwMnCkcvwZ-target
 // The element we are looking for has the attribute -> value pairing role="presentation"
 // There are probably less than 5 sibling nodes for edge-wrapper, so the iteration is really no concern: O(>5)
-function getDOMSiblings(edgeWrapper: SVGPathElement | null) {
-    console.assert(
-        edgeWrapper !== null,
-        "A wire was mounted with an empty edgeWrapper binding, maybe it hasn't loaded yet"
-    )
+export function getDOMSiblings(edgeWrapper: SVGPathElement | null) {
+    const parentElement = getDOMParent(edgeWrapper)
     // these case is so impossible, I think it needs to be the rooot-most element
     console.assert(
-        edgeWrapper?.parentElement !== null,
+        parentElement,
         'edge Wrapper is not null but edgeWrapper binding has no parentElement'
     )
-    if (
-        edgeWrapper === null ||
-        edgeWrapper.parentElement === null ||
-        edgeWrapper.parentElement.childNodes === null
-    ) {
-        return null
-    }
 
-    return edgeWrapper.parentElement.childNodes
+    return edgeWrapper?.parentElement?.childNodes ?? null;
 }
 
 // helper function for getWireIdFromDOM
@@ -125,19 +122,24 @@ const inputAncIdFromEleId = (edgeId: string) => {
     return edgeId.substring(startInputId, endInputId)
 }
 
+export function getSvelvetEdgeEle(edgeWrapper: SVGPathElement | null) {
+
+    const siblings = getDOMSiblings(edgeWrapper) as NodeListOf<HTMLElement>
+
+    // okay  this is super ugly
+    const edge: HTMLElement | null =
+        (siblings &&
+            Array.from(siblings)
+                .find((ele) => ele.role === 'presentation')  || null)
+
+    return edge
+}
+
 export function getWireIdFromDOM(
     edgeWrapper: SVGPathElement | null,
     sourceAncId: string
 ): [string, string] {
-    const siblings = getDOMSiblings(edgeWrapper) as NodeListOf<HTMLElement>
-
-    // okay  this is super ugly
-    const edgeId: string | null =
-        (siblings &&
-            Array.from(siblings)
-                .find((ele) => ele.role === 'presentation')
-                ?.getAttribute('id')) ||
-        null
+    const edgeId = getSvelvetEdgeEle(edgeWrapper)?.getAttribute('id')
 
     if (!edgeId) throw new Error('No ID found on the edgeNode')
 
