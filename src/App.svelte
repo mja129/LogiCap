@@ -79,6 +79,7 @@
 <main id="logicap">
     <SideMenu {createCanvasDevice} />
     <SimMenu clearCanvas={clearDeviceData} />
+
     <Svelvet
         theme="LogiCap"
         zoom={initialScale}
