@@ -1,12 +1,15 @@
 <script lang="ts">
     import { Command } from "cmdk-sv";
-    import { menuJsonData, type NodeMenuGroups, type menuJsonElement } from './circuitModel.ts';
-    import { onMount, afterUpdate } from 'svelte';
+    import { menuJsonData, type NodeMenuGroups, type menuJsonElement, type allNodeTypes } from './circuitModel.ts';
+    import { onMount, afterUpdate, onDestroy } from 'svelte';
 
     let isMenuOpen = false; // local state for toggle menu visibility
     let search = ""; 
     let searchFlag = "";
-
+    let ghostElement: HTMLElement | null = null;
+    let dragging = false;
+    let activeNodeType: allNodeTypes | null = null;
+    
     let pages: NodeMenuGroups[] = [];
     $: page = pages.length > 0 ? pages[pages.length - 1] : undefined; // current page based on stack
 
@@ -16,6 +19,8 @@
       if (!isMenuOpen) {
         pages = [];
         search = "";
+        activeNodeType = null;
+        dragging = false;
       }
     }
 
@@ -66,16 +71,89 @@
       });
     });
 
-    export let createCanvasNode: (node: {gateType: string}) => void;
+    export let createCanvasNode: (node: {gateType: string; x: number; y: number }) => void;
 
-    // Handlers for selecting items.
-    function handleSelect(nodeType: string) {
-      createCanvasNode({ gateType: nodeType });
+    function createGhost(item: menuJsonElement) {
+      if (ghostElement) return; // Avoid creating multiple ghost elements
+      ghostElement = document.createElement("div");
+      ghostElement.className = "drag-ghost";
+      ghostElement.style.position = "fixed";
+      ghostElement.style.pointerEvents = "none"; // Make it unclickable
+      ghostElement.style.left = `0px`;
+      ghostElement.style.top = `0px`;
+      ghostElement.style.zIndex = "1000";
+
+      // Add the item's icon to the ghost
+      const img = document.createElement("img");
+      img.src = item.icon;
+      img.alt = item.name;
+      img.style.width = "40px";
+      img.style.opacity = "0.7";
+
+      ghostElement.appendChild(img);
+      document.body.appendChild(ghostElement);
+
+      // Update the ghost position with mouse movement
+      window.addEventListener("mousemove", updateGhostPosition);
     }
 
-    // Keydown handling for toggling and backspace navigation
+    function updateGhostPosition(event: MouseEvent) {
+      if (ghostElement) {
+        ghostElement.style.left = `${event.pageX}px`;
+        ghostElement.style.top = `${event.pageY}px`;
+      }
+    }
+
+    function removeGhost() {
+      if (ghostElement) {
+        ghostElement.remove();
+        ghostElement = null;
+      }
+      window.removeEventListener("mousemove", updateGhostPosition);
+      dragging = false;
+    }
+
+    // Start dragging interaction
+    function handleDragStart(nodeType: allNodeTypes, item: menuJsonElement) {
+      if (!dragging) {
+        activeNodeType = nodeType; // Set active node type
+        createGhost(item); // Attach ghost
+        dragging = true; // Enable dragging state
+        console.log(`Dragging started for: ${nodeType}`);
+      }
+
+    }
+
+    // Handle drop to create the node
+    function handleDrop(event: MouseEvent) {
+      if (dragging && activeNodeType) {
+        const cursorPosition = { x: event.pageX, y: event.pageY };
+        console.log(`Creating node at position: ${cursorPosition.x}, ${cursorPosition.y}`);
+        createCanvasNode({ gateType: activeNodeType, ...cursorPosition }); // Spawn the node
+        activeNodeType = null; // Clear active node type
+        removeGhost(); // Cleanup ghost
+      }
+    }
+
+    // Prevent repeated node creation on "Enter" or click
+    function handleInteraction(nodeType: allNodeTypes, item: menuJsonElement) {
+      if (!dragging) {
+        handleDragStart(nodeType, item); // Start drag interaction
+      }
+    }
+
+
+    // Attach global event listeners
     onMount(() => {
-      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("mouseup", handleDrop); // Listen for drop events
+      window.addEventListener("mousemove", updateGhostPosition); // Track mouse movement
+    });
+
+    // Remove global event listeners
+    onDestroy(() => {
+      window.removeEventListener("mouseup", handleDrop);
+      window.removeEventListener("mousemove", updateGhostPosition);
+      removeGhost(); // Ensure ghost cleanup
     });
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -120,7 +198,7 @@
                       el.name.toLowerCase().startsWith(search.toLowerCase())
                     ) as element (element.nodeType)}
                       <Command.Item
-                        onSelect={() => handleSelect(element.nodeType)}
+                        onSelect={() => handleInteraction(element.nodeType, element)} 
                         class="menu-item"
                       >
                         {element.name}
@@ -182,4 +260,13 @@
     z-index: 10;
     border-color: black;
   }
+
+  .drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    transform: scale(1.3);
+    opacity: 0.8;
+  }
+
 </style>
