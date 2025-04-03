@@ -1,7 +1,13 @@
 <script lang="ts">
     import type { Component } from 'svelte'
 
-    import { CircuitStore, saveCircuit, backupDelete, downloadCiruit, uploadCiruit } from '@CircuitStore'
+    import {
+        CircuitStore,
+        saveCircuit,
+        backupDelete,
+        downloadCiruit,
+        uploadCiruit,
+    } from '@CircuitStore'
     import {
         toggleSimulation,
         updateNext,
@@ -11,7 +17,6 @@
         resetCircuit,
     } from '@CircuitEngine'
 
-
     import UpdateGatesNextIcon from '~icons/streamline/button-fast-forward-2'
     import PlayTickIcon from '~icons/streamline/button-play'
     import ResetStateIcon from '~icons/streamline/interface-arrows-synchronize-arrows-loading-load-sync-synchronize-arrow-reload'
@@ -20,14 +25,19 @@
     import SaveIcon from '~icons/lucide/save'
     import TrashIcon from '~icons/material-symbols/delete-outline'
     import ButtonNode from '../Circuits/InputOutputNodes/ButtonNode.svelte'
-	import LoadIcon from '~icons/lucide/upload'
+    import LoadIcon from '~icons/lucide/upload'
 
     type Icon = { Component: Component<any>; styles: string; width: number }
     type IconName = string
 
     type SimMenuModel = Record<IconName, Icon>
 
-    let { clearCanvas, currCircuitName, setCanvas }: { clearCanvas: Function, currCircuitName: String, setCanvas: Function } = $props()
+    let {
+        clearCanvas,
+        currCircuitName,
+        setCanvas,
+    }: { clearCanvas: Function; currCircuitName: String; setCanvas: Function } =
+        $props()
 
     const simMenuModel: SimMenuModel = {
         playTick: {
@@ -65,7 +75,7 @@
             styles: 'transform:scale(2.69);',
             width: 40,
         },
-		load: {
+        load: {
             Component: LoadIcon,
             styles: 'transform:scale(2.4);',
             width: 40,
@@ -84,17 +94,16 @@
         }
     }
 
-    function turnOffLamps()
-    {
+    function turnOffLamps() {
         let circleElement: SVGElement | null
-        let lineElement: SVGElement | null 
+        let lineElement: SVGElement | null
         const lampOffColors: string[] = ['red', 'var(--lime-red)']
-        const lamps: NodeListOf<HTMLElement> | null = document.querySelectorAll("[id^='N-Lamp']");
-        if(lamps === null)
-        {
+        const lamps: NodeListOf<HTMLElement> | null =
+            document.querySelectorAll("[id^='N-Lamp']")
+        if (lamps === null) {
             return
         }
-        lamps.forEach(lamp => {
+        lamps.forEach((lamp) => {
             circleElement = lamp.querySelector('circle')
             lineElement = lamp.querySelector('line')
             if (circleElement === null || lineElement === null) return
@@ -102,7 +111,6 @@
             circleElement.setAttribute('fill', lampOffColors[0])
             lineElement.setAttribute('stroke', lampOffColors[0])
         })
-
     }
 
     function toggleRunSim(
@@ -183,7 +191,11 @@
     <span style="margin-right: 7px" class="vl"></span>
     {@render simMenuBtn(simMenuModel['save'], downloadCiruit(currCircuitName))}
     {@render simMenuBtn(simMenuModel['trash'], onTrash, 'margin-left: -6px')}
-	{@render simMenuBtn(simMenuModel['load'], ()=>{event.preventDefault(); uploadCiruit(); setCanvas($CircuitStore.devices)})}
+    {@render simMenuBtn(simMenuModel['load'], (e: event) => {
+        event.preventDefault()
+        uploadCiruit()
+        setCanvas($CircuitStore.devices)
+    })}
 </div>
 
 <style>

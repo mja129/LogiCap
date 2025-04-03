@@ -254,12 +254,20 @@ export function downloadCiruit(filename: string){
 	saveCircuit();
 	// => Turn the current Circuuit into a file ...
 	
-	const circuitBlob = new Blob([getLsItem('circuitStoreSave')], {type: 'application/json'});
+	const getItem = getLsItem('circuitStoreSave');
+	if (!getItem) {
+	    console.log('Tried to load empty circuit');
+	    return null;
+	}
+	
+	const circuitJson = JSON.parse(getItem);
+	const prettyCircuitJson = JSON.stringify(circuitJson, null, 2);
+	
+	const circuitBlob = new Blob([prettyCircuitJson], { type: 'application/json' });
 	const jsonObjectUrl = URL.createObjectURL(circuitBlob);
-	if(filename === "") filename = "Circuit"
-
-
-	// Creates the elemet to do the dowload
+	if (filename === "") filename = "Circuit";
+	
+	// Creates the element to do the download
 	const anchorEl = document.createElement("a");
 	anchorEl.href = jsonObjectUrl;
 	anchorEl.download = filename + ".json";
