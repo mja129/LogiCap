@@ -241,3 +241,30 @@ export function backupDelete() {
     }
     localStorage.removeItem('circuitStoreSave')
 }
+
+export function downloadCiruit(filename: string){
+	saveCircuit();
+	// => Turn the current Circuuit into a file ...
+	
+	const circuitBlob = new Blob([localStorage.getItem('circuitStoreSave')], {type: 'text/plain'});
+	const jsonObjectUrl = URL.createObjectURL(circuitBlob);
+	//const defaultFilename = "Circuit";
+
+
+	// Creates the elemet to do the dowload
+	const anchorEl = document.createElement("a");
+	anchorEl.href = jsonObjectUrl;
+	anchorEl.download = filename + ".json";
+
+	// Trigger's the download
+	anchorEl.click();
+
+	// Clean up
+	URL.revokeObjectURL(jsonObjectUrl);
+}
+
+export function uploadCiruit(){
+	// Get User File
+
+
+}

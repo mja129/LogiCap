@@ -74,12 +74,22 @@
         saveCircuit()
     }
     // fitView={true}
+
+
+	let setDevices = (d: Devices) => (currentDevicesData = d)
+
+	let currCircuitName = ""
+
 </script>
 
 <main id="logicap">
     <SideMenu {createCanvasDevice} />
-    <SimMenu clearCanvas={clearDeviceData} />
-
+    <SimMenu clearCanvas={clearDeviceData} currCircuitName = {currCircuitName}, setCanvas = {setDevices}/>
+	<div
+		style="position: absolute"
+	>
+		<input value={currCircuitName}/>
+	</div>
     <Svelvet
         theme="LogiCap"
         zoom={initialScale}
