@@ -84,7 +84,7 @@
 
 <main id="logicap">
     <SideMenu {createCanvasDevice} />
-    <SimMenu clearCanvas={clearDeviceData} currCircuitName = {currCircuitName}, setCanvas = {setDevices}/>
+    <SimMenu clearCanvas={clearDeviceData} currCircuitName = {currCircuitName} setCanvas = {setDevices}/>
 	<div
 		style="position: absolute"
 	>

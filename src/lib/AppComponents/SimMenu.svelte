@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Component } from 'svelte'
 
-    import { CircuitStore, saveCircuit, backupDelete, downloadCiruit } from '@CircuitStore'
+    import { CircuitStore, saveCircuit, backupDelete, downloadCiruit, uploadCiruit } from '@CircuitStore'
     import {
         toggleSimulation,
         updateNext,
@@ -20,6 +20,7 @@
     import SaveIcon from '~icons/lucide/save'
     import TrashIcon from '~icons/material-symbols/delete-outline'
     import ButtonNode from '../Circuits/InputOutputNodes/ButtonNode.svelte'
+	import LoadIcon from '~icons/lucide/upload'
 
     type Icon = { Component: Component<any>; styles: string; width: number }
     type IconName = string
@@ -62,6 +63,11 @@
         trash: {
             Component: TrashIcon,
             styles: 'transform:scale(2.69);',
+            width: 40,
+        },
+		load: {
+            Component: LoadIcon,
+            styles: 'transform:scale(2.4);',
             width: 40,
         },
     }
@@ -177,6 +183,7 @@
     <span style="margin-right: 7px" class="vl"></span>
     {@render simMenuBtn(simMenuModel['save'], downloadCiruit)}
     {@render simMenuBtn(simMenuModel['trash'], onTrash, 'margin-left: -6px')}
+	{@render simMenuBtn(simMenuModel['save'/*Change*/], ()=>(uploadCiruit(); setCanvas($CircuitStore.devices)))}
 </div>
 
 <style>

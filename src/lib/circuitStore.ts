@@ -265,6 +265,10 @@ export function downloadCiruit(filename: string){
 
 export function uploadCiruit(){
 	// Get User File
+	let userfile;
 
+	loadCircuit(userfile);
+
+	
 
 }
