@@ -183,7 +183,7 @@
     <span style="margin-right: 7px" class="vl"></span>
     {@render simMenuBtn(simMenuModel['save'], downloadCiruit)}
     {@render simMenuBtn(simMenuModel['trash'], onTrash, 'margin-left: -6px')}
-	{@render simMenuBtn(simMenuModel['save'/*Change*/], ()=>(uploadCiruit(); setCanvas($CircuitStore.devices)))}
+	{@render simMenuBtn(simMenuModel['save'/*Change*/], ()=>{uploadCiruit(); setCanvas($CircuitStore.devices)})}
 </div>
 
 <style>
