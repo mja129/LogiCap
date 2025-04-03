@@ -78,18 +78,13 @@
 
 	let setDevices = (d: Devices) => (currentDevicesData = d)
 
-	let currCircuitName = ""
+	let currCircuitName = $state("")
 
 </script>
 
 <main id="logicap">
     <SideMenu {createCanvasDevice} />
-    <SimMenu clearCanvas={clearDeviceData} currCircuitName = {currCircuitName} setCanvas = {setDevices}/>
-	<div
-		style="position: absolute"
-	>
-		<input value={currCircuitName}/>
-	</div>
+	<SimMenu clearCanvas={clearDeviceData} currCircuitName = {currCircuitName} setCanvas = {setDevices}/>
     <Svelvet
         theme="LogiCap"
         zoom={initialScale}
@@ -113,6 +108,13 @@
             />
         {/each}
     </Svelvet>
+	<div
+		style="position: absolute; top: 0; right:150px; width: 100px; z-index=100; ">
+		Circuit Name
+		<input bind:value={currCircuitName}/>
+	</div>
+	
+	
 </main>
 
 <style>

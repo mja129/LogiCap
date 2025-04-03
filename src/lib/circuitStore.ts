@@ -199,7 +199,13 @@ export async function saveCircuit() {
 // default is local storage
 function validateSavedCircuit(savedCircuit: any) {
     if (!savedCircuit?.devices || !savedCircuit?.connectors || !savedCircuit?.subcircuits) {
-      throw new Error('Parsed circuit object is missing required properties');
+		let missingProps = "";
+		if(!savedCircuit?.devices) missingProps += "[Devices]";
+		if(!savedCircuit?.devices) missingProps += "[Connectors]";
+		if(!savedCircuit?.devices) missingProps += "[Subciruits]";
+
+
+      throw new Error('Parsed circuit object is missing required properties ' + missingProps);
     }
     else if (Object.keys(savedCircuit.devices).length === 0) {
       console.log('Loaded in a valid circuit with empty devices');
@@ -242,16 +248,26 @@ export function backupDelete() {
     localStorage.removeItem('circuitStoreSave')
 }
 
+
+// Downloads the circuitsStoreSave to the user's machine
 export function downloadCiruit(filename: string){
 	saveCircuit();
 	// => Turn the current Circuuit into a file ...
 	
-	const circuitBlob = new Blob([localStorage.getItem('circuitStoreSave')], {type: 'text/plain'});
+	const getItem = getLsItem('circuitStoreSave');
+	if (!getItem) {
+	    console.log('Tried to load empty circuit');
+	    return null;
+	}
+	
+	const circuitJson = JSON.parse(getItem);
+	const prettyCircuitJson = JSON.stringify(circuitJson, null, 2);
+	
+	const circuitBlob = new Blob([prettyCircuitJson], { type: 'application/json' });
 	const jsonObjectUrl = URL.createObjectURL(circuitBlob);
-	//const defaultFilename = "Circuit";
-
-
-	// Creates the elemet to do the dowload
+	if (filename === "") filename = "Circuit";
+	
+	// Creates the element to do the download
 	const anchorEl = document.createElement("a");
 	anchorEl.href = jsonObjectUrl;
 	anchorEl.download = filename + ".json";
@@ -261,14 +277,48 @@ export function downloadCiruit(filename: string){
 
 	// Clean up
 	URL.revokeObjectURL(jsonObjectUrl);
+
+	anchorEl.remove();
 }
 
+// Uploads a circuit from the User's machnie to this interface
 export function uploadCiruit(){
 	// Get User File
-	let userfile;
+	const inputEl = document.createElement("input");
+	inputEl.setAttribute("type", "file");
+	inputEl.setAttribute("accept", "application/JSON");
 
-	loadCircuit(userfile);
 
+	inputEl.click();
+	inputEl.addEventListener("change", ()=>{loadInput(inputEl)});
 	
 
+
+	// Upload
+	
+
+	// Clean Up
+	inputEl.remove();
+}
+
+function loadInput(inputEl){
+	const file = inputEl.files?.[0];
+
+	if(file){
+		const reader = new FileReader();
+
+
+		reader.onload = (e: ProgressEvent<FileReader>) => {
+			const text = e.target?.result as string;
+			// Process the text content here
+			console.log(text);
+			loadCircuit(text);
+		  };
+	  
+		  reader.onerror = (e: ProgressEvent<FileReader>) => {
+			console.error("Error reading file:", e);
+		  };
+	  
+		  reader.readAsText(file);
+	}
 }
