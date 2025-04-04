@@ -173,7 +173,7 @@
         /*    hide scrollbars     */
     }
     img {
-        width: 82px;
+        width: 70px;
         margin-bottom: -6px;
         margin-top: 3px;
     }

@@ -9,24 +9,12 @@
 </script>
 
 <script lang="ts">
-    import { Svelvet, Minimap, ThemeToggle, Node, Anchor } from 'svelvet'
-
-    import {
-        circuitStore,
-        saveCircuit,
-        translateConnectionsToSvelvet,
-    } from './lib/circuitStore'
-    import SideMenu from './lib/SideMenu/SideMenu.svelte'
     import CommandMenu from './lib/CommandMenu.svelte'
     // engines as just to call it with uppercase 'Engines'
 
-    import SimNode from './lib/SimNode.svelte'
-    import type {
-        dualInputLogicTypes,
-        logicGateTypes,
-    } from './lib/circuitModel'
-    import { deviceFactoryMap } from './lib/makeDigitalJsJson'
-    import SimMenu from './lib/SimMenu.svelte'
+    // import Circuit from './Circuit.svelte'
+
+    // import { deviceFactoryMap } from '@Util/makeDigitalJsJson'
     import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
