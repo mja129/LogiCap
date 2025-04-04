@@ -6,6 +6,38 @@
     "module": "ESNext",
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
+    "paths": {
+      "@src/*": [
+        "./src/*"
+      ],
+      "@assets/*": [
+        "./src/assets/*"
+      ],
+      "@icons/*": [
+        "./src/assets/icons/*"
+      ],
+      "@AppComponents/*": [
+        "./src/lib/AppComponents/*"
+      ],
+      "@Circuits/*": [
+        "./src/lib/Circuits/*"
+      ],
+      "@CircuitParts/*": [
+        "./src/lib/CircuitParts/*"
+      ],
+      "@Util/*": [
+        "./src/lib/Util/*"
+      ],
+      "@CircuitModel": [
+        "./src/lib/circuitModel.ts"
+      ],
+      "@CircuitStore": [
+        "./src/lib/circuitStore.ts"
+      ],
+      "@CircuitEngine": [
+        "./src/lib/circuitEngine.svelte.ts"
+      ],
+    },
     "emitDeclarationOnly": true,
     "composite": true,
     /**
@@ -22,6 +54,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.js",
-    "src/**/*.svelte"
+    "src/**/*.svelte",
+    "src/types/**/*.d.ts" // Ensure global.d.ts is included
   ]
 }

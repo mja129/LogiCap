@@ -1,30 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.cdnfonts.com/css/vcr-osd-mono');
+/* @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap'); */
+/* @import url('https://fonts.cdnfonts.com/css/vcr-osd-mono'); */
+
+@font-face {
+    font-family: 'Dynamic';
+    src:
+        url('/Fonts/DynamicSchematicRegular.ttf') format('woff2'),
+        url('/Fonts/DynamicSchematicRegular.ttf') format('ttf'),
+        url('/Fonts/DynamicSchematicRegular.otf') format('oft');
+    font-weight: normal;
+    font-style: normal;
+}
+
 @font-face {
     font-family: 'Mouse';
     src:
-        url('assets/fonts/mouse.eot?') format('eot'),
-        url('assets/fonts/mouse.woff') format('woff'),
-        url('assets/fonts/mouse.ttf') format('truetype'),
-        url('assets/fonts/mouse.svg#Mouse') format('svg');
+        url('/Fonts/mouse.eot?') format('eot'),
+        url('/Fonts/mouse.woff') format('woff'),
+        url('/Fonts/mouse.ttf') format('ttf');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'vcr';
     src:
-        url('assets/fonts/vcr_osd_mono_1.001-webfont.woff2') format('woff2'),
-        url('assets/fonts/vcr_osd_mono_1.001-webfont.woff') format('woff'),
-        url('assets/fonts/VCR_OSD_MONO_1.001.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Dynamic';
-    src:
-        url('assets/fonts/DynamicSchematicRegular.ttf') format('woff2'),
-        url('assets/fonts/DynamicSchematicRegular.otf') format('oft'),
-        url('assets/fonts/DynamicSchematicRegular.ttf') format('ttf');
+        url('/Fonts/vcr_osd_mono_1.001-webfont.woff2') format('woff2'),
+        url('/Fonts/vcr_osd_mono_1.001-webfont.woff') format('woff'),
+        url('/Fonts/VCR_OSD_MONO_1.001.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -45,14 +46,19 @@
     --yellow: #fee440;
     --light-yellow: rgb(255, 255, 73);
     --blue: #00bbf9;
+    --pitt-blue: #003594;
+    --pitt-yellow: #ffb81c;
     /*    The dark blue is hella out of place      */
     --dark-blue: #242652;
     --cream: #fff0dc;
     --dark-cream: #ffdbac;
 
     --lime-green: #aaff75;
+    --dark-green: #06402b;
+    --green: #005800;
     --lime-red: #ff5f63;
-    --red: #ff073a;
+    --red: #b7001f;
+    --dark-red: #910000;
 
     line-height: 1.5;
     font-weight: 400;
@@ -219,6 +225,14 @@ h1 {
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
+}
+
+@media (max-width: 400px) {
+    main {
+        display: block;
+        z-index: 10;
+        background-color: black !important;
+    }
 }
 
 @media (prefers-color-scheme: light) {

@@ -1,4 +1,13 @@
-<!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
+<!-- https://coolorgS.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
+<script module>
+    export function onWireConnection() {
+        console.log('CONNECTED IN APP')
+        // saveCircuit() // we could auto-save on wire linking
+        // but save on reload pretty much covers us.
+        return null
+    }
+</script>
+
 <script lang="ts">
     import { Svelvet, Minimap, ThemeToggle, Node, Anchor } from 'svelvet'
 
@@ -19,178 +28,99 @@
     import { deviceFactoryMap } from './lib/makeDigitalJsJson'
     import SimMenu from './lib/SimMenu.svelte'
     import { onMount } from 'svelte'
+    import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    // this should probably be it's own file soon.
+    import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
 
-    // the Devices part of the digitalJS json.
-    let currentDevicesData: DeviceRecord = $state({})
-    // this is literally not state
-    let existingConnections:
-        | Map<string, Array<[string, string] | string>>
-        | any = $state()
+    import type { logicGateTypes } from '@CircuitModel'
+
+    import SideMenu from '@AppComponents/SideMenu/SideMenu.svelte'
+
+    // I could call this 'generic' circuit or something
+    import Circuit from './lib/Circuit.svelte'
+    import SimMenu from '@AppComponents/SimMenu.svelte'
+    import { fixSvelvetBugs, generateNonce, captureCurrentZoom } from './app'
+
+    // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
+    let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
+    const clearDeviceData = () => (currentDevicesData = {})
+
+    let initialScale: number = $state(1)
+
+    // const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
 
     // check if circuitStore is not null when the app starts up.
     onMount(() => {
-        const saveJsonText =
-            localStorage.getItem('circuitStoreSave') ||
-            (console.log('No saved state found in localStorage.'), null)
+        // All three of these ways work
+        // loadCircuit((newData: Devices) => setDeviceData(newData))
+        // loadCircuit((newData: Devices) => (currentDevicesData = newData))
+        initialScale = parseFloat(localStorage.getItem('SavedScale') || '1')
 
-        // sync up here.
-        if (saveJsonText === null) {
-            return
-        }
+        loadCircuit() // load circuit from LS into CircuitStore,
+        currentDevicesData = $CircuitStore.devices
+        fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
 
-        const saveJson = JSON.parse(saveJsonText)
+        // restrictFitViewZoom()
+    })
 
-        $circuitStore = saveJson
-
-        existingConnections = translateConnectionsToSvelvet(
-            $circuitStore.connectors
-        )
-
-        // console.log('circuitStore has devices on init')
-        currentDevicesData = $circuitStore.devices
+    // save circuit on page reload.
+    window.addEventListener('beforeunload', () => {
+        saveCircuit()
+        captureCurrentZoom() // sets 'SavedScale' in localStorage
     })
 
     // create new node in the global store for circuitStore digital js backend.
     // sync the devices list with the currentDevicesData variable.
-    const newGateCircuitStore = (
-        gateType: string,
-        uuid: string,
-        options?: any
-    ) => {
-        const nodeName: string = `${gateType}_${uuid}`
-        circuitStore.update((currentCircuit) => {
-            // Add the new device with a unique ID, e.g., 'newDeviceId'
-            // get function from map
 
-            const newDevice: Device =
-                options === undefined
-                    ? deviceFactoryMap[gateType](nodeName)
-                    : deviceFactoryMap[gateType](nodeName, options)
-
-            // const nextDeviceNum = Object.keys(currentDevicesData).length
-            currentCircuit.devices[nodeName] = newDevice
-
-            // sync new Device data with currentDevicesData
-            // I guess this could also just be currentDevicesData =
-            // $circuitStore.devices, but it may update more frequently than we need.
-            // makes more sense for it to be here.
-            currentDevicesData = currentCircuit.devices
-            // Add the new connector
-            // currentCircuit.connectors.push(newConnector)
-
-            // Return the updated circuit
-            return currentCircuit
-        })
-        return nodeName
-    }
-
-    // this happens on every connection
-    // ON change of global JSON circuit DATA, Run this.
-    function generateNonce(length: number = 16): string {
-        const charset =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-        const values = crypto.getRandomValues(new Uint8Array(length))
-        return Array.from(
-            values,
-            (byte) => charset[byte % charset.length]
-        ).join('')
-    }
-
-    // $inspect($circuitStore).with(console.log)
-    // called on "drop" in sidemenugroupitems.svelte
-    function createCanvasNode(e: any) {
+    // called on "drop" in sidemenugroupitem.svelte
+    function createCanvasDevice(e: MouseEvent & { gateType: string }) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         // this gate will update the store and then the subscribe will update the
         // list of circuits currently active on the screen
 
         // saves state to local storage on node add.
         const uuid = generateNonce()
-        newGateCircuitStore(gateType, uuid)
+
+        // create new gate on global circuit store on drop
+        const newDeviceList = CircuitStore.addCircuitDevice(
+            gateType,
+            uuid
+        ) as Devices
+        currentDevicesData = newDeviceList
 
         // save on every addition of a new node.
         saveCircuit()
     }
-
-    // TELEPORT BUG GET FUCKED
-    // try to fix the teleport bug.
-    document.addEventListener('DOMContentLoaded', () => {
-        const svelvetCanvas = document.querySelector('.svelvet-wrapper')
-        if (svelvetCanvas) {
-            // Create a MouseEvent with additional options
-            const event = new MouseEvent('mousedown', {
-                bubbles: true,
-                cancelable: true,
-            })
-
-            // Dispatch the event on the canvas
-            svelvetCanvas.dispatchEvent(event)
-            const eventUp = new MouseEvent('mouseup', {
-                bubbles: true,
-                cancelable: true,
-            })
-            svelvetCanvas.dispatchEvent(eventUp)
-        }
-    })
-
-    const clearCanvas = () => (currentDevicesData = {})
+    // fitView={true}
 </script>
 
-<main>
-    <SideMenu {createCanvasNode} />
-    <SimMenu {clearCanvas} />
-    <CommandMenu {createCanvasNode} />
-    <Svelvet theme="LogiCap" disableSelection={false} controls>
+<main id="logicap">
+    <SideMenu {createCanvasDevice} />
+    <SimMenu clearCanvas={clearDeviceData} />
+
+    <CommandMenu {createCanvasDevice} />
+    <Svelvet
+        theme="LogiCap"
+        zoom={initialScale}
+        editable={false}
+        disableSelection={false}
+        controls
+    >
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
-        {#each Object.entries(currentDevicesData) as [nodeId, device]}
-            <!-- svelte-ignore svelte_component_deprecated -->
-            <SimNode
+        {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
+            <Circuit
                 gateType={device.type as logicGateTypes}
+                position={device.position}
+                {nodeId}
                 nodeProps={{
-                    gateType: device.type as dualInputLogicTypes,
+                    ...(device.type && { gateType: device.type }),
                     width: 80,
                     height: 50,
-                    position: device.position,
-                    connections:
-                        existingConnections === undefined
-                            ? []
-                            : existingConnections.get(nodeId) || [],
-                    nodeId,
                     // Add any other specific props your node components need
                 }}
             />
-            <!-- content here -->
         {/each}
-        <!-- <Node id="testNode2" connections={['testNode1', 'in_testNode1']}> -->
-        <!--     <div style="width:300px; background-color: red; height: 100px;"> -->
-        <!--         testNode2 -->
-        <!--     </div> -->
-        <!--     <Anchor -->
-        <!--         let:linked -->
-        <!--         let:hovering -->
-        <!--         let:connecting -->
-        <!--         id={'out_testNode2'} -->
-        <!--         key={'out_testNode2'} -->
-        <!--         direction={'east'} -->
-        <!--         output -->
-        <!--     ></Anchor> -->
-        <!-- </Node> -->
-        <!-- <Node id="testNode1" position={{ x: 40, y: 60 }}> -->
-        <!--     <div style="width:300px; background-color: red; height: 100px;"> -->
-        <!--         testNode1 -->
-        <!--     </div> -->
-        <!--     <Anchor -->
-        <!--         let:linked -->
-        <!--         let:hovering -->
-        <!--         let:connecting -->
-        <!--         id={'in_testNode1'} -->
-        <!--         key={'in_testNode1'} -->
-        <!--         direction={'west'} -->
-        <!--         input -->
-        <!--     ></Anchor> -->
-        <!-- </Node> -->
     </Svelvet>
 </main>
 
@@ -200,7 +130,7 @@
         --main-app-flex-height: calc(100vh - var(--app-bar-height));
     }
 
-    /*   Hide the svelvet theme toggle button but make a proxy for it in simMenu.svelte */
+    /*   Hide the svelvet theme toggle button but make a proxy for it in simMenu.svelte *note 'has selector in css' is pretty cool*/
     :global(.controls-wrapper:has(.save-button)) {
         display: none !important;
     }
@@ -224,6 +154,8 @@
         padding: 0 !important;
         width: auto !important;
         height: auto !important;
+        min-width: 80px;
+        min-height: 50px;
     }
     :global(
         .svelvet-wrapper,

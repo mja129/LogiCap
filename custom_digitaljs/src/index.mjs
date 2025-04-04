@@ -8,8 +8,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Backbone from 'backbone';
 import { Vector3vl } from '3vl';
-import 'jquery-ui/ui/widgets/dialog.js';
-import 'jquery-ui/themes/base/all.css';
+// import 'jquery-ui/ui/widgets/dialog.js';
+// import 'jquery-ui/themes/base/all.css';
 import * as cells from './cells.mjs';
 import * as engines from './engines.mjs';
 import * as tools from './tools.mjs';
@@ -18,7 +18,6 @@ import { HeadlessCircuit, getCellType } from './circuit.mjs';
 import { BrowserSynchEngine } from './engines/browsersynch.mjs';
 import { MonitorView, Monitor } from './monitor.mjs';
 import { IOPanelView } from './iopanel.mjs';
-import { elk_layout } from './elkjs.mjs';
 import './style.css';
 
 // polyfill ResizeObserver for e.g. Firefox ESR 68.8
@@ -79,7 +78,7 @@ const defaultSubcircuitButtons = [
         id: "zoomOut",
         hidden: false,
         buttonText: "–",
-        callback: ({circuit, model, paper}) => {
+        callback: ({ circuit, model, paper }) => {
             const newZoom = model.get('zoomLevel') - 1;
             circuit.scaleAndRefreshPaper(paper, newZoom);
             model.set("zoomLevel", newZoom);
@@ -89,7 +88,7 @@ const defaultSubcircuitButtons = [
         id: "zoomIn",
         hidden: false,
         buttonText: "+",
-        callback: ({circuit, model, paper}) => {
+        callback: ({ circuit, model, paper }) => {
             const newZoom = model.get('zoomLevel') + 1;
             circuit.scaleAndRefreshPaper(paper, newZoom);
             model.set("zoomLevel", newZoom);
@@ -98,7 +97,7 @@ const defaultSubcircuitButtons = [
 ];
 
 export class Circuit extends HeadlessCircuit {
-    constructor(data, { windowCallback = Circuit.prototype._defaultWindowCallback, layoutEngine = "elkjs", subcircuitButtons = [], ...options } = {}) {
+    constructor(data, { windowCallback = Circuit.prototype._defaultWindowCallback, layoutEngine = "dagre", subcircuitButtons = [], ...options } = {}) {
         if (!options.engine) options.engine = BrowserSynchEngine;
         super(data, options);
         this._layoutEngine = layoutEngine
@@ -174,8 +173,8 @@ export class Circuit extends HeadlessCircuit {
                     rankDir: "LR",
                     setPosition: (element, position) => {
                         element.setLayoutPosition({
-                            x: position.x - position.width/2,
-                            y: position.y - position.height/2,
+                            x: position.x - position.width / 2,
+                            y: position.y - position.height / 2,
                             width: position.width,
                             height: position.height
                         });
@@ -186,9 +185,7 @@ export class Circuit extends HeadlessCircuit {
                     dagre: dagre,
                     graphlib: graphlib
                 });
-            } else if (this._layoutEngine == "elkjs") {
-                elk_layout(graph);
-            }
+            } 
             graph.set('laid_out', true);
         }
         paper.listenTo(this, 'display:add', () => {
@@ -227,7 +224,7 @@ export class Circuit extends HeadlessCircuit {
             for (const button of this._subcircuitButtons) {
                 $('<button class="btn btn-secondary"></button>')
                     .append($('<strong></strong>').text(button.buttonText))
-                    .on('click', {circuit, model, paper}, (event) => button.callback(event.data))
+                    .on('click', { circuit, model, paper }, (event) => button.callback(event.data))
                     .appendTo(buttonGroup);
             }
             buttonGroup.prependTo(subcircuitModal);
@@ -238,7 +235,7 @@ export class Circuit extends HeadlessCircuit {
         this.listenTo(paper, 'open:fsm', (subcircuitModal, closeCallback) => {
             this._windowCallback('FSM', subcircuitModal, closeCallback);
         });
-        paper.fixed = function(fixed) {
+        paper.fixed = function (fixed) {
             this.setInteractivity(!fixed);
             this.$el.toggleClass('fixed', fixed);
         };
