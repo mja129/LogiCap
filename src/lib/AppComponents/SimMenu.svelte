@@ -54,7 +54,7 @@
     import UpdateGatesIcon from '~icons/streamline/entertainment-control-button-next-button-television-buttons-movies-skip-next-video-controls'
     import SaveIcon from '~icons/lucide/save'
     import TrashIcon from '~icons/material-symbols/delete-outline'
-    import ButtonNode from '../Circuits/InputOutputNodes/ButtonNode.svelte'
+    // import ButtonNode from '../Circuits/InputOutputNodes/ButtonNode.svelte'
 
     type Icon = { Component: Component<any>; styles: string; width: number }
     type IconName = string
@@ -113,17 +113,16 @@
         }
     }
 
-    function turnOffLamps()
-    {
+    function turnOffLamps() {
         let circleElement: SVGElement | null
-        let lineElement: SVGElement | null 
+        let lineElement: SVGElement | null
         const lampOffColors: string[] = ['red', 'var(--lime-red)']
-        const lamps: NodeListOf<HTMLElement> | null = document.querySelectorAll("[id^='N-Lamp']");
-        if(lamps === null)
-        {
+        const lamps: NodeListOf<HTMLElement> | null =
+            document.querySelectorAll("[id^='N-Lamp']")
+        if (lamps === null) {
             return
         }
-        lamps.forEach(lamp => {
+        lamps.forEach((lamp) => {
             circleElement = lamp.querySelector('circle')
             lineElement = lamp.querySelector('line')
             if (circleElement === null || lineElement === null) return
@@ -131,7 +130,6 @@
             circleElement.setAttribute('fill', lampOffColors[0])
             lineElement.setAttribute('stroke', lampOffColors[0])
         })
-
     }
 
     function toggleRunSim(
@@ -219,7 +217,7 @@
         position: absolute;
         /*    the side menu width should be 22.5% of the main app flexbox */
         transform: scale(0.75);
-        left: calc(22.5% - 38px);
+        left: calc(22.5% - 45px);
         top: 2px;
         z-index: 300;
         display: flex;
@@ -227,7 +225,7 @@
         padding-inline: 5px;
         padding-block: 0px;
         justify-content: space-evenly;
-        background-color: lightblue;
+        background-color: var(--lightblue);
         border-radius: 5px;
         border: 3px solid black;
     }
@@ -235,7 +233,7 @@
     .vl {
         border: 1px solid black;
         border-radius: 4px;
-        background-color: lightblue;
+        background-color: var(--lightblue);
         width: 5px;
         margin-block: 4px;
     }
@@ -254,7 +252,7 @@
         margin-inline: 0px;
         max-height: 70px;
         border: none;
-        background-color: lightblue;
+        background-color: var(--lightblue);
     }
     :global(.menuRunButtons button:hover svg) {
         color: red;

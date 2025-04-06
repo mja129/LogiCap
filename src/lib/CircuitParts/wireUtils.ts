@@ -130,7 +130,7 @@ export function getSvelvetEdgeEle(edgeWrapper: SVGPathElement | null) {
     const edge: HTMLElement | null =
         (siblings &&
             Array.from(siblings)
-                .find((ele) => ele.role === 'presentation')  || null)
+                .find((ele) => ele.role === 'presentation') || null)
 
     return edge
 }
@@ -148,3 +148,5 @@ export function getWireIdFromDOM(
     const wireId = sourceAncId + '-' + inputAncIdFromEleId(edgeId)
     return [wireId, edgeId]
 }
+
+

@@ -3,6 +3,7 @@
     import { CircuitEngine, inputSetter, getRunning } from '@CircuitEngine'
     import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
+    // import Switch from './Switch.svelte'
 
     let {
         width = 80,
@@ -14,10 +15,7 @@
         nodeId: string
     } = $props()
 
-
     let signalOn: boolean = $state(false)
-
-    
 
     let buttonColor = $derived({
         color: signalOn ? 'green' : 'red',
@@ -31,6 +29,7 @@
     // After you get either of them, both listeners are killed and created again on the next mousedown.
     function toggleButton(e: MouseEvent) {
         e.preventDefault()
+        // e.stopImmediatePropagation()
 
         let isDragging = false
         const startX = e.clientX
@@ -75,7 +74,6 @@
             return
         }
     })
-
 </script>
 
 <svg
@@ -103,10 +101,9 @@
     />
 
     <!-- Circle -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <circle
         onmousedowncapture={toggleButton}
+        role="presentation"
         cx="50"
         cy="50"
         r="30"
@@ -116,6 +113,7 @@
         stroke-width="7"
     />
 </svg>
+<!-- <Switch signalOn {toggleButton} /> -->
 
 <SimulationNodeAnchor
     offset={buttonOffset}

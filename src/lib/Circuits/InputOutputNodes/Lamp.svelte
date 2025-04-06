@@ -1,5 +1,6 @@
 <script lang="ts">
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
+    // import Switch from './Switch.svelte'
 
     let {
         width = 80,
@@ -14,7 +15,6 @@
     const lampOffset: [number, number] = [-5, 35.43]
 </script>
 
-<!-- cursor = drop -->
 <div class="button_fix">
     <svg
         width="85"

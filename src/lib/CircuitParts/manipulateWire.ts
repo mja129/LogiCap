@@ -123,7 +123,7 @@ export function createEndPointCircle(
 export function createControlPointCircle(
     center: Point,
     id: string,
-    radius: number = 8,
+    radius: number = 10,
     className: string = 'control-point',
 ): SVGCircleElement {
     if (isNaN(center?.x) || isNaN(center?.y) || isNaN(radius)) {
@@ -136,7 +136,7 @@ export function createControlPointCircle(
             class: className,
             cx: '0',
             cy: '0',
-            r: '50',
+            r: '6',
         })
     }
     const circle = createSVGElement('circle', {
@@ -293,7 +293,7 @@ export function createDragWire(svg: SVGPathElement, pathUpdate: string = "") {
             x: updatePoints.p1.x - initPoints.p1.x,
             y: updatePoints.p1.y - initPoints.p1.y
         };
-        console.log('Vector:', vectorP0, vectorP1);
+        // console.log('Vector:', vectorP0, vectorP1);
     }
 
     const domParent = getDOMParent(svg);
@@ -341,6 +341,8 @@ export function createDragWire(svg: SVGPathElement, pathUpdate: string = "") {
 
         const moveControlX = controlPoint1?.setAttribute('cx', String((parseFloat(controlPoint1.getAttribute('cx') ||'0')) + deltaX1))
         const moveControlY =controlPoint1?.setAttribute('cy', String((parseFloat(controlPoint1.getAttribute('cy') || '0')) + deltaY1 ))
+        controlPoint2?.setAttribute('cx', String((parseFloat(controlPoint2.getAttribute('cx') ||'0')) + (deltaX1)))
+        controlPoint2?.setAttribute('cy', String((parseFloat(controlPoint2.getAttribute('cy') || '0')) + (deltaY1) ))
         // console.log(`End Point 1 - Position Delta: (${deltaX1}, ${deltaY1})`);
     }
     
@@ -359,8 +361,10 @@ export function createDragWire(svg: SVGPathElement, pathUpdate: string = "") {
         const deltaX2 = parseFloat(newX2) - parseFloat(oldX2 || "");
         const deltaY2 = parseFloat(newY2) - parseFloat(oldY2 || "");
 
-        const moveControlX = controlPoint2?.setAttribute('cx', String((parseFloat(controlPoint2.getAttribute('cx') ||'0')) + deltaX2))
-        const moveControlY =controlPoint2?.setAttribute('cy', String((parseFloat(controlPoint2.getAttribute('cy') || '0')) + deltaY2 ))
+        const moveControlX = controlPoint1?.setAttribute('cx', String((parseFloat(controlPoint1.getAttribute('cx') ||'0')) + deltaX2))
+        const moveControlY =controlPoint1?.setAttribute('cy', String((parseFloat(controlPoint1.getAttribute('cy') || '0')) + deltaY2))
+        controlPoint2?.setAttribute('cx', String((parseFloat(controlPoint2.getAttribute('cx') ||'0')) + (deltaX2)))
+        controlPoint2?.setAttribute('cy', String((parseFloat(controlPoint2.getAttribute('cy') || '0')) + (deltaY2) ))
 
         // get controlPoint2 and offset it acoording to the "delta"
         // console.log(`End Point 2 - Position Delta: (${deltaX2}, ${deltaY2})`);

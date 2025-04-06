@@ -140,7 +140,7 @@ function savePositionsToCircuitStore() {
     const saveJsonText = getSvelvetSave()
 
     // early return, state not found in localStorage
-    if (saveJsonText === null) return null
+    if (!saveJsonText) return (console.warn('svelvet save unsucessful'), null)
 
     const savedNodeNames: NodeInfoList | null = filterSvelvetSave(saveJsonText)
 
@@ -158,11 +158,12 @@ function savePositionsToCircuitStore() {
 }
 
 // save the current circuit store to localStorage
-function saveCircuitStoreToLS() {
+export function saveCircuitStoreToLS() {
     const CircuitStoreSave: string | null = getLsItem('circuitStoreSave')
 
     // getLsItem might warn that circuitStoreSave does not exist, in this case
     // we are creating it for the first time, thats okay
+    // const currCircuitStore = get(CircuitStore)
 
     localStorage.setItem('circuitStoreSave', JSON.stringify(get(CircuitStore)))
 }
@@ -206,7 +207,7 @@ function validateSavedCircuit(savedCircuit: any) {
     }
 }
 
-export function loadCircuit(circuitText = 'default') {
+export function loadCircuit(circuitText: string = 'default') {
 
     let savedCircuitText = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
     if (!savedCircuitText) return
@@ -217,6 +218,7 @@ export function loadCircuit(circuitText = 'default') {
     
 
     CircuitStore.set(savedCircuit)
+
     // setDevices(savedCircuit.devices)
 }
 
@@ -241,3 +243,4 @@ export function backupDelete() {
     }
     localStorage.removeItem('circuitStoreSave')
 }
+
