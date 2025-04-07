@@ -5,8 +5,8 @@
         CircuitStore,
         saveCircuit,
         backupDelete,
-        downloadCiruit,
-        uploadCiruit,
+        downloadCircuit,
+        uploadCircuit,
     } from '@CircuitStore'
     import {
         toggleSimulation,
@@ -36,7 +36,7 @@
         clearCanvas,
         currCircuitName,
         setCanvas,
-    }: { clearCanvas: Function; currCircuitName: String; setCanvas: Function } =
+    }: { clearCanvas: Function; currCircuitName: string; setCanvas: Function;} =
         $props()
 
     const simMenuModel: SimMenuModel = {
@@ -131,6 +131,19 @@
         updateTick()
     }
 
+    function circuitDownload(
+        event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+    ) {
+        downloadCircuit(currCircuitName)
+    }
+
+    async function circuitUpload(
+        event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+    ) {
+        await uploadCircuit()
+        setCanvas($CircuitStore.devices)
+    }
+
     function onTrash() {
         backupDelete()
 
@@ -189,13 +202,9 @@
     <span class="vl"></span>
     {@render simMenuBtn(simMenuModel['resetState'], resetCircuit)}
     <span style="margin-right: 7px" class="vl"></span>
-    {@render simMenuBtn(simMenuModel['save'], downloadCiruit(currCircuitName))}
+    {@render simMenuBtn(simMenuModel['save'], circuitDownload)}
+    {@render simMenuBtn(simMenuModel['load'], circuitUpload)}
     {@render simMenuBtn(simMenuModel['trash'], onTrash, 'margin-left: -6px')}
-    {@render simMenuBtn(simMenuModel['load'], (e: event) => {
-        event.preventDefault()
-        uploadCiruit()
-        setCanvas($CircuitStore.devices)
-    })}
 </div>
 
 <style>

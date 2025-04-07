@@ -212,9 +212,9 @@ function validateSavedCircuit(savedCircuit: any) {
     }
 }
 
-export function loadCircuit(circuitText = 'default') {
+export function loadCircuit(circuitText: string = 'default') {
 
-    let savedCircuitText = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
+    let savedCircuitText: string | null = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
     if (!savedCircuitText) return
 
     const savedCircuit = JSON.parse(savedCircuitText) as { devices: {}; connectors: {}; subcircuits: {} };
@@ -250,9 +250,9 @@ export function backupDelete() {
 
 
 // Downloads the circuitsStoreSave to the user's machine
-export function downloadCiruit(filename: string){
+export function downloadCircuit(filename: string){
 	saveCircuit();
-	// => Turn the current Circuuit into a file ...
+	// => Turn the current Circuit into a file ...
 	
 	const getItem = getLsItem('circuitStoreSave');
 	if (!getItem) {
@@ -282,15 +282,20 @@ export function downloadCiruit(filename: string){
 }
 
 // Uploads a circuit from the User's machnie to this interface
-export function uploadCiruit(){
+//Rewrote to make async because u need to wait for the file before setting the canvas in SimMenu
+export async function uploadCircuit(): Promise<void>{
 	// Get User File
-	const inputEl = document.createElement("input");
+    return new Promise((resolve) => {
+	const inputEl: HTMLInputElement = document.createElement("input");
 	inputEl.setAttribute("type", "file");
 	inputEl.setAttribute("accept", "application/JSON");
 
 
 	inputEl.click();
-	inputEl.addEventListener("change", ()=>{loadInput(inputEl)});
+    inputEl.addEventListener("change", async () => {
+        await loadInput(inputEl);
+        resolve();
+    });
 	
 
 
@@ -299,26 +304,32 @@ export function uploadCiruit(){
 
 	// Clean Up
 	inputEl.remove();
+    });
+
 }
 
-function loadInput(inputEl){
-	const file = inputEl.files?.[0];
+//Rewrote to make async because u need to wait for the file before setting the canvas in SimMenu
+async function loadInput(inputEl: HTMLInputElement): Promise<void>{
+	const file: File| undefined = inputEl.files?.[0];
+    if(!file) return;
 
-	if(file){
-		const reader = new FileReader();
+    const text = await new Promise<string>((resolve, reject) => {
+        const reader: FileReader = new FileReader();
 
 
-		reader.onload = (e: ProgressEvent<FileReader>) => {
-			const text = e.target?.result as string;
-			// Process the text content here
-			console.log(text);
-			loadCircuit(text);
-		  };
-	  
-		  reader.onerror = (e: ProgressEvent<FileReader>) => {
-			console.error("Error reading file:", e);
-		  };
-	  
-		  reader.readAsText(file);
-	}
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+            const textResult: string = e.target?.result as string;
+                // Process the text content here
+                resolve(textResult)
+            };
+        
+            reader.onerror = (e: ProgressEvent<FileReader>) => {
+                reject(new Error("Error reading file"))
+            };
+        
+            reader.readAsText(file);
+    })
+    console.log(text)
+    loadCircuit(text)
+
 }
