@@ -9,10 +9,12 @@
         width = 80,
         height = 50,
         nodeId,
+        rotation = $bindable(),
     }: {
         width?: number
         height?: number
         nodeId: string
+        rotation?: number
     } = $props()
 
     let signalOn: boolean = $state(false)
@@ -115,12 +117,14 @@
 </svg>
 <!-- <Switch signalOn {toggleButton} /> -->
 
-<SimulationNodeAnchor
-    offset={buttonOffset}
-    location={['right', 'mid']}
-    id={nodeId}
-    io="output"
-    connections={get(CircuitStore).connectors[
-        ('out_' + nodeId) as outputAnchorName
-    ]}
-/>
+{#key rotation}
+    <SimulationNodeAnchor
+        offset={buttonOffset}
+        location={['right', 'mid']}
+        id={nodeId}
+        io="output"
+        connections={get(CircuitStore).connectors[
+            ('out_' + nodeId) as outputAnchorName
+        ]}
+    />
+{/key}

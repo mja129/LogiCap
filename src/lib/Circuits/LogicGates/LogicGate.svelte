@@ -77,6 +77,9 @@ the only problem with rerendering the entire node is that position is defined wh
 and rerendering the entire node
 
 We could just unset position on node rotation.
+It does work but its chunky and teleports for some reason
+this passing the rotation as a bindable prop in all components is the best solution
+rerender only the output anchor, very demure very minimal.
 -->
 {#key rotation}
     <SimulationNodeAnchor

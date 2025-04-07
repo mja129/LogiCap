@@ -154,7 +154,6 @@
         .svelvet-wrapper:active,
         .svelvet-wrapper:focus
     ) {
-        /* border-radius: 20px; */
         outline: none !important;
         border: none !important;
         box-shadow: unset !important;

@@ -30,20 +30,6 @@
     // do I even need this derived? Nah
     let nodeComponent = $derived(getComponent(gateType))
     let nodeRotation: number = $state(0)
-
-    const hoverAllAnchors = () => {
-        // Wire glitch on dev mode fix
-        const hoverAnchor = new MouseEvent('mouseenter', {
-            bubbles: true,
-            cancelable: true,
-        })
-        const allAnchors: NodeListOf<HTMLElement> =
-            document.querySelectorAll('.anchor-wrapper')
-
-        allAnchors.forEach((anc: HTMLElement) => {
-            anc.dispatchEvent(hoverAnchor)
-        })
-    }
 </script>
 
 <!-- I added this here because I kept changing the SvelvetNode properties in all
@@ -55,20 +41,56 @@ of the different components now I just need to do it here -->
     <Node
         drop={position !== undefined ? false : 'cursor'}
         {position}
+        editable={false}
         id={nodeId}
     >
         <div
-            onclick={async (e: MouseEvent) => {
-                const clickedEle = e.target as HTMLElement
-                if (
-                    !clickedEle ||
-                    (clickedEle.nodeName !== 'IMG' &&
-                        clickedEle.nodeName !== 'svg')
-                ) {
-                    console.warn('Did not click on node image base')
-                    return
+            onmousedown={(e: MouseEvent) => {
+                e.preventDefault()
+                let isDragging = false
+                const startX = e.clientX
+                const startY = e.clientY
+                const dragThreshold = 5
+
+                // this debouce code is repeated from buttonNode.svelte.
+                // #todo refactor needed, pass in a success function and the mouse event.
+                function handleMouseMove(moveEvent: MouseEvent) {
+                    const distanceX = moveEvent.clientX - startX
+                    const distanceY = moveEvent.clientY - startY
+                    // euclidian distance
+                    const distance = Math.sqrt(distanceX ** 2 + distanceY ** 2)
+
+                    if (distance > dragThreshold) {
+                        isDragging = true
+                        cleanup()
+                    }
                 }
-                nodeRotation = (nodeRotation + 90) % 360
+
+                function handleMouseUp() {
+                    console.log('handled')
+                    const clickedEle = e.target as HTMLElement
+                    if (!clickedEle) {
+                        console.warn('no event target on node click')
+                    } else if (
+                        clickedEle.nodeName !== 'IMG' &&
+                        clickedEle.parentNode?.nodeName !== 'svg'
+                    ) {
+                        console.warn(
+                            'not a part of the node to preform a node action, in this case "rotate" '
+                        )
+                    } else {
+                        nodeRotation = (nodeRotation + 90) % 360
+                    }
+                    cleanup()
+                }
+
+                function cleanup() {
+                    window.removeEventListener('mousemove', handleMouseMove)
+                    window.removeEventListener('mouseup', handleMouseUp)
+                }
+
+                window.addEventListener('mousemove', handleMouseMove)
+                window.addEventListener('mouseup', handleMouseUp)
             }}
             style="transform:rotate({nodeRotation}deg)"
         >
