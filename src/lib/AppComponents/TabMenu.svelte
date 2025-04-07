@@ -10,6 +10,7 @@
 
     const initTab = localStorage.getItem('currActiveTab') || 'init_circuit'
     let currentTab = $state(initTab)
+
     let activeTabList = $state(
         (localStorage.getItem('activeTabList') &&
             JSON.parse(localStorage.getItem('activeTabList') || '')) || [

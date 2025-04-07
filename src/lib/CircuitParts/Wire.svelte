@@ -19,6 +19,14 @@
     let wireActive: number = $state(-1)
     let wireId: string = $state('')
 
+    let {
+        initAncId,
+        wireType = 'bezier',
+    }: {
+        initAncId: string
+        wireType?: string
+    } = $props()
+
     function monitorWire(
         newId: string | null,
         setWire: Function = (id: string) => (wireId = id)
@@ -98,14 +106,6 @@
             (() => null)
         monitorFn()
     })
-
-    let {
-        initAncId,
-        wireType = 'bezier',
-    }: {
-        initAncId: string
-        wireType: string
-    } = $props()
 
     // used for finding the html element with the connectionID
 </script>
