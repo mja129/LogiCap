@@ -3,6 +3,7 @@
     import { CircuitEngine, inputSetter, getRunning } from '@CircuitEngine'
     import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
+    import { rejectMoveClick } from '@Util/cursors.ts'
     // import Switch from './Switch.svelte'
 
     let {
@@ -29,44 +30,13 @@
     // after a mouse down, if you start dragging, don't flip the signal
     // if after mousedown you get mouseUp, flip the signal
     // After you get either of them, both listeners are killed and created again on the next mousedown.
-    function toggleButton(e: MouseEvent) {
-        e.preventDefault()
-        // e.stopImmediatePropagation()
-
-        let isDragging = false
-        const startX = e.clientX
-        const startY = e.clientY
-        const dragThreshold = 5 // Allow for small movements while clicking
-
-        function handleMouseMove(moveEvent: MouseEvent) {
-            const distanceX = moveEvent.clientX - startX
-            const distanceY = moveEvent.clientY - startY
-            // euclidian distance
-            const distance = Math.sqrt(distanceX ** 2 + distanceY ** 2)
-
-            if (distance > dragThreshold) {
-                isDragging = true
-                cleanup()
-            }
+    function buttonSwitch() {
+        if (getRunning()) {
+            // Flip the signal only if it was a click, not a drag, and its on
+            // console.log(getRunning())
+            signalOn = !signalOn
+            inputSetter(nodeId)
         }
-
-        function handleMouseUp() {
-            if (!isDragging && getRunning()) {
-                // Flip the signal only if it was a click, not a drag, and its on
-                console.log(getRunning())
-                signalOn = !signalOn
-                inputSetter(nodeId)
-            }
-            cleanup()
-        }
-
-        function cleanup() {
-            window.removeEventListener('mousemove', handleMouseMove)
-            window.removeEventListener('mouseup', handleMouseUp)
-        }
-
-        window.addEventListener('mousemove', handleMouseMove)
-        window.addEventListener('mouseup', handleMouseUp)
     }
 
     CircuitEngine.subscribe((digitalJsCircuit) => {
@@ -104,7 +74,7 @@
 
     <!-- Circle -->
     <circle
-        onmousedowncapture={toggleButton}
+        onmousedowncapture={(e: MouseEvent) => rejectMoveClick(e, buttonSwitch)}
         role="presentation"
         cx="50"
         cy="50"
