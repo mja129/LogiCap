@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Node } from 'svelvet'
+    import { rerenderInputAnchorHack } from '@src/lib/Util/cursors'
     import type { Component } from 'svelte'
     import {
         getComponent,
@@ -8,6 +9,9 @@
         type allNodeTypes,
     } from '@CircuitModel'
     import { rejectMoveClick } from './Util/cursors'
+    import { get } from 'svelte/store'
+
+    import { CircuitStore } from '@CircuitStore'
 
     // props that all nodes have in common.
     interface SimNodeProps {
@@ -30,7 +34,7 @@
     // Use $derived for reactive value
     // do I even need this derived? Nah
     let nodeComponent = $derived(getComponent(gateType))
-    let nodeRotation: number = $state(0)
+    let rotation: number = $state(0)
 
     const nodeAction = (e: MouseEvent) => {
         const clickedEle = e.target as HTMLElement
@@ -45,9 +49,36 @@
                 'not a part of the node to preform a node action, in this case "rotate" '
             )
         } else {
-            nodeRotation = (nodeRotation + 90) % 360
+            rotation = (rotation + 90) % 360
         }
     }
+    // #TODO tell the nodes NSEW. when changing direction
+    // this solution is better. just need to fine tune it a bit.
+    // its hacky but our data persists, vs with a {key } block we have rerender
+    $effect(() => {
+        // this if statement is weird bc effect is weird.
+        // this code will run whenever rotation changes.
+        if (rotation || rotation === 0) {
+            if (nodeId.startsWith('Lamp')) {
+                rerenderInputAnchorHack('in_' + nodeId)
+                return
+            }
+
+            rerenderInputAnchorHack('out_' + nodeId)
+            rerenderInputAnchorHack('in1_' + nodeId)
+            rerenderInputAnchorHack('in2_' + nodeId)
+            const outputConnections =
+                get(CircuitStore).connectors[
+                    ('out_' + nodeId) as outputAnchorName
+                ]
+            if (outputConnections && outputConnections.length > 0) {
+                outputConnections.forEach(([_, inAnc]) => {
+                    console.warn(inAnc)
+                    rerenderInputAnchorHack(inAnc)
+                })
+            }
+        }
+    })
 </script>
 
 <!-- I added this here because I kept changing the SvelvetNode properties in all
@@ -66,9 +97,9 @@ of the different components now I just need to do it here -->
             onmousedown={(e: MouseEvent) => {
                 rejectMoveClick(e, nodeAction)
             }}
-            style="transform:rotate({nodeRotation}deg)"
+            style="transform:rotate({rotation}deg)"
         >
-            <MyComponent rotation={nodeRotation} {nodeId} {...nodeProps} />
+            <MyComponent {nodeId} {...nodeProps} />
         </div>
     </Node>
 {/snippet}

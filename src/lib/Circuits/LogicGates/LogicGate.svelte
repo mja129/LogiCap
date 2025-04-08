@@ -34,13 +34,11 @@
         height = 50,
         gateType = 'And',
         nodeId,
-        rotation = $bindable(),
     }: {
         width?: number
         height?: number
         gateType?: logicGateTypes
         nodeId: string
-        rotation?: number
     } = $props()
 
     const circuitSvg = circuitSvgs[gateType as dualInputLogicTypes]
@@ -81,17 +79,15 @@ It does work but its chunky and teleports for some reason
 this passing the rotation as a bindable prop in all components is the best solution
 rerender only the output anchor, very demure very minimal.
 -->
-{#key rotation}
-    <SimulationNodeAnchor
-        location={['right', 'mid']}
-        id={nodeId}
-        io="output"
-        offset={logicGateAnchorOffsets['out']}
-        connections={get(CircuitStore).connectors[
-            ('out_' + nodeId) as outputAnchorName
-        ]}
-    />
-{/key}
+<SimulationNodeAnchor
+    location={['right', 'mid']}
+    id={nodeId}
+    io="output"
+    offset={logicGateAnchorOffsets['out']}
+    connections={get(CircuitStore).connectors[
+        ('out_' + nodeId) as outputAnchorName
+    ]}
+/>
 
 <style>
     /* div { */

@@ -32,3 +32,25 @@ export function rejectMoveClick(e: MouseEvent, successFn: Function) {
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
 }
+    // the lamp needs this hack because it only has an input node
+    // theoretically it works for all but its not very declarative.
+    // I just noticed that the edit wired dont delete themselves with this rerender solution
+    // no its the input anchor on all of them that does that.
+export function rerenderInputAnchorHack(ancId: string) {
+        // Wire glitch on dev mode fix
+
+        const down = new MouseEvent('mouseenter', {
+            bubbles: true,
+            cancelable: false,
+        })
+        const up = new MouseEvent('mouseleave', {
+            bubbles: true,
+            cancelable: false,
+        })
+        const anc: HTMLElement | null = document.querySelector(`.${ancId}`)
+
+        if (!anc) return console.warn('no element of the specified ID'), null
+
+        anc.dispatchEvent(down)
+        anc.dispatchEvent(up)
+    }
