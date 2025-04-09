@@ -28,10 +28,13 @@
     import Circuit from './lib/Circuit.svelte'
     import SimMenu from '@AppComponents/SimMenu.svelte'
     import { fixSvelvetBugs, generateNonce, captureCurrentZoom } from './app'
+    import SingleIoLogic from './lib/Circuits/LogicGates/SingleIoLogic.svelte'
+    import TabMenu from '@AppComponents/TabMenu.svelte'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
     const clearDeviceData = () => (currentDevicesData = {})
+    const setDeviceData = (devs: Devices) => (currentDevicesData = devs)
 
     let initialScale: number = $state(1)
 
@@ -79,19 +82,26 @@
         // save on every addition of a new node.
         saveCircuit()
     }
-    // fitView={true}
+    // localStorage.setItem('currActiveTab', JSON.stringify(activeTabList))
+
+    // current problem, we arent saving positions.
+
+    // localStorage.clear()
 </script>
 
 <main id="logicap">
     <SideMenu {createCanvasDevice} />
     <SimMenu clearCanvas={clearDeviceData} />
+    <TabMenu {clearDeviceData} {setDeviceData} />
 
     <CommandMenu {createCanvasDevice} />
+    <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->
     <Svelvet
         theme="LogiCap"
         zoom={initialScale}
         editable={false}
         disableSelection={false}
+        edgeStyle={'bezier'}
         controls
     >
         <Minimap width={100} corner="NE" slot="minimap" />
@@ -151,7 +161,6 @@
         .svelvet-wrapper:active,
         .svelvet-wrapper:focus
     ) {
-        /* border-radius: 20px; */
         outline: none !important;
         border: none !important;
         box-shadow: unset !important;

@@ -27,11 +27,13 @@
         height = 50,
         gateType = 'Not',
         nodeId,
+        rotation = $bindable(),
     }: {
         width?: number
         height?: number
         gateType?: logicGateTypes
         nodeId: string
+        rotation?: number
     } = $props()
 
     // Define a new device
@@ -49,12 +51,15 @@
     io="input"
     offset={singleIoGateAnchorOffests['in']}
 />
-<SimulationNodeAnchor
-    location={['right', 'mid']}
-    id={nodeId}
-    io="output"
-    offset={singleIoGateAnchorOffests['out']}
-    connections={get(CircuitStore).connectors[
-        ('out_' + nodeId) as outputAnchorName
-    ]}
-/>
+
+{#key rotation}
+    <SimulationNodeAnchor
+        location={['right', 'mid']}
+        id={nodeId}
+        io="output"
+        offset={singleIoGateAnchorOffests['out']}
+        connections={get(CircuitStore).connectors[
+            ('out_' + nodeId) as outputAnchorName
+        ]}
+    />
+{/key}

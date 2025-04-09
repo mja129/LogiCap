@@ -1,3 +1,5 @@
+// make disabled mouse cursor on O-O 
+// make cursor disabled on linking to already linked output
 import { CircuitStore } from '@CircuitStore'
 // @ts-ignore this doesn't even cause err on VScode.
 import { onWireConnection } from '../../App.svelte'
@@ -65,6 +67,7 @@ function pushConnectionToCircuitStore(sourceClass: string, destClass: string) {
 // this fn is way too big
 export function checkLink(
     destClassList: string[],
+
     sourceClassName: string
 ) {
     const destClassName: string | null = findAnchorTargetClassName(destClassList)

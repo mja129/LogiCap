@@ -1,20 +1,59 @@
 <script lang="ts">
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
+    // import Switch from './Switch.svelte'
 
     let {
         width = 80,
         height = 50,
         nodeId,
+        rotation = $bindable(),
     }: {
         width?: number
         height?: number
         nodeId: string
+        rotation?: number
     } = $props()
 
     const lampOffset: [number, number] = [-5, 35.43]
+
+    // const a = $derived((rotation: number) => {
+    //     rerenderInputAnchorHack()
+    // })
+
+    // the lamp needs this hack because it only has an input node
+    // theoretically it works for all but its not very declarative.
+    // I just noticed that the edit wired dont delete themselves with this rerender solution
+    // no its the input anchor on all of them that does that.
+    const rerenderInputAnchorHack = () => {
+        // Wire glitch on dev mode fix
+        console.log('hovered')
+
+        const down = new MouseEvent('mouseenter', {
+            bubbles: true,
+            cancelable: false,
+        })
+        const up = new MouseEvent('mouseleave', {
+            bubbles: true,
+            cancelable: false,
+        })
+        const anc: HTMLElement | null = document.querySelector(`.in_${nodeId}`)
+
+        console.log(nodeId)
+        if (!anc) return console.warn('no element of the specified ID'), null
+
+        anc.dispatchEvent(down)
+        anc.dispatchEvent(up)
+    }
+
+    $effect(() => {
+        // this if statement is weird bc effect is weird.
+        // this code will run whenever rotation changes.
+        if (rotation || rotation === 0) {
+            rerenderInputAnchorHack()
+        }
+    })
 </script>
 
-<!-- cursor = drop -->
 <div class="button_fix">
     <svg
         width="85"

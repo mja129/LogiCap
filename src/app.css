@@ -46,6 +46,7 @@
     --yellow: #fee440;
     --light-yellow: rgb(255, 255, 73);
     --blue: #00bbf9;
+    --lightblue: #dbeeff;
     --pitt-blue: #003594;
     --pitt-yellow: #ffb81c;
     /*    The dark blue is hella out of place      */
@@ -110,9 +111,9 @@
     /* --minimap-background-color: hsl(225, 90%, 84%); */
     /*   FEATURE: Different nodes should be different colors in the menu and in the map.   */
     --minimap-node-color: hsl(0, 0%, 0%);
-    --minimap-background-color: lightblue;
+    --minimap-background-color: var(--lightblue);
 
-    --controls-background-color: lightblue;
+    --controls-background-color: var(--lightblue);
     --controls-text-color: hsl(0, 0%, 0%);
 
     --theme-toggle-text-color: hsl(0, 0%, 100%);
@@ -164,7 +165,7 @@ body.light {
       height of the viewport excluding the mobile default browser address bar.
       ensure the element always fills the visible portion of the screen,
     */
-    background-color: lightblue;
+    background-color: var(--lightblue);
 }
 body.dark {
     background-color: #747bff !important;

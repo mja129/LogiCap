@@ -16,6 +16,7 @@
         setLamp,
         getSvelvetEdgeEle,
     } from './wireUtils.ts'
+
     import {
         createDragWire,
         toggleManipulationTools,
@@ -26,19 +27,18 @@
     let {
         initAncId,
         currentPath,
+        wireActive = $bindable(),
+        monitorWire,
     }: {
         initAncId: string
         currentPath: string
+        wireActive: number
+        monitorWire: Function
     } = $props()
 
     // used for finding the html element with the connectionID
 
-    let wireActive: number = $state(-1)
-
-    let wireId: string = $state('')
-
     let edgeWrapper: SVGPathElement | null = $state(null)
-
     // $inspect(currentPath).with(console.log)
     onMount(() => {
         let [wireId, domWireId] = getWireIdFromDOM(edgeWrapper, initAncId)
@@ -62,88 +62,10 @@
     // creates a monitor on wireMount
     // also creates the wire name from the class on the wire that svelvet provides
     // definitely used when loading in circuits from a save
-    function monitorWire(
-        newId: string | null,
-        setWire: Function = (id: string) => (wireId = id)
-    ) {
-        // console.assert(newId !== null, 'wire id does not exist in edgeWrapper sibling nodes')
-        if (!newId) return null
-
-        // in theory the wireConnecting should update
-        setWire(newId)
-
-        const wireConnecting: boolean = newId.includes('cursor')
-
-        wireConnecting && console.log('Connecting wire mounted')
-
-        if (wireConnecting) return null // don't create listeners for connecting wires
-
-        const monitorFn =
-            ($CircuitEngine !== null && getMonitor($CircuitEngine)) ||
-            (() => null)
-        monitorFn()
-    }
 
     // I know there is a less convoluted way to do this
     // I tried removing the inner function and just running monitorFn right away by default
     // It didn't work, very curious? I want to know why
-    function getMonitor(
-        digitalJsCircuit: CustomHeadlessCircuit,
-        setWireCallback: Function = (newSignal: number) =>
-            (wireActive = newSignal)
-    ) {
-        // console.log('Getting monitor')
-        const currWire = findWireInEngine(digitalJsCircuit, wireId)
-        if (currWire === null) return
-
-        const monitorFn = () =>
-            digitalJsCircuit.monitorWire(currWire, (tick: number) => {
-                const wireChange = onWireChange(currWire)
-
-                // wireActive = wireChange // side-effects
-                // external global function that sets this (not param), (like was here b4) is side-effects too
-                setWireCallback(wireChange) // No side-effects basically!
-
-                // get stuff out of the target.
-                const {
-                    id: connectedTo,
-                    port: toPort,
-                    magnet: _,
-                }: Record<
-                    'id' | 'port' | 'magnet',
-                    string | undefined
-                > = currWire.attributes?.target
-
-                if (!connectedTo || !toPort) return
-
-                setAnchor(toPort, connectedTo, wireChange)
-
-                const labelOutputTo =
-                    connectedTo &&
-                    digitalJsCircuit.getLabelIndex()['outputs'][connectedTo]
-
-                if (!labelOutputTo) return null
-
-                setLamp(connectedTo, wireChange)
-            })
-        return monitorFn
-    }
-
-    // decent amount of overhead here, new listeners for every wire on circuit update
-    CircuitEngine.subscribe((digitalJsCircuit) => {
-        // reset on play/pause
-        // console.log('ENGINE UPDATE')
-        if (digitalJsCircuit === null) {
-            // console.log('circuitEngine has become null set wire to be inactive')
-            wireActive = -1
-            return
-        }
-
-        const monitorFn =
-            (digitalJsCircuit !== null && getMonitor(digitalJsCircuit)) ||
-            (() => null)
-        monitorFn()
-    })
 
     let editWire: boolean = $state(false)
 </script>
@@ -177,15 +99,6 @@
         console.warn(pathReset)
     }}
 />
-
-<!-- <path -->
-<!--     class={wireActive === -1 -->
-<!--         ? 'hit-area' -->
-<!--         : wireActive === 1 -->
-<!--           ? 'hit-area on' -->
-<!--           : 'hit-area off'} -->
-<!--     d={currentPath} -->
-<!-- /> -->
 
 <style>
     path {
@@ -225,9 +138,13 @@
 
     :global(.control-point) {
         cursor: pointer !important; /* Indicate these points are draggable */
-        fill: orange;
+        fill: var(--cream);
+        border: black;
+        border-radius: 999px;
         stroke-width: 1;
         pointer-events: all !important;
+        outline: 4px solid black; /* Add an outline to the circle */
+        outline-offset: 0; /* Offset the outline for better visibility */
     }
     :global(.control-point:hover) {
         filter: brightness(70%);
