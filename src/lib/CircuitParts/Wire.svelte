@@ -5,12 +5,10 @@
 <!--     // how do I avoid having these for input and outputs? -->
 <!--     // probably with the inverted mapping I keep talking about. -->
 <!--     type WireSaveData = Record<AnchorId, WireType> -->
-<!---->
 <!--     let wireSaveData: Writable<WireSaveData> = writable({}) -->
 <!-- </script> -->
 
 <script lang="ts">
-    import { onDestroy, onMount } from 'svelte'
     import { Edge } from 'svelvet'
 
     import { CustomHeadlessCircuit } from '@Util/CustomHeadlessCircuit'

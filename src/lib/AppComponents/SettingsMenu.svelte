@@ -8,7 +8,7 @@
 </script>
 
 <script>
-    import SettingsIcon from '~icons/streamline/button-fast-forward-2'
+    import SettingsIcon from '~icons/material-symbols/settings-outline'
     // modal menu that lets you toggle the wire type.
     // change the theme
     // let settingsVisible = false
@@ -17,7 +17,7 @@
 </script>
 
 <button class="launch-button" onclick={() => (show = !show)}>
-    <SettingsIcon />
+    <SettingsIcon height={30} width={30} />
 </button>
 {#if show}
     <div class="modal">
@@ -51,8 +51,11 @@
         --settings-menu-spacing: 5px;
     }
     .launch-button {
+        cursor: pointer;
+        border-width: 4px;
+        border-radius: 999px;
         position: absolute;
-        background-color: gray;
+        background-color: transparent;
         padding: var(--settings-menu-spacing);
         right: 10px;
         bottom: 10px;

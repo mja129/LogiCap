@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Node } from 'svelvet'
     import { rerenderInputAnchorHack } from '@src/lib/Util/cursors'
-    import type { Component } from 'svelte'
+    import { setContext, type Component } from 'svelte'
     import {
         getComponent,
         type AllNodeProps,
@@ -35,10 +35,13 @@
     // do I even need this derived? Nah
     let nodeComponent = $derived(getComponent(gateType))
     let rotation: number = $state(0)
+    const getRotation: () => number = () => {
+        return rotation
+    }
 
     const nodeAction = (e: MouseEvent) => {
         const clickedEle = e.target as HTMLElement
-        console.log(e.target)
+        // console.log(e.target)
         if (!clickedEle) {
             console.warn('no event target on node click')
         } else if (
@@ -52,6 +55,7 @@
             rotation = (rotation + 90) % 360
         }
     }
+    setContext('rotation', getRotation)
     // #TODO tell the nodes NSEW. when changing direction
     // this solution is better. just need to fine tune it a bit.
     // its hacky but our data persists, vs with a {key } block we have rerender
@@ -73,7 +77,7 @@
                 ]
             if (outputConnections && outputConnections.length > 0) {
                 outputConnections.forEach(([_, inAnc]) => {
-                    console.warn(inAnc)
+                    // console.warn(inAnc)
                     rerenderInputAnchorHack(inAnc)
                 })
             }

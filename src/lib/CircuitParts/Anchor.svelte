@@ -3,6 +3,7 @@
     import CustomAnchor from './CustomAnchor.svelte'
     import Wire from './Wire.svelte'
     import { getRunning } from '@CircuitEngine'
+    import { getContext } from 'svelte'
 
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -41,6 +42,33 @@
         portName = 'out'
     }
     const anchorId = `${portName}_${id}`
+    const getRotation: () => number = getContext('rotation')
+
+    function getDirection() {
+        if (location[0] === 'left') {
+            if (getRotation() === 0) {
+                return 'west'
+            }
+            if (getRotation() === 90) {
+                return 'north'
+            } else if (getRotation() === 180) {
+                return 'east'
+            } else if (getRotation() === 270) {
+                return 'south'
+            }
+        } else {
+            if (getRotation() === 0) {
+                return 'east'
+            }
+            if (getRotation() === 90) {
+                return 'south'
+            } else if (getRotation() === 180) {
+                return 'west'
+            } else if (getRotation() === 270) {
+                return 'north'
+            }
+        }
+    }
 </script>
 
 <!--
@@ -59,7 +87,7 @@
         let:connecting
         id={anchorId}
         key={anchorId}
-        direction={location[0] === 'left' ? 'west' : 'east'}
+        direction={getDirection()}
         input={(io === 'input' && true) || false}
         output={(io === 'output' && true) || false}
         locked={getRunning()}

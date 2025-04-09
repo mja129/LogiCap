@@ -49,7 +49,8 @@ export function rerenderInputAnchorHack(ancId: string) {
         })
         const anc: HTMLElement | null = document.querySelector(`.${ancId}`)
 
-        if (!anc) return console.warn('no element of the specified ID'), null
+        // if (!anc) return ( console.warn('no element of the specified ID'), null )
+        if (!anc) return null
 
         anc.dispatchEvent(down)
         anc.dispatchEvent(up)
