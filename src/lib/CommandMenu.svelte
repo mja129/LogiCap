@@ -284,7 +284,7 @@
         border-radius: 8px;
         width: 175px;
         padding: 16px;
-        z-index: 10;
+        z-index: 30;
         border-color: black;
     }
 
