@@ -12,6 +12,7 @@
     import { get } from 'svelte/store'
 
     import { CircuitStore } from '@CircuitStore'
+    import { getRunning } from './circuitEngine.svelte'
 
     // props that all nodes have in common.
     interface SimNodeProps {
@@ -99,7 +100,9 @@ of the different components now I just need to do it here -->
     >
         <div
             onmousedown={(e: MouseEvent) => {
-                rejectMoveClick(e, nodeAction)
+                if (!getRunning()) {
+                    rejectMoveClick(e, nodeAction)
+                }
             }}
             style="transform:rotate({rotation}deg)"
         >
