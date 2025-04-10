@@ -34,16 +34,35 @@
         height = 50,
         gateType = 'And',
         nodeId,
-        rotation = $bindable(),
     }: {
         width?: number
         height?: number
         gateType?: logicGateTypes
         nodeId: string
-        rotation?: number
     } = $props()
 
     const circuitSvg = circuitSvgs[gateType as dualInputLogicTypes]
+
+    function findOutputAnchor(inputAnchorId: string) {
+        let outputAnchorTuple: [string] | undefined
+        // O(N*M) where N is number of output anchors
+        // and M is the number of connections per output anchor
+        // this could be faster.
+        for (const fromAnchorId in get(CircuitStore).connectors) {
+            // Filter out any connections that match the `toAnchorId`
+            // This logic would also remove duplicates, could be good or bad.
+            get(CircuitStore).connectors[
+                fromAnchorId as outputAnchorName
+            ].forEach(([inputNode, inputAnc]) => {
+                console.log(inputAnc)
+                if (inputAnc === inputAnchorId) {
+                    outputAnchorTuple = [fromAnchorId.substring(4)]
+                }
+            })
+        }
+        console.log(outputAnchorTuple)
+        return outputAnchorTuple
+    }
 
     // $inspect($savedConnections).with(console.log)
 </script>
@@ -81,20 +100,12 @@ It does work but its chunky and teleports for some reason
 this passing the rotation as a bindable prop in all components is the best solution
 rerender only the output anchor, very demure very minimal.
 -->
-{#key rotation}
-    <SimulationNodeAnchor
-        location={['right', 'mid']}
-        id={nodeId}
-        io="output"
-        offset={logicGateAnchorOffsets['out']}
-        connections={get(CircuitStore).connectors[
-            ('out_' + nodeId) as outputAnchorName
-        ]}
-    />
-{/key}
-
-<style>
-    /* div { */
-    /*     transform: rotate(10deg); */
-    /* } */
-</style>
+<SimulationNodeAnchor
+    location={['right', 'mid']}
+    id={nodeId}
+    io="output"
+    offset={logicGateAnchorOffsets['out']}
+    connections={get(CircuitStore).connectors[
+        ('out_' + nodeId) as outputAnchorName
+    ]}
+/>

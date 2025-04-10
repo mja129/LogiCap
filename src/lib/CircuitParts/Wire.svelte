@@ -1,7 +1,15 @@
+<!-- <script module lang="ts"> -->
+<!--     import { writable, type Writable } from 'svelte/store' -->
+<!--     type AnchorId = string -->
+<!--     type WireType = string -->
+<!--     // how do I avoid having these for input and outputs? -->
+<!--     // probably with the inverted mapping I keep talking about. -->
+<!--     type WireSaveData = Record<AnchorId, WireType> -->
+<!--     let wireSaveData: Writable<WireSaveData> = writable({}) -->
+<!-- </script> -->
+
 <script lang="ts">
-    import { onDestroy, onMount } from 'svelte'
     import { Edge } from 'svelvet'
-    import type { Action } from 'svelte/action'
 
     import { CustomHeadlessCircuit } from '@Util/CustomHeadlessCircuit'
 
@@ -19,13 +27,25 @@
     let wireActive: number = $state(-1)
     let wireId: string = $state('')
 
+    import { settingsStore } from '@AppComponents/SettingsMenu.svelte'
+
     let {
         initAncId,
-        wireType = 'bezier',
+        wireType = $settingsStore.wireType,
     }: {
         initAncId: string
         wireType?: string
     } = $props()
+
+    // $inspect($wireSaveData).with(console.log)
+    // Cache the wire type.
+    // once a wire type is created once it will always be that type of wire unless edited with the cursor tool
+    // onMount(() => {
+    //     if (!(initAncId in $wireSaveData)) {
+    //         $wireSaveData[initAncId] = $settingsStore.wireType
+    //     }
+    //     wireType = $wireSaveData[initAncId]
+    // })
 
     function monitorWire(
         newId: string | null,
@@ -111,10 +131,16 @@
 </script>
 
 <!-- I need this custom element (even though I don't want the extra nexting) because I need to track changes in 'Path' actively-->
-<Edge let:path let:destroy let:hovering>
+<Edge
+    straight={wireType === 'straight'}
+    step={wireType === 'step'}
+    let:path
+    let:destroy
+    let:hovering
+>
     {#if wireType === 'bezier'}
         <CustomEdge {initAncId} currentPath={path} {wireActive} {monitorWire} />
-    {:else if wireType === 'step'}
+    {:else if wireType === 'step' || wireType == 'straight'}
         <NormalEdge {initAncId} currentPath={path} {wireActive} {monitorWire} />
     {/if}
 </Edge>

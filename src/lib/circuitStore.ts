@@ -5,14 +5,14 @@ import { deviceJsonFactoryMap } from './Util/makeDigitalJsJson'
 // https://github.com/tilk/digitaljs
 
 interface CircuitStoreType extends Writable<Circuit> {
-    reset(): void;
-    addConnection(fromAnchorId: outputAnchorName, toAnchorId: inputAnchorName): void;
-    removeConnection(inputAnchorId: string): void;
-    findOutputAnchor(inputAnchorId: string): void;
-    addCircuitDevice(gateType: string, uuid: string, options?: any): Devices;
+    reset(): void
+    addConnection(
+        fromAnchorId: outputAnchorName,
+        toAnchorId: inputAnchorName
+    ): void
+    removeConnection(inputAnchorId: string): void
+    addCircuitDevice(gateType: string, uuid: string, options?: any): Devices
 }
-
-
 
 // create a custom svelte store
 const createCircuitStore = (): CircuitStoreType => {
@@ -27,16 +27,18 @@ const createCircuitStore = (): CircuitStoreType => {
         subscribe,
         set,
         update,
-        reset: () => update(() => {
-            return {
-                devices: {},
-                connectors: {},
-                subcircuits: {},
-            }
-        }),
+        reset: () =>
+            update(() => {
+                return {
+                    devices: {},
+                    connectors: {},
+                    subcircuits: {},
+                }
+            }),
         addConnection: (fromId: outputAnchorName, toId: inputAnchorName) => {
-
-            const toNodeId: inputGateName = toId.substring(toId.indexOf('_') + 1) as inputGateName
+            const toNodeId: inputGateName = toId.substring(
+                toId.indexOf('_') + 1
+            ) as inputGateName
             update((currCircuit) => {
                 if (!(fromId in currCircuit.connectors)) {
                     currCircuit.connectors[fromId] = new Array()
@@ -72,33 +74,10 @@ const createCircuitStore = (): CircuitStoreType => {
                 return currCircuit
             })
         },
-        findOutputAnchor: (inputAnchorId: string) => {
-            update((currCircuit) => {
-                const newConnectors: SvelvetConnectors = {}
-                // O(N*M) where N is number of output anchors
-                // and M is the number of connections per output anchor
-                // this could be faster.
-                for (const fromAnchorId in currCircuit.connectors) {
-                    // Filter out any connections that match the `toAnchorId`
-                    // This logic would also remove duplicates, could be good or bad.
-                    newConnectors[fromAnchorId as outputAnchorName] = [
-                        ...currCircuit.connectors[
-                            fromAnchorId as outputAnchorName
-                        ].filter(([, anchorId]) => {
-                            return anchorId !== inputAnchorId
-                        }),
-                    ]
-                }
-                // console.log(newConnectors);
-                currCircuit.connectors = newConnectors
-                return currCircuit
-            })
-        },
         addCircuitDevice: (gateType: string, uuid: string, options?: any) => {
             const nodeName: string = `${gateType}_${uuid}`
             let newDevices: Devices | null = null
             update((currCircuit) => {
-
                 const newDevice: Device =
                     options === undefined
                         ? deviceJsonFactoryMap[gateType](nodeName)
@@ -113,12 +92,11 @@ const createCircuitStore = (): CircuitStoreType => {
                 throw new Error('devices null after setting devices')
             }
             return newDevices
-        }
-
+        },
     }
 }
 
-export const CircuitStore: CircuitStoreType = createCircuitStore();
+export const CircuitStore: CircuitStoreType = createCircuitStore()
 
 // the info that we will extract from the svelvet save.
 type NodeInfoList = {
@@ -163,7 +141,7 @@ function savePositionsToCircuitStore() {
     const saveJsonText = getSvelvetSave()
 
     // early return, state not found in localStorage
-    if (!saveJsonText) return (console.warn('svelvet save unsucessful'), null)
+    if (!saveJsonText) return console.warn('svelvet save unsucessful'), null
 
     const savedNodeNames: NodeInfoList | null = filterSvelvetSave(saveJsonText)
 
@@ -222,23 +200,29 @@ export async function saveCircuit() {
 // to set that state 'remotely' lets say
 // default is local storage
 function validateSavedCircuit(savedCircuit: any) {
-    if (!savedCircuit?.devices || !savedCircuit?.connectors || !savedCircuit?.subcircuits) {
-      throw new Error('Parsed circuit object is missing required properties');
-    }
-    else if (Object.keys(savedCircuit.devices).length === 0) {
-      console.log('Loaded in a valid circuit with empty devices');
+    if (
+        !savedCircuit?.devices ||
+        !savedCircuit?.connectors ||
+        !savedCircuit?.subcircuits
+    ) {
+        throw new Error('Parsed circuit object is missing required properties')
+    } else if (Object.keys(savedCircuit.devices).length === 0) {
+        console.log('Loaded in a valid circuit with empty devices')
     }
 }
 
 export function loadCircuit(circuitText: string = 'default') {
-
-    let savedCircuitText = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
+    let savedCircuitText =
+        circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
     if (!savedCircuitText) return
 
-    const savedCircuit = JSON.parse(savedCircuitText) as { devices: {}; connectors: {}; subcircuits: {} };
+    const savedCircuit = JSON.parse(savedCircuitText) as {
+        devices: {}
+        connectors: {}
+        subcircuits: {}
+    }
 
     validateSavedCircuit(savedCircuit)
-    
 
     CircuitStore.set(savedCircuit)
 
@@ -266,4 +250,3 @@ export function backupDelete() {
     }
     localStorage.removeItem('circuitStoreSave')
 }
-

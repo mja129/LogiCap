@@ -30,6 +30,7 @@
     import { fixSvelvetBugs, generateNonce, captureCurrentZoom } from './app'
     import SingleIoLogic from './lib/Circuits/LogicGates/SingleIoLogic.svelte'
     import TabMenu from '@AppComponents/TabMenu.svelte'
+    import SettingsMenu from '@AppComponents/SettingsMenu.svelte'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
@@ -90,6 +91,7 @@
 </script>
 
 <main id="logicap">
+    <SettingsMenu />
     <SideMenu {createCanvasDevice} />
     <SimMenu clearCanvas={clearDeviceData} />
     <TabMenu {clearDeviceData} {setDeviceData} />
@@ -101,7 +103,6 @@
         zoom={initialScale}
         editable={false}
         disableSelection={false}
-        edgeStyle={'bezier'}
         controls
     >
         <Minimap width={100} corner="NE" slot="minimap" />
