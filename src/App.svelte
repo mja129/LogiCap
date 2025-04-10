@@ -9,6 +9,12 @@
 </script>
 
 <script lang="ts">
+    import CommandMenu from './lib/CommandMenu.svelte'
+    // engines as just to call it with uppercase 'Engines'
+
+    // import Circuit from './Circuit.svelte'
+
+    // import { deviceFactoryMap } from '@Util/makeDigitalJsJson'
     import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
@@ -90,6 +96,7 @@
     <SimMenu clearCanvas={clearDeviceData} />
     <TabMenu {clearDeviceData} {setDeviceData} />
 
+    <CommandMenu {createCanvasDevice} />
     <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->
     <Svelvet
         theme="LogiCap"

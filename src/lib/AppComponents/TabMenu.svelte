@@ -18,6 +18,10 @@
         ]
     )
 
+    // variables for incline renaming
+    let editingTab = $state<string | null>(null);
+    let tabNewName = $state<string>('');
+
     async function backupTab(currentTab: string) {
         await saveCircuit()
 
@@ -33,6 +37,7 @@
     }
     async function handleTabClick(tabName: string) {
         // saveCircuit()
+        if (editingTab === tabName) return;
         if (currentTab === tabName) {
             return null
         }
@@ -108,54 +113,189 @@
         // add the last one to
         // let activeTabList = $state(['Tab1_circuitStoreSave'])
     }
+
+    function deleteTab(index: number): void {
+        if (activeTabList.length <= 1) {
+            alert("Cannot delete the last tab.");
+            return;
+        }
+        // Get the tab name of the tab being deleted.
+        const deletedTab = activeTabList[index];
+        // Remove just the one tab using its index.
+        activeTabList = activeTabList.filter((_: string, i: number): boolean => i !== index);
+        localStorage.setItem('activeTabList', JSON.stringify(activeTabList));
+        localStorage.removeItem(deletedTab);
+
+        // If the deleted tab is the current tab, switch to the first remaining tab.
+        if (currentTab === deletedTab) {
+            const newActiveTab = activeTabList[0];
+            currentTab = newActiveTab;
+            localStorage.setItem('currActiveTab', newActiveTab);
+            let loadedCircuit = localStorage.getItem(newActiveTab) || '';
+            localStorage.setItem('circuitStoreSave', loadedCircuit);
+            loadCircuit();
+            setDeviceData($CircuitStore.devices);
+        }
+    }
+
+    function startEditing(tabName: string) {
+        editingTab = tabName;
+        tabNewName = tabName; // Initialize the new name with the current tab name
+    }
+
+    function cancelEditing(): void {
+        editingTab = null; // Cancel editing mode
+        tabNewName = ''; // Clear the new name input
+    }
+
+    function commitRename(): void {
+        if (!editingTab) return;
+        const trimmedName = tabNewName.trim();
+        if (!trimmedName) return;
+        if (activeTabList.includes(trimmedName) && trimmedName !== editingTab) {
+            alert('Tab name already exists! Please choose a different name.');
+            return;
+        }
+        // update the tab name in list and localStorage
+        activeTabList = activeTabList.map((name: string) => (name === editingTab ? trimmedName : name));
+        localStorage.setItem('activeTabList', JSON.stringify(activeTabList));
+
+        // rename associated to stored content if exists
+        const tabContent = localStorage.getItem(editingTab);
+        if (tabContent !== null) {
+            localStorage.removeItem(editingTab); // Remove old name
+            localStorage.setItem(trimmedName, tabContent); // Set new name with content
+        }
+        // update current tab if necessary
+        if (currentTab === editingTab) {
+            currentTab = trimmedName;
+            localStorage.setItem('currActiveTab', trimmedName);
+        }
+        editingTab = null;
+        tabNewName = '';
+    }
 </script>
 
 <div class="tabs">
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    {#each activeTabList as tabName (tabName)}
-        <p
-            style={currentTab === tabName ? 'background-color: pink' : ''}
-            onclick={async () => await handleTabClick(tabName)}
-        >
-            {tabName}
-        </p>
-    {/each}
-    <button
-        style="border: unset; width: 30px; float: left;background-color:transparent;margin-left:-3px;margin-right: 4px;"
-        onclick={() => makeNewTab()}
-    >
-        <AddTab
-            style="display: block; margin: 0 auto; height: 100%; width: 100%;"
-        />
+    <div class="scrollable-tabs">
+      {#each activeTabList as tabName, index (tabName + index)}
+        <div class="tab-item">
+          {#if editingTab === tabName}
+            <input
+              type="text"
+              bind:value={tabNewName}
+              onkeydown={(e: KeyboardEvent) => {
+                if (e.key === 'Enter') commitRename();
+                else if (e.key === 'Escape') cancelEditing();
+              }}
+              onblur={commitRename}
+              autofocus
+            />
+          {:else}
+            <button
+              type="button"
+              class="tab-title"
+              onclick={async () => await handleTabClick(tabName)}
+              ondblclick={() => startEditing(tabName)}
+            >
+              {tabName}
+            </button>
+          {/if}
+          <button 
+            type="button"
+            class="delete-btn"
+            onclick={(e: MouseEvent) => {
+              e.stopPropagation();
+              deleteTab(index);
+            }}
+            title="Delete Tab"
+          >
+            ×
+          </button>
+        </div>
+      {/each}
+    </div>
+    <button type="button" class="new-tab-btn" onclick={() => makeNewTab()}>
+      <AddTab />
     </button>
-</div>
+  </div>
 
-<style>
+  <style>
     .tabs {
-        position: absolute;
-        right: calc(120px);
-        top: 8px;
-        z-index: 20;
-        display: flex;
-        align-items: center;
-        justify-content: space-evenly;
-        background-color: var(--lightblue);
-        border-radius: 5px;
-        border: 3px solid black;
-
-        padding-block: 5px;
+      position: absolute;
+      right: calc(120px);
+      top: 8px;
+      z-index: 20;
+      display: flex; /* Use flexbox for alignment */
+      align-items: center;
+      background-color: var(--lightblue);
+      border-radius: 5px;
+      border: 3px solid black;
+      padding: 5px;
     }
-    .tabs > * {
-        margin-left: 3px;
+    .scrollable-tabs {
+      display: flex;
+      overflow-x: auto;
+      /* Dynamically resize based on number of tabs but max out at 3 tabs wide */
+      max-width: calc(3 * 130px + 2 * 8px); /* Up to 3 tabs (150px width, 8px margin) */
+      /* Hide scrollbar */
+      -ms-overflow-style: none; /* For Internet Explorer and Edge */
+      scrollbar-width: none; /* For Firefox */
     }
-    .tabs p {
-        padding-inline: 12px;
-        padding-block: 2px;
-        border-radius: 25px;
+    .scrollable-tabs::-webkit-scrollbar {
+      display: none; /* For Chrome, Safari, and Opera */
     }
-    .tabs p:hover {
-        color: red;
-        background-color: black;
+    .tab-item {
+      display: flex;
+      align-items: center;
+      margin-right: 8px; /* Spacing between tabs */
+      white-space: nowrap;
+      flex: none; /* Prevent the tabs from shrinking */
     }
-</style>
+    .tab-title {
+      padding: 4px 12px; /* Padding adjusts the "clickable" area */
+      border-radius: 25px;
+      cursor: pointer;
+      background-color: white;
+      border: none;
+      font-size: 14px; /* Adjust text size as needed */
+      text-align: center; /* Keep text centered */
+    }
+    .tab-title:hover {
+      color: red;
+      background-color: black;
+    }
+    .delete-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      margin-left: 4px;
+      font-size: 16px;
+      color: #900;
+    }
+    .delete-btn:hover {
+      color: red;
+    }
+    .new-tab-btn {
+      flex-shrink: 0; /* Prevent shrinking */
+      margin-left: auto; /* Push the button to the far right */
+      border: none;
+      width: 30px;
+      height: 30px;
+      background-color: transparent;
+    }
+    .new-tab-btn :global(svg) {
+      display: block;
+      margin: auto;
+      height: 100%;
+      width: 100%;
+    }
+    input[type="text"] {
+      border-radius: 25px;
+      padding: 4px 12px;
+      border: 1px solid #ccc;
+      outline: none;
+      width: auto; /* Allow input to size based on its content */
+      box-sizing: border-box;
+    }
+  </style>
