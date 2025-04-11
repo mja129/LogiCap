@@ -49,6 +49,7 @@
     io="input"
     offset={singleIoGateAnchorOffests['in']}
 />
+
 <SimulationNodeAnchor
     location={['right', 'mid']}
     id={nodeId}

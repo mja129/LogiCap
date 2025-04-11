@@ -212,7 +212,7 @@
         position: absolute;
         /*    the side menu width should be 22.5% of the main app flexbox */
         transform: scale(0.75);
-        left: calc(22.5% - 38px);
+        left: calc(22.5% - 45px);
         top: 2px;
         z-index: 300;
         display: flex;
@@ -220,7 +220,7 @@
         padding-inline: 5px;
         padding-block: 0px;
         justify-content: space-evenly;
-        background-color: lightblue;
+        background-color: var(--lightblue);
         border-radius: 5px;
         border: 3px solid black;
     }
@@ -228,7 +228,7 @@
     .vl {
         border: 1px solid black;
         border-radius: 4px;
-        background-color: lightblue;
+        background-color: var(--lightblue);
         width: 5px;
         margin-block: 4px;
     }
@@ -247,7 +247,7 @@
         margin-inline: 0px;
         max-height: 70px;
         border: none;
-        background-color: lightblue;
+        background-color: var(--lightblue);
     }
     :global(.menuRunButtons button:hover svg) {
         color: red;

@@ -5,13 +5,14 @@ import { deviceJsonFactoryMap } from './Util/makeDigitalJsJson'
 // https://github.com/tilk/digitaljs
 
 interface CircuitStoreType extends Writable<Circuit> {
-    reset(): void;
-    addConnection(fromAnchorId: outputAnchorName, toAnchorId: inputAnchorName): void;
-    removeConnection(inputAnchorId: string): void;
-    addCircuitDevice(gateType: string, uuid: string, options?: any): Devices;
+    reset(): void
+    addConnection(
+        fromAnchorId: outputAnchorName,
+        toAnchorId: inputAnchorName
+    ): void
+    removeConnection(inputAnchorId: string): void
+    addCircuitDevice(gateType: string, uuid: string, options?: any): Devices
 }
-
-
 
 // create a custom svelte store
 const createCircuitStore = (): CircuitStoreType => {
@@ -26,16 +27,18 @@ const createCircuitStore = (): CircuitStoreType => {
         subscribe,
         set,
         update,
-        reset: () => update(() => {
-            return {
-                devices: {},
-                connectors: {},
-                subcircuits: {},
-            }
-        }),
+        reset: () =>
+            update(() => {
+                return {
+                    devices: {},
+                    connectors: {},
+                    subcircuits: {},
+                }
+            }),
         addConnection: (fromId: outputAnchorName, toId: inputAnchorName) => {
-
-            const toNodeId: inputGateName = toId.substring(toId.indexOf('_') + 1) as inputGateName
+            const toNodeId: inputGateName = toId.substring(
+                toId.indexOf('_') + 1
+            ) as inputGateName
             update((currCircuit) => {
                 if (!(fromId in currCircuit.connectors)) {
                     currCircuit.connectors[fromId] = new Array()
@@ -75,7 +78,6 @@ const createCircuitStore = (): CircuitStoreType => {
             const nodeName: string = `${gateType}_${uuid}`
             let newDevices: Devices | null = null
             update((currCircuit) => {
-
                 const newDevice: Device =
                     options === undefined
                         ? deviceJsonFactoryMap[gateType](nodeName)
@@ -90,12 +92,11 @@ const createCircuitStore = (): CircuitStoreType => {
                 throw new Error('devices null after setting devices')
             }
             return newDevices
-        }
-
+        },
     }
 }
 
-export const CircuitStore: CircuitStoreType = createCircuitStore();
+export const CircuitStore: CircuitStoreType = createCircuitStore()
 
 // the info that we will extract from the svelvet save.
 type NodeInfoList = {
@@ -140,7 +141,7 @@ function savePositionsToCircuitStore() {
     const saveJsonText = getSvelvetSave()
 
     // early return, state not found in localStorage
-    if (saveJsonText === null) return null
+    if (!saveJsonText) return console.warn('svelvet save unsucessful'), null
 
     const savedNodeNames: NodeInfoList | null = filterSvelvetSave(saveJsonText)
 
@@ -158,11 +159,12 @@ function savePositionsToCircuitStore() {
 }
 
 // save the current circuit store to localStorage
-function saveCircuitStoreToLS() {
+export function saveCircuitStoreToLS() {
     const CircuitStoreSave: string | null = getLsItem('circuitStoreSave')
 
     // getLsItem might warn that circuitStoreSave does not exist, in this case
     // we are creating it for the first time, thats okay
+    // const currCircuitStore = get(CircuitStore)
 
     localStorage.setItem('circuitStoreSave', JSON.stringify(get(CircuitStore)))
 }
@@ -217,12 +219,16 @@ export function loadCircuit(circuitText: string = 'default') {
     let savedCircuitText: string | null = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
     if (!savedCircuitText) return
 
-    const savedCircuit = JSON.parse(savedCircuitText) as { devices: {}; connectors: {}; subcircuits: {} };
+    const savedCircuit = JSON.parse(savedCircuitText) as {
+        devices: {}
+        connectors: {}
+        subcircuits: {}
+    }
 
     validateSavedCircuit(savedCircuit)
-    
 
     CircuitStore.set(savedCircuit)
+
     // setDevices(savedCircuit.devices)
 }
 

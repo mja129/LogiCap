@@ -5,7 +5,7 @@ import Icons from 'unplugin-icons/vite'
 // used to automatically create the paths from tsconfig.app.json
 import tsconfigPaths from 'vite-tsconfig-paths'
 // Woah thats so cool
-import { visualizer } from 'rollup-plugin-visualizer'
+// import { visualizer } from 'rollup-plugin-visualizer'
 
 // App runs offline
 // https://www.youtube.com/watch?v=sFsRylCQblw
@@ -26,8 +26,8 @@ const pwaConfig = {
     },
 }
 
-const addVisualizer = () =>
-    visualizer({ emitFile: true, filename: 'stats.html' })
+// const addVisualizer = () =>
+//     visualizer({ emitFile: true, filename: 'stats.html' })
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -38,7 +38,7 @@ export default defineConfig({
         }),
         tsconfigPaths(),
         // addVisualizer(),
-        VitePWA(pwaConfig),
+        VitePWA(pwaConfig as any),
     ],
     base: './', // Use relative paths
     optimizeDeps: {

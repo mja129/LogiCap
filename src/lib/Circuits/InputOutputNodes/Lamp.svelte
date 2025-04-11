@@ -1,5 +1,6 @@
 <script lang="ts">
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
+    // import Switch from './Switch.svelte'
 
     let {
         width = 80,
@@ -12,9 +13,12 @@
     } = $props()
 
     const lampOffset: [number, number] = [-5, 35.43]
+
+    // const a = $derived((rotation: number) => {
+    //     rerenderInputAnchorHack()
+    // })
 </script>
 
-<!-- cursor = drop -->
 <div class="button_fix">
     <svg
         width="85"
