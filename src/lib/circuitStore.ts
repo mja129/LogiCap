@@ -200,20 +200,23 @@ export async function saveCircuit() {
 // to set that state 'remotely' lets say
 // default is local storage
 function validateSavedCircuit(savedCircuit: any) {
-    if (
-        !savedCircuit?.devices ||
-        !savedCircuit?.connectors ||
-        !savedCircuit?.subcircuits
-    ) {
-        throw new Error('Parsed circuit object is missing required properties')
-    } else if (Object.keys(savedCircuit.devices).length === 0) {
-        console.log('Loaded in a valid circuit with empty devices')
+    if (!savedCircuit?.devices || !savedCircuit?.connectors || !savedCircuit?.subcircuits) {
+		let missingProps = "";
+		if(!savedCircuit?.devices) missingProps += "[Devices]";
+		if(!savedCircuit?.devices) missingProps += "[Connectors]";
+		if(!savedCircuit?.devices) missingProps += "[Subciruits]";
+
+
+      throw new Error('Parsed circuit object is missing required properties ' + missingProps);
+    }
+    else if (Object.keys(savedCircuit.devices).length === 0) {
+      console.log('Loaded in a valid circuit with empty devices');
     }
 }
 
 export function loadCircuit(circuitText: string = 'default') {
-    let savedCircuitText =
-        circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
+
+    let savedCircuitText: string | null = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
     if (!savedCircuitText) return
 
     const savedCircuit = JSON.parse(savedCircuitText) as {
@@ -249,4 +252,90 @@ export function backupDelete() {
         localStorage.setItem('prevCircuitStore', saveDeleted)
     }
     localStorage.removeItem('circuitStoreSave')
+}
+
+
+// Downloads the circuitsStoreSave to the user's machine
+export function downloadCircuit(filename: string){
+	saveCircuit();
+	// => Turn the current Circuit into a file ...
+	
+	const getItem = getLsItem('circuitStoreSave');
+	if (!getItem) {
+	    console.log('Tried to load empty circuit');
+	    return null;
+	}
+	
+	const circuitJson = JSON.parse(getItem);
+	const prettyCircuitJson = JSON.stringify(circuitJson, null, 2);
+	
+	const circuitBlob = new Blob([prettyCircuitJson], { type: 'application/json' });
+	const jsonObjectUrl = URL.createObjectURL(circuitBlob);
+	if (filename === "") filename = "Circuit";
+	
+	// Creates the element to do the download
+	const anchorEl = document.createElement("a");
+	anchorEl.href = jsonObjectUrl;
+	anchorEl.download = filename + ".json";
+
+	// Trigger's the download
+	anchorEl.click();
+
+	// Clean up
+	URL.revokeObjectURL(jsonObjectUrl);
+
+	anchorEl.remove();
+}
+
+// Uploads a circuit from the User's machnie to this interface
+//Rewrote to make async because u need to wait for the file before setting the canvas in SimMenu
+export async function uploadCircuit(): Promise<void>{
+	// Get User File
+    return new Promise((resolve) => {
+	const inputEl: HTMLInputElement = document.createElement("input");
+	inputEl.setAttribute("type", "file");
+	inputEl.setAttribute("accept", "application/JSON");
+
+
+	inputEl.click();
+    inputEl.addEventListener("change", async () => {
+        await loadInput(inputEl);
+        resolve();
+    });
+	
+
+
+	// Upload
+	
+
+	// Clean Up
+	inputEl.remove();
+    });
+
+}
+
+//Rewrote to make async because u need to wait for the file before setting the canvas in SimMenu
+async function loadInput(inputEl: HTMLInputElement): Promise<void>{
+	const file: File| undefined = inputEl.files?.[0];
+    if(!file) return;
+
+    const text = await new Promise<string>((resolve, reject) => {
+        const reader: FileReader = new FileReader();
+
+
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+            const textResult: string = e.target?.result as string;
+                // Process the text content here
+                resolve(textResult)
+            };
+        
+            reader.onerror = (e: ProgressEvent<FileReader>) => {
+                reject(new Error("Error reading file"))
+            };
+        
+            reader.readAsText(file);
+    })
+    console.log(text)
+    loadCircuit(text)
+
 }

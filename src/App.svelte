@@ -83,17 +83,19 @@
         // save on every addition of a new node.
         saveCircuit()
     }
-    // localStorage.setItem('currActiveTab', JSON.stringify(activeTabList))
+    // fitView={true}
 
-    // current problem, we arent saving positions.
 
-    // localStorage.clear()
+	let setDevices = (d: Devices) => (currentDevicesData = d)
+
+	let currCircuitName = $state("")
+
 </script>
 
 <main id="logicap">
     <SettingsMenu />
     <SideMenu {createCanvasDevice} />
-    <SimMenu clearCanvas={clearDeviceData} />
+	<SimMenu clearCanvas={clearDeviceData} currCircuitName = {currCircuitName} setCanvas = {setDevices}/>
     <TabMenu {clearDeviceData} {setDeviceData} />
 
     <CommandMenu {createCanvasDevice} />
@@ -121,6 +123,13 @@
             />
         {/each}
     </Svelvet>
+	<div
+		style="position: absolute; top: 0; right:350px; width: 100px; z-index=100; ">
+		Circuit Name
+		<input bind:value={currCircuitName}/>
+	</div>
+	
+	
 </main>
 
 <style>
