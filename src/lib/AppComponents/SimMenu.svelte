@@ -92,12 +92,12 @@
         save: {
             Component: SaveIcon,
             styles: 'transform:scale(2.4);',
-            width: 40,
+            width: 30,
         },
         trash: {
             Component: TrashIcon,
             styles: 'transform:scale(2.69);',
-            width: 40,
+            width: 30,
         },
     }
 
@@ -172,7 +172,7 @@
     onClickFn: Function,
     btnStyles: string = ''
 )}
-    <button style={btnStyles} onclick={() => onClickFn()}>
+    <button style={btnStyles} onclick={() => onClickFn()} width={iconProps.width}>
         {@render simIcon(iconProps)}
     </button>
 {/snippet}
@@ -209,6 +209,7 @@
     {@render simMenuBtn(simMenuModel['resetState'], resetCircuit)}
     <span style="margin-right: 7px" class="vl"></span>
     {@render simMenuBtn(simMenuModel['save'], saveCircuit)}
+	<span style="margin-right: 7px" class="vl"></span>
     {@render simMenuBtn(simMenuModel['trash'], onTrash, 'margin-left: -6px')}
 </div>
 
