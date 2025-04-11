@@ -95,7 +95,7 @@
 <main id="logicap">
     <SettingsMenu />
     <SideMenu {createCanvasDevice} />
-    <SimMenu clearCanvas={clearDeviceData} />
+	<SimMenu clearCanvas={clearDeviceData} currCircuitName = {currCircuitName} setCanvas = {setDevices}/>
     <TabMenu {clearDeviceData} {setDeviceData} />
 
     <CommandMenu {createCanvasDevice} />
@@ -124,7 +124,7 @@
         {/each}
     </Svelvet>
 	<div
-		style="position: absolute; top: 0; right:150px; width: 100px; z-index=100; ">
+		style="position: absolute; top: 0; right:350px; width: 100px; z-index=100; ">
 		Circuit Name
 		<input bind:value={currCircuitName}/>
 	</div>

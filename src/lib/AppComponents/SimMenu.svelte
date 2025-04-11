@@ -140,6 +140,10 @@
     async function circuitUpload(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
+        if(getRunning())
+        {
+            toggleRunSim()
+        }
         await uploadCircuit()
         setCanvas($CircuitStore.devices)
     }
