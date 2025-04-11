@@ -73,12 +73,12 @@
         trash: {
             Component: TrashIcon,
             styles: 'transform:scale(2.69);',
-            width: 40,
+            width: 30,
         },
         load: {
             Component: LoadIcon,
             styles: 'transform:scale(2.4);',
-            width: 40,
+            width: 30,
         },
     }
 
