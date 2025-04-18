@@ -14,6 +14,8 @@
     // let settingsVisible = false
     let show = $state(false)
     // $inspect($settingsStore).with(console.log)
+
+    let hasKitty = $state(false)
 </script>
 
 <button class="launch-button" onclick={() => (show = !show)}>
@@ -42,7 +44,43 @@
             </select>
         </div>
 
-        <button onclick={() => (show = false)}>Close</button>
+        <div
+            style="display:flex;flex-direction: row;justify-content: space-between;width: 100%;margin-bottom:-25px;margin-top:5px;"
+        >
+            <button
+                class="kittyBtn"
+                onclick={() => {
+                    const kittyElement: HTMLElement | null =
+                        document.querySelector('#kitty')
+                    // if the kitty has not been spawned before.
+                    if (kittyElement) {
+                        if (hasKitty) {
+                            kittyElement.style.display = 'none'
+                            // kittyElement.remove()
+                            hasKitty = false
+                        } else {
+                            kittyElement.style.display = 'unset'
+                            hasKitty = true
+                        }
+                    } else {
+                        // create the element for the first time
+
+                        // This function is injected into the code via, index.html
+                        //@ts-ignore
+                        herekittykittykitty('Furnando')
+                        hasKitty = true
+                    }
+                }}>{hasKitty ? 'Despawn Kitty' : 'Spawn Kitty'}</button
+            >
+            <button
+                class="closeBtn"
+                onclick={(e: MouseEvent) => {
+                    e.stopPropagation()
+                    show = false
+                }}>Close Menu</button
+            >
+        </div>
+        <br />
     </div>
 {/if}
 
@@ -77,6 +115,10 @@
     }
     .modal h2 {
         font-size: 2rem !important;
+        color: black;
+        -webkit-text-stroke: unset;
+        transform: translateY(-13px);
+        margin-bottom: -20px;
     }
     .modal div {
         display: flex;
@@ -89,9 +131,13 @@
     .modal select {
         width: 40%;
     }
-    .modal button {
+    .kittyBtn {
         /* float is a magic property and the conditions for it working are determined by a higher power.*/
         margin-top: calc(var(--settings-menu-spacing) + 2px);
-        float: right;
+    }
+    .closeBtn {
+        margin-top: calc(var(--settings-menu-spacing) + 2px);
+        margin-right: -4px;
+        padding-inline: 3px;
     }
 </style>

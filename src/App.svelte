@@ -86,7 +86,6 @@
     // fitView={true}
 
     let setDevices = (d: Devices) => (currentDevicesData = d)
-
     let currCircuitName = $state('')
 </script>
 
@@ -98,6 +97,7 @@
         {currCircuitName}
         setCanvas={setDevices}
     />
+    <CommandMenu {createCanvasDevice} />
     <TabMenu {clearDeviceData} {setDeviceData} />
 
     <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->

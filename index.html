@@ -52,15 +52,10 @@
                 console.log(fnStr)
 
                 // Patch the hardcoded path strings
-                fnStr = fnStr
-                    .replace(
-                        /var str_kitty_imgPath\s*=\s*"[^"]*";/,
-                        'var str_kitty_imgPath = "https://tetrageddon.com/straycat/straycat_images/";'
-                    )
-                    .replace(
-                        /var str_kitty_sndPath\s*=\s*"[^"]*";/,
-                        'var str_kitty_sndPath = "https://tetrageddon.com/straycat/straycat_audio/";'
-                    )
+                fnStr = fnStr.replace(
+                    /var str_kitty_imgPath\s*=\s*"[^"]*";/,
+                    'var str_kitty_imgPath = "https://tetrageddon.com/straycat/straycat_images/";'
+                )
 
                 // Redefine the function using the patched version
                 window.herekittykittykitty = new Function('return ' + fnStr)()
@@ -78,7 +73,7 @@
         <title>LogicAp</title>
     </head>
 
-    <body onload="herekittykittykitty('Furnando')">
+    <body>
         <div id="app"></div>
         <script type="module" src="/src/main.ts"></script>
     </body>
