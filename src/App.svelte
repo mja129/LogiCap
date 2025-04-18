@@ -85,20 +85,21 @@
     }
     // fitView={true}
 
+    let setDevices = (d: Devices) => (currentDevicesData = d)
 
-	let setDevices = (d: Devices) => (currentDevicesData = d)
-
-	let currCircuitName = $state("")
-
+    let currCircuitName = $state('')
 </script>
 
 <main id="logicap">
     <SettingsMenu />
     <SideMenu {createCanvasDevice} />
-	<SimMenu clearCanvas={clearDeviceData} currCircuitName = {currCircuitName} setCanvas = {setDevices}/>
+    <SimMenu
+        clearCanvas={clearDeviceData}
+        {currCircuitName}
+        setCanvas={setDevices}
+    />
     <TabMenu {clearDeviceData} {setDeviceData} />
 
-    <CommandMenu {createCanvasDevice} />
     <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->
     <Svelvet
         theme="LogiCap"
@@ -123,13 +124,6 @@
             />
         {/each}
     </Svelvet>
-	<div
-		style="position: absolute; top: 0; right:650px; width: 100px; z-index=100; ">
-		Circuit Name
-		<input bind:value={currCircuitName}/>
-	</div>
-	
-	
 </main>
 
 <style>

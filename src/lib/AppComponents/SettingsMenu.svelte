@@ -55,7 +55,7 @@
         border-width: 4px;
         border-radius: 999px;
         position: absolute;
-        background-color: transparent;
+        background-color: var(--lightblue);
         padding: var(--settings-menu-spacing);
         right: 10px;
         bottom: 10px;
@@ -68,12 +68,15 @@
         border-radius: 10px;
         padding: 10px;
         background: var(--lightblue);
+        width: 300px;
         z-index: 20;
-        width: 200px;
         position: absolute;
         top: 45%;
         left: calc(50% + 100px);
         transform: translate(-50%, -50%);
+    }
+    .modal h2 {
+        font-size: 2rem !important;
     }
     .modal div {
         display: flex;

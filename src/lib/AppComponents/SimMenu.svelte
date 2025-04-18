@@ -14,7 +14,6 @@
         updateTick,
         getRunning,
         getCurrTick,
-        resetCircuit,
     } from '@CircuitEngine'
 
     import UpdateGatesNextIcon from '~icons/streamline/button-fast-forward-2'
@@ -34,9 +33,8 @@
 
     let {
         clearCanvas,
-        currCircuitName,
         setCanvas,
-    }: { clearCanvas: Function; currCircuitName: string; setCanvas: Function;} =
+    }: { clearCanvas: Function; currCircuitName: string; setCanvas: Function } =
         $props()
 
     const simMenuModel: SimMenuModel = {
@@ -59,11 +57,6 @@
             Component: UpdateGatesNextIcon,
             styles: 'transform:scale(2.3);',
             width: 50,
-        },
-        resetState: {
-            Component: ResetStateIcon,
-            styles: 'transform:scale(2);',
-            width: 40,
         },
         save: {
             Component: SaveIcon,
@@ -134,16 +127,23 @@
     function circuitDownload(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
+        const currCircuitName = localStorage.getItem('currActiveTab')
+        if (!currCircuitName)
+            return (
+                console.log(
+                    'could not download because current active tab name is null'
+                ),
+                null
+            )
         downloadCircuit(currCircuitName)
     }
 
     async function circuitUpload(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
-        if(getRunning())
-        {
-            toggleRunSim()
-        }
+        // if (getRunning()) {
+        //     toggleRunSim()
+        // }
         await uploadCircuit()
         setCanvas($CircuitStore.devices)
     }
@@ -170,7 +170,7 @@
     onClickFn: Function,
     btnStyles: string = ''
 )}
-    <button style={btnStyles} onclick={() => onClickFn()} width={iconProps.width}>
+    <button style={btnStyles} onclick={() => onClickFn()}>
         {@render simIcon(iconProps)}
     </button>
 {/snippet}
@@ -203,12 +203,10 @@
     <span class="vl"></span>
     {@render simMenuBtn(simMenuModel['updateGatesNext'], updateGatesNext)}
 
-    <span class="vl"></span>
-    {@render simMenuBtn(simMenuModel['resetState'], resetCircuit)}
     <span style="margin-right: 7px" class="vl"></span>
     {@render simMenuBtn(simMenuModel['save'], circuitDownload)}
     {@render simMenuBtn(simMenuModel['load'], circuitUpload)}
-	<span style="margin-right: 7px" class="vl"></span>
+    <span style="margin-right: 7px" class="vl"></span>
     {@render simMenuBtn(simMenuModel['trash'], onTrash, 'margin-left: -6px')}
 </div>
 
