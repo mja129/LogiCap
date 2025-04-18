@@ -256,14 +256,13 @@
       padding: 4px 12px; /* Padding adjusts the "clickable" area */
       border-radius: 25px;
       cursor: pointer;
-      background-color: white;
-      border: none;
+      background-color: var(--lightblue);
+      border: 2px solid black;
       font-size: 14px; /* Adjust text size as needed */
       text-align: center; /* Keep text centered */
     }
     .tab-title:hover {
-      color: red;
-      background-color: black;
+      filter: brightness(90%);
     }
     .delete-btn {
       background: transparent;
