@@ -7,6 +7,8 @@
     import repeaterGate from '@assets/svg/repeater.svg'
     import type { logicGateTypes, singleIoLogicTypes } from '@CircuitModel'
     import { CircuitStore } from '@CircuitStore'
+    import { getViewbox, makeEmptySvgEle, parseSvg } from '@Util/parseSvg'
+    import { onMount } from 'svelte'
 
     type SingleLogicGateAnchors = 'in' | 'out'
     const singleIoGateAnchorOffests: Record<
@@ -34,15 +36,25 @@
         nodeId: string
     } = $props()
 
+    let circuitSvg = circuitSvgs[gateType as singleIoLogicTypes]
+    let circuitSvgEle: SVGElement = $state(makeEmptySvgEle())
+
+    onMount(() => {
+        // check if html element 'doc.documentElement' has
+        const parsedSvg = parseSvg(circuitSvg)
+        let svgViewbox: string = getViewbox(parsedSvg)
+
+        circuitSvgEle.setAttribute('viewBox', svgViewbox)
+        circuitSvgEle.setAttribute('width', width.toString())
+        circuitSvgEle.setAttribute('height', height.toString())
+        circuitSvgEle.innerHTML = parsedSvg.innerHTML
+    })
+
     // Define a new device
 </script>
 
-<img
-    src={circuitSvgs[gateType as singleIoLogicTypes]}
-    alt={`${gateType} logic gate`}
-    {width}
-    {height}
-/>
+<svg bind:this={circuitSvgEle} class="circuitSvgContainer"></svg>
+
 <SimulationNodeAnchor
     location={['left', 'mid']}
     id={nodeId}

@@ -11,23 +11,9 @@
     import norGate from '@assets/svg/norgate.svg'
     import xorGate from '@assets/svg/xorgate.svg'
     import xnorGate from '@assets/svg/xnorgate.svg'
+    import { onMount } from 'svelte'
+    import { getViewbox, makeEmptySvgEle, parseSvg } from '@Util/parseSvg'
     // import { transform } from 'custom_digitaljs'
-
-    type LogicGateAnchors = 'in1' | 'in2' | 'out'
-    const logicGateAnchorOffsets: Record<LogicGateAnchors, [number, number]> = {
-        in1: [-7.5, 68.5],
-        in2: [-7.5, 7.5],
-        out: [100, 37.58],
-    }
-
-    const circuitSvgs: Record<dualInputLogicTypes, string> = {
-        And: andGate,
-        Nand: nandGate,
-        Or: orGate,
-        Nor: norGate,
-        Xor: xorGate,
-        Xnor: xnorGate,
-    }
 
     let {
         width = 80,
@@ -41,8 +27,44 @@
         nodeId: string
     } = $props()
 
-    const circuitSvg = circuitSvgs[gateType as dualInputLogicTypes]
+    const logicGateAnchorOffsets: Record<LogicGateAnchors, [number, number]> = {
+        in1: [-7.5, 68.5],
+        in2: [-7.5, 7.5],
+        out: [100, 37.58],
+    }
 
+    type LogicGateAnchors = 'in1' | 'in2' | 'out'
+
+    const circuitSvgs: Record<dualInputLogicTypes, string> = {
+        And: andGate,
+        Nand: nandGate,
+        Or: orGate,
+        Nor: norGate,
+        Xor: xorGate,
+        Xnor: xnorGate,
+    }
+
+    // the svg image coorisponding to the 'gateType' passed in.
+    let circuitSvg = circuitSvgs[gateType as dualInputLogicTypes]
+    let circuitSvgEle: SVGElement = $state(makeEmptySvgEle())
+
+    // make the svgFile that we linked into an actual svg on the page as opposed to an image with an 'src={circuitSvgImport}' attribute
+    onMount(() => {
+        // check if html element 'doc.documentElement' has
+        const parsedSvg = parseSvg(circuitSvg)
+        let svgViewbox: string = getViewbox(parsedSvg)
+
+        circuitSvgEle.setAttribute('viewBox', svgViewbox)
+        circuitSvgEle.setAttribute('width', width.toString())
+        circuitSvgEle.setAttribute('height', height.toString())
+        circuitSvgEle.innerHTML = parsedSvg.innerHTML
+    })
+
+    // decodeSvgUrl already checks that the element is an svg so, we can safely cast and tell typescript to shut up
+
+    // this function is unused, should it be deleted
+    // it seems like functionality that should be in circuitStore.
+    // finding an output anchor via an inputAnchor.
     function findOutputAnchor(inputAnchorId: string) {
         let outputAnchorTuple: [string] | undefined
         // O(N*M) where N is number of output anchors
@@ -54,13 +76,13 @@
             get(CircuitStore).connectors[
                 fromAnchorId as outputAnchorName
             ].forEach(([inputNode, inputAnc]) => {
-                console.log(inputAnc)
+                // console.log(inputAnc)
                 if (inputAnc === inputAnchorId) {
                     outputAnchorTuple = [fromAnchorId.substring(4)]
                 }
             })
         }
-        console.log(outputAnchorTuple)
+        // console.log(outputAnchorTuple)
         return outputAnchorTuple
     }
 
@@ -68,7 +90,8 @@
 </script>
 
 <!-- Position property only works if cursor is set to false. -->
-<img src={circuitSvg} alt={`${gateType} logic gate`} {width} {height} />
+<!-- <circuitSvgElement /> -->
+<svg bind:this={circuitSvgEle} class="circuitSvgContainer"></svg>
 
 <SimulationNodeAnchor
     location={['left', 'bot']}

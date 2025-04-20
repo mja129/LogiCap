@@ -26,7 +26,7 @@
     import ButtonNode from '../Circuits/InputOutputNodes/ButtonNode.svelte'
     import LoadIcon from '~icons/lucide/upload'
 
-    type Icon = { Component: Component<any>; styles: string; width: number }
+    type Icon = { Component: Component<any>; width: number }
     type IconName = string
 
     type SimMenuModel = Record<IconName, Icon>
@@ -40,38 +40,31 @@
     const simMenuModel: SimMenuModel = {
         playTick: {
             Component: PlayTickIcon,
-            styles: 'transform:scale(1.8);',
             width: 40,
         },
         pauseTick: {
             Component: PauseTickIcon,
-            styles: 'transform:scale(1.8);',
             width: 40,
         },
         updateGates: {
             Component: UpdateGatesIcon,
-            styles: 'transform:scale(2);',
             width: 40,
         },
         updateGatesNext: {
             Component: UpdateGatesNextIcon,
-            styles: 'transform:scale(2.3);',
-            width: 50,
+            width: 40,
         },
         save: {
             Component: SaveIcon,
-            styles: 'transform:scale(2.4);',
-            width: 30,
+            width: 40,
         },
         trash: {
             Component: TrashIcon,
-            styles: 'transform:scale(2.69);',
-            width: 30,
+            width: 40,
         },
         load: {
             Component: LoadIcon,
-            styles: 'transform:scale(2.4);',
-            width: 30,
+            width: 40,
         },
     }
 
@@ -106,6 +99,7 @@
         })
     }
 
+    // button click functions
     function toggleRunSim(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
@@ -161,16 +155,16 @@
 </script>
 
 {#snippet simIcon({ ...iconProps })}
-    <iconProps.Component style={iconProps.styles} width={iconProps.width} />
+    <iconProps.Component style={iconProps.styles} width="30px" height="100%" />
 {/snippet}
 
-<!-- Render  -->
 {#snippet simMenuBtn(
     iconProps: Icon,
     onClickFn: Function,
+    tooltipTitle: string = 'tooltipTest',
     btnStyles: string = ''
 )}
-    <button style={btnStyles} onclick={() => onClickFn()}>
+    <button style={btnStyles} title={tooltipTitle} onclick={() => onClickFn()}>
         {@render simIcon(iconProps)}
     </button>
 {/snippet}
@@ -178,15 +172,17 @@
 {#snippet playPauseSection(simToggle: Function)}
     <button
         onclick={() => simToggle()}
-        style="display:flex;align-items: center;padding-block:1px;"
+        style="display:flex;align-items: center;padding-block:2px;"
+        title={getRunning() ? 'Pause Simulation' : 'Play Simulation'}
     >
-        <div style="margin-left: -8px">
+        <div style="margin-right:2px;transform:scale(0.85)">
             {#if getRunning()}
                 {@render simIcon(simMenuModel['pauseTick'])}
             {:else}
                 {@render simIcon(simMenuModel['playTick'])}
             {/if}
         </div>
+        <!-- box that shows the current tick -->
         <p
             style={getRunning() ? 'border-color:green' : 'border-color:red'}
             id="tickNumber"
@@ -196,36 +192,72 @@
     </button>
 {/snippet}
 
-<div class="menuRunButtons">
-    {@render playPauseSection(toggleRunSim)}
-    <span class="vl"></span>
-    {@render simMenuBtn(simMenuModel['updateGates'], updateGates)}
-    <span class="vl"></span>
-    {@render simMenuBtn(simMenuModel['updateGatesNext'], updateGatesNext)}
+<div class="floatingMenu">
+    <div class="menuRunButtons">
+        {@render playPauseSection(toggleRunSim)}
 
-    <span style="margin-right: 7px" class="vl"></span>
-    {@render simMenuBtn(simMenuModel['save'], circuitDownload)}
-    {@render simMenuBtn(simMenuModel['load'], circuitUpload)}
-    <span style="margin-right: 7px" class="vl"></span>
-    {@render simMenuBtn(simMenuModel['trash'], onTrash, 'margin-left: -6px')}
+        <span class="vl"></span>
+        {@render simMenuBtn(
+            simMenuModel['updateGates'],
+            updateGates,
+            'update gates'
+        )}
+        <span class="vl"></span>
+        {@render simMenuBtn(
+            simMenuModel['updateGatesNext'],
+            updateGatesNext,
+            'update gates next'
+        )}
+
+        <span class="vl"></span>
+        <!-- <span class="vl"></span> -->
+        {@render simMenuBtn(simMenuModel['trash'], onTrash, 'Clear Tab')}
+    </div>
+
+    <div class="editBtnSection">
+        {@render simMenuBtn(
+            simMenuModel['save'],
+            circuitDownload,
+            'download circuit json'
+        )}
+        <span class="vl" style="margin-block:4px"></span>
+        {@render simMenuBtn(
+            simMenuModel['load'],
+            circuitUpload,
+            'upload circuit json file'
+        )}
+    </div>
 </div>
 
 <style>
-    .menuRunButtons {
-        position: absolute;
-        /*    the side menu width should be 22.5% of the main app flexbox */
-        transform: scale(0.75);
-        left: calc(22.5% - 45px);
-        top: 2px;
-        z-index: 300;
+    .editBtnSection {
         display: flex;
+        justify-content: space-evenly;
+        margin-left: 10px;
+        padding-inline: 8px;
+        background-color: var(--lightblue);
+        border: 3px solid black;
+        border-radius: 5px;
+    }
+    .menuRunButtons {
+        display: flex;
+        justify-content: space-evenly;
         align-items: stretch;
         padding-inline: 5px;
-        padding-block: 0px;
-        justify-content: space-evenly;
         background-color: var(--lightblue);
         border-radius: 5px;
         border: 3px solid black;
+        padding-block: 4px;
+    }
+    .floatingMenu {
+        position: absolute;
+        /*    the side menu width should be 22.5% of the main app flexbox */
+        left: calc(22.5% + 10px);
+        top: 10px;
+        height: 40px;
+        z-index: 300;
+        display: flex;
+        justify-content: center;
     }
 
     .vl {
@@ -233,26 +265,25 @@
         border-radius: 4px;
         background-color: var(--lightblue);
         width: 5px;
-        margin-block: 4px;
+        margin-block: 0px;
+        margin-inline: 8px;
     }
     .menuRunButtons p {
         background-color: white;
         text-align: right;
         border: 3px solid black;
         border-radius: 5px;
-        font-size: 1.8rem;
+        font-size: 1.3rem;
         padding-inline: 5px;
-        min-width: 80px;
+        min-width: 60px;
         margin-block: 4px;
     }
-    .menuRunButtons button {
-        padding: 8px;
-        margin-inline: 0px;
-        max-height: 70px;
+    button {
+        /* padding: 8px; */
         border: none;
         background-color: var(--lightblue);
     }
-    :global(.menuRunButtons button:hover svg) {
+    :global(.floatingMenu button:hover svg) {
         color: red;
     }
 </style>

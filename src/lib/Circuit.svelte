@@ -118,3 +118,26 @@ of the different components now I just need to do it here -->
     <!-- Optional fallback -->
     <div>Unknown gate type: {gateType}</div>
 {/if}
+
+<style>
+    /* only for logic gates */
+    /* add outline and gray color on light mode */
+    /* warning, if you want to edit node properties directly, you should probably go into the svg files and set certain classes. 
+        otherwise the css will mess with some of the nodes.
+    */
+    /* if you want this css to not impact a certain node. I would put a specific class on that node and add a :not() pseudoselector to this css rule */
+    :global(.light .svelvet-node svg) {
+        /* to change the color from black to literally anything use the link below */
+        /* https://isotropic.co/tool/hex-color-to-css-filter/ */
+        /* filter: drop-shadow(-1px -1px 0px black) drop-shadow(1px -1px 0px black) */
+        /*     drop-shadow(1px 1px 0px black) drop-shadow(-1px 1px 0px black); */
+        /* white + black */
+        filter: drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white)
+            drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white)
+            drop-shadow(1px 0 0 black) drop-shadow(-1px 0 0 black)
+            drop-shadow(0 -1px 0 black) drop-shadow(0 1px 0 black);
+    }
+    :global(.dark .svelvet-node svg) {
+        filter: unset;
+    }
+</style>
