@@ -1,9 +1,10 @@
 <!-- I like doing this global store here because of the locality -->
 <script module lang="ts">
     import { writable, type Writable } from 'svelte/store'
+    console.log(localStorage.getItem('theme'))
     export let settingsStore: Writable<any> = writable({
         wireType: 'bezier',
-        theme: 'light',
+        theme: localStorage.getItem('theme') === 'dark' ? 'dark' : 'light',
     })
 </script>
 

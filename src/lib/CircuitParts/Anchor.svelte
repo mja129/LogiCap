@@ -69,6 +69,20 @@
             }
         }
     }
+
+    // when rotating an input anchor
+    // the connection will be lost
+    // the only way to retrieve is to full re-render the coorisponding output nodeConnect
+    // talk to another node that you know the name of
+    // tell its anchor to rerender
+    // message needs to be passed above circuit.svelte
+    // anchor checks if its name is in the message buffer, if its is, it rendenders and
+    // key getRotation() || inputJustRotated
+    const globalAnchorUpdateSignal = 'out_nodetype_nodeid'
+    $effect(() => {
+        if (globalAnchorUpdateSignal === 'this_node') {
+        }
+    })
 </script>
 
 <!--
@@ -80,20 +94,50 @@
 
 <!-- This property will automatically set the dragged anchor to the first available io that fits on the node you drag your mouse to -->
 <!-- nodeConnect={true} -->
-<div style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}>
-    <SvelvetAnchor
-        let:linked
-        let:hovering
-        let:connecting
-        id={anchorId}
-        key={anchorId}
-        direction={getDirection()}
-        input={(io === 'input' && true) || false}
-        output={(io === 'output' && true) || false}
-        locked={getRunning()}
-        {connections}
-    >
-        <CustomAnchor {io} {connecting} {linked} {anchorId} {hovering} />
-        <Wire initAncId={anchorId} slot="edge" />
-    </SvelvetAnchor>
-</div>
+{#if io === 'output'}
+    {#key getRotation()}
+        <div
+            style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}
+        >
+            <SvelvetAnchor
+                let:linked
+                let:hovering
+                let:connecting
+                id={anchorId}
+                key={anchorId}
+                direction={getDirection()}
+                input={(io === 'input' && true) || false}
+                output={(io === 'output' && true) || false}
+                locked={getRunning()}
+                {connections}
+            >
+                <CustomAnchor
+                    {io}
+                    {connecting}
+                    {linked}
+                    {anchorId}
+                    {hovering}
+                />
+                <Wire initAncId={anchorId} slot="edge" />
+            </SvelvetAnchor>
+        </div>
+    {/key}
+{:else if io === 'input'}
+    <div style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}>
+        <SvelvetAnchor
+            let:linked
+            let:hovering
+            let:connecting
+            id={anchorId}
+            key={anchorId}
+            direction={getDirection()}
+            input={(io === 'input' && true) || false}
+            output={(io === 'output' && true) || false}
+            locked={getRunning()}
+            {connections}
+        >
+            <CustomAnchor {io} {connecting} {linked} {anchorId} {hovering} />
+            <Wire initAncId={anchorId} slot="edge" />
+        </SvelvetAnchor>
+    </div>
+{/if}

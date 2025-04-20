@@ -176,8 +176,7 @@
 </script>
 
 <main>
-    <button on:click={toggleMenu} class="menu-toggle-button">Toggle Menu</button
-    >
+    <button on:click={toggleMenu} class="menu-toggle-button">CMD Menu</button>
 
     {#if isMenuOpen}
         {#key `${page}:${searchFlag}`}
@@ -248,7 +247,7 @@
         position: absolute;
         top: 7rem; /* Adjust to position it under the minimap */
         right: 0.5rem;
-        padding: 1px 19px;
+        padding: 1px 26px;
         background-color: lightblue;
         color: black;
         border-color: black;
