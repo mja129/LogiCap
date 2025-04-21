@@ -69,7 +69,7 @@ This project was designed and built by:
 
 MIT License (MIT)
 
-Copyright (c) 2011-2025 The Bootstrap Authors (replace with your project's copyright holders)
+Copyright (c) 2025 - Sean Shmulevich, Joseph Secosky, Mason McGinnis, Gabriel Schmidt
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
