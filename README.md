@@ -27,6 +27,7 @@ This project was designed and built by:
 - **TypeScript** - Programming language
 - **DigitalJS** (npm lib) - Logic gate simulation library ([GitHub](https://github.com/tilk/digitaljs))
 - **unplugin-icons** (npm lib) - Icon handling for Svelte ([GitHub](https://github.com/unplugin/unplugin-icons))
+- **Svelvet** (npm lib) - Canvas/Node/Edge drawing for Svelte ([GitHub](https://github.com/open-source-labs/Svelvet))
 
 ## Features
 
