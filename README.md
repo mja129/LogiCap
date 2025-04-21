@@ -1,10 +1,10 @@
 <table style="width: 100%; border: unset !important;">
   <tr>
     <td style="text-align: left;">
-      <img src="https://jmsjoseph.github.io/LogiCap/logicap.webp" style="width: 150px; margin-left: 10px;">
+      <img src="https://jmsjoseph.github.io/LogiCap/logicap.webp" style="width: 85px; margin-left: 10px;">
     </td>
-    <td style="text-align: left;">
-      <h1 style="text-decoration: none !important;">LogicAp</h1>
+    <td style="text-align: left;font-size:10rem">
+      <h1 style="text-decoration: none !important">LogicAp</h1>
     </td>
   </tr>
 </table>
