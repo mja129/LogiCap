@@ -181,7 +181,7 @@
 <!-- nodeConnect={true} -->
 <!-- key block triggers a full component rerender when the 'key' value changes-->
 {#if io === 'output'}
-    {#key outputUpdateTrigger && $rotation}
+    {#key outputUpdateTrigger || $rotation || direction}
         {@render anchor()}
     {/key}
 {:else}

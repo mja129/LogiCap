@@ -81,12 +81,12 @@
                 get(CircuitStore).connectors[
                     ('out_' + nodeId) as outputAnchorName
                 ]
-            if (outputConnections && outputConnections.length > 0) {
-                outputConnections.forEach(([_, inAnc]) => {
-                    // console.warn(inAnc)
-                    rerenderInputAnchorHack(inAnc)
-                })
-            }
+            // if (outputConnections && outputConnections.length > 0) {
+            //     outputConnections.forEach(([_, inAnc]) => {
+            //         // console.warn(inAnc)
+            //         rerenderInputAnchorHack(inAnc)
+            //     })
+            // }
         }
     })
 </script>
