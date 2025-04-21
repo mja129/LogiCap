@@ -1,11 +1,17 @@
-# LogicAp
+<table style="width: 100%; border: unset !important;">
+  <tr>
+    <td style="text-align: left;">
+      <h1 style="text-decoration: none !important;">LogicAp</h1>
+    </td>
+    <td style="text-align: left;">
+      <img src="https://jmsjoseph.github.io/LogiCap/logicap.webp" style="width: 50px; margin-left: 10px;">
+    </td>
+  </tr>
+</table>
 
-![LogicAp Logo](https://jmsjoseph.github.io/LogiCap/logicap.webp)
+![LogicAp image](https://jmsjoseph.github.io/LogiCap/metaImage.png)
 
 LogicAp is a fully functional logic simulator developed as part of the CS1980 course at the University of Pittsburgh in Spring 2025.
-
-## Why is it called LogicAp?
-The name *LogicAp* is derived from the combination of "Logic" and "App," highlighting its purpose as a logic simulation application designed to model and visualize circuits.
 
 ## Contributors
 
@@ -19,6 +25,9 @@ This project was designed and built by:
   - Full-stack, frontend-focused
 - **Gabriel Schmidt**  
   - Graphic Design
+
+## Why is it called LogicAp? 🤔
+The name *LogicAp* is derived from the combination of "Logic" and "Capstone," highlighting that this project started as our senior capstone project.
 
 ## Tech Stack
 
