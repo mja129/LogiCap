@@ -13,7 +13,7 @@
 
 LogicAp is a fully functional logic simulator developed as part of the CS1980 course at the University of Pittsburgh in Spring 2025.
 
-## Contributors
+## Contributors 🤝
 
 This project was designed and built by:
 
@@ -29,7 +29,7 @@ This project was designed and built by:
 ## Why is it called LogicAp? 🤔
 The name *LogicAp* is derived from the combination of "Logic" and "Capstone," highlighting that this project started as our senior capstone project.
 
-## Tech Stack
+## Tech Stack 🛠️
 
 - **Svelte** - UI framework
 - **Vite** - Build and bundle
@@ -38,29 +38,29 @@ The name *LogicAp* is derived from the combination of "Logic" and "Capstone," hi
 - **unplugin-icons** (npm lib) - Icon handling for Svelte ([GitHub](https://github.com/unplugin/unplugin-icons))
 - **Svelvet** (npm lib) - Canvas/Node/Edge drawing for Svelte ([GitHub](https://github.com/open-source-labs/Svelvet))
 
-## Features
+## Features ✨
 
 ### General Functionality
-- Offline functionality
-- Sync circuit with local storage to persist after reload
-- Save and load circuit as JSON
-- Tabs for organizing different circuits
+- Offline functionality 🌐
+- Sync circuit with local storage to persist after reload 💾
+- Save and load circuit as JSON 📂
+- Tabs for organizing different circuits 🗂️
 
 ### Circuit Manipulation
-- Manipulate wires
-- Drag and drop nodes onto the canvas
-- Rotate nodes and wires (NSEW)
-- Support for multiple wire types in one circuit
+- Manipulate wires 🔌
+- Drag and drop nodes onto the canvas 🖱️
+- Rotate nodes and wires (NSEW) 🔄
+- Support for multiple wire types in one circuit 🔗
 
 ### User Interface
-- Command menu for quick actions
-- MiniMap for easy navigation
-- Settings menu for customization
+- Command menu for quick actions ⌨️
+- MiniMap for easy navigation 🗺️
+- Settings menu for customization ⚙️
 
 ### Circuit Devices
-- Single Input/Output Logic Gates
-- Dual Input/Output Logic Gates
-- Lamp and Button components
+- Single Input/Output Logic Gates ➡️⬅️
+- Dual Input/Output Logic Gates 🔀
+- Lamp and Button components 💡🔘
 
 ## Future Features
 
@@ -71,11 +71,11 @@ The name *LogicAp* is derived from the combination of "Logic" and "Capstone," hi
 - Integrate Yosys to DigitalJS for outputting circuit representation in different formats ([Yosys2DigitalJS GitHub](https://github.com/tilk/yosys2digitaljs))
 - Add support for more types of logic gates
 
-## Architecture
+## Architecture 🏗️
 
 ![Architecture Diagram](./images/architecture.png)
 
-## License
+## License 📄
 
 MIT License (MIT)
 
