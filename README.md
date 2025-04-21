@@ -24,7 +24,6 @@ This project was designed and built by:
 - **Mason McGinnis**  
   - Full-stack, frontend-focused
 - **Gabriel Schmidt**  
-  - Graphic Design
 
 ## Why is it called LogicAp? 🤔
 The name *LogicAp* is derived from the combination of "Logic" and "Capstone," highlighting that this project started as our senior capstone project.
