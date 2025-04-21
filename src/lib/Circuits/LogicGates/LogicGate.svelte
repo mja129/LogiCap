@@ -65,27 +65,6 @@
     // this function is unused, should it be deleted
     // it seems like functionality that should be in circuitStore.
     // finding an output anchor via an inputAnchor.
-    function findOutputAnchor(inputAnchorId: string) {
-        let outputAnchorTuple: [string] | undefined
-        // O(N*M) where N is number of output anchors
-        // and M is the number of connections per output anchor
-        // this could be faster.
-        for (const fromAnchorId in get(CircuitStore).connectors) {
-            // Filter out any connections that match the `toAnchorId`
-            // This logic would also remove duplicates, could be good or bad.
-            get(CircuitStore).connectors[
-                fromAnchorId as outputAnchorName
-            ].forEach(([inputNode, inputAnc]) => {
-                // console.log(inputAnc)
-                if (inputAnc === inputAnchorId) {
-                    outputAnchorTuple = [fromAnchorId.substring(4)]
-                }
-            })
-        }
-        // console.log(outputAnchorTuple)
-        return outputAnchorTuple
-    }
-
     // $inspect($savedConnections).with(console.log)
 </script>
 

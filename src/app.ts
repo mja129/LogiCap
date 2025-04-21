@@ -1,7 +1,5 @@
 const DEVMODE = import.meta.env.DEV
 
-console.log("IS DEVMODE: "+DEVMODE)
-
 // at what percentage of 10! (10 factorial) do we start to worry about hash collisions
 export function generateNonce(length: number = 10): string {
     const charset =

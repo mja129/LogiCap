@@ -1,9 +1,16 @@
+<script lang="ts" module>
+    import { writable, type Writable } from 'svelte/store'
+
+    export let signalQ: Writable<Array<string>> = writable([])
+</script>
+
 <script lang="ts">
-    import { Anchor as SvelvetAnchor } from 'svelvet'
+    import { Anchor as SvelvetAnchor, type Direction } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     import Wire from './Wire.svelte'
     import { getRunning } from '@CircuitEngine'
     import { getContext } from 'svelte'
+    import { findOutputAnchor } from '@CircuitStore'
 
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -42,33 +49,38 @@
         portName = 'out'
     }
     const anchorId = `${portName}_${id}`
-    const getRotation: () => number = getContext('rotation')
+    const rotation: Writable<number> = getContext('rotation')
+    const rotationNode: Writable<string> = getContext('rotationNode')
+    const hasRotated: Writable<boolean> = getContext('hasRotated')
 
-    function getDirection() {
+    console.log($hasRotated)
+
+    function getDirection(rotation: number) {
         if (location[0] === 'left') {
-            if (getRotation() === 0) {
+            if (rotation === 0) {
                 return 'west'
             }
-            if (getRotation() === 90) {
+            if (rotation === 90) {
                 return 'north'
-            } else if (getRotation() === 180) {
+            } else if (rotation === 180) {
                 return 'east'
-            } else if (getRotation() === 270) {
+            } else if (rotation === 270) {
                 return 'south'
             }
         } else {
-            if (getRotation() === 0) {
+            if (rotation === 0) {
                 return 'east'
             }
-            if (getRotation() === 90) {
+            if (rotation === 90) {
                 return 'south'
-            } else if (getRotation() === 180) {
+            } else if (rotation === 180) {
                 return 'west'
-            } else if (getRotation() === 270) {
+            } else if (rotation === 270) {
                 return 'north'
             }
         }
     }
+    let direction = $derived(getDirection($rotation))
 
     // when rotating an input anchor
     // the connection will be lost
@@ -78,11 +90,65 @@
     // message needs to be passed above circuit.svelte
     // anchor checks if its name is in the message buffer, if its is, it rendenders and
     // key getRotation() || inputJustRotated
-    const globalAnchorUpdateSignal = 'out_nodetype_nodeid'
+
+    // if any linked input gets rotated
+    // its output must be relinked
+    // you can have 1 output going into both inputs
+    // you can have 2 outputs to 2 inputs
+    // you can have only 1 connected
+    // you can have none of them connected
+
+    // so if I listen on the anchor level its a bit racey
+    // and I might need to trigger two output rerenders
+    // so make a global event q
+
+    let outputUpdateTrigger = $state(false)
+
+    // an output anchor, this is important for rotations
+    let linkedToInput: outputAnchorName | '' | undefined = ''
+
+    // if you rotate a linked input anchor you need to do some convoluted stuff to get the output anchor to rerender.
     $effect(() => {
-        if (globalAnchorUpdateSignal === 'this_node') {
+        // if ($signalQ.includes(linkedToInput as string)) {
+        //     linkedToInput = ''
+        //     return
+        // }
+
+        if (id === $rotationNode && $hasRotated) {
+            if ($rotation || $rotation === 0) {
+                if (io === 'input') {
+                    linkedToInput = findOutputAnchor(anchorId)
+                    // console.log(linkedToInput)
+
+                    // the input anchor is unlinked "likely".
+                    if (linkedToInput === undefined) {
+                        console.log('didnt send signal')
+                        linkedToInput = ''
+                        return
+                    }
+
+                    signalQ.update((currQ) => {
+                        return [...currQ, linkedToInput as string]
+                    })
+                    console.log('signal sent')
+                }
+                // search $circuitStore.connections for the 1 or 2 corrisponding outputs
+                // add to a globalStoreQueue
+                // if io
+            }
+        }
+
+        if (io === 'output' && $signalQ.includes(anchorId)) {
+            console.log('consume signal')
+            // console.log($signalQ)
+            outputUpdateTrigger = !outputUpdateTrigger
+            // signal was handled
+            signalQ.update((currQ) => {
+                return currQ.filter((id) => id !== anchorId)
+            })
         }
     })
+    console.log(io + '' + connections)
 </script>
 
 <!--
@@ -92,37 +158,7 @@
     within the outermost scope of this component
 -->
 
-<!-- This property will automatically set the dragged anchor to the first available io that fits on the node you drag your mouse to -->
-<!-- nodeConnect={true} -->
-{#if io === 'output'}
-    {#key getRotation()}
-        <div
-            style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}
-        >
-            <SvelvetAnchor
-                let:linked
-                let:hovering
-                let:connecting
-                id={anchorId}
-                key={anchorId}
-                direction={getDirection()}
-                input={(io === 'input' && true) || false}
-                output={(io === 'output' && true) || false}
-                locked={getRunning()}
-                {connections}
-            >
-                <CustomAnchor
-                    {io}
-                    {connecting}
-                    {linked}
-                    {anchorId}
-                    {hovering}
-                />
-                <Wire initAncId={anchorId} slot="edge" />
-            </SvelvetAnchor>
-        </div>
-    {/key}
-{:else if io === 'input'}
+{#snippet anchor()}
     <div style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}>
         <SvelvetAnchor
             let:linked
@@ -130,9 +166,9 @@
             let:connecting
             id={anchorId}
             key={anchorId}
-            direction={getDirection()}
-            input={(io === 'input' && true) || false}
+            direction={direction as Direction}
             output={(io === 'output' && true) || false}
+            input={(io === 'input' && true) || false}
             locked={getRunning()}
             {connections}
         >
@@ -140,4 +176,16 @@
             <Wire initAncId={anchorId} slot="edge" />
         </SvelvetAnchor>
     </div>
+{/snippet}
+<!-- This property will automatically set the dragged anchor to the first available io that fits on the node you drag your mouse to -->
+<!-- nodeConnect={true} -->
+<!-- key block triggers a full component rerender when the 'key' value changes-->
+{#if io === 'output'}
+    {#key outputUpdateTrigger && $rotation}
+        {@render anchor()}
+    {/key}
+{:else}
+    {#key $rotation}
+        {@render anchor()}
+    {/key}
 {/if}

@@ -9,7 +9,7 @@
         type allNodeTypes,
     } from '@CircuitModel'
     import { rejectMoveClick } from './Util/cursors'
-    import { get } from 'svelte/store'
+    import { get, writable, type Writable } from 'svelte/store'
 
     import { CircuitStore } from '@CircuitStore'
     import { getRunning } from './circuitEngine.svelte'
@@ -35,10 +35,12 @@
     // Use $derived for reactive value
     // do I even need this derived? Nah
     let nodeComponent = $derived(getComponent(gateType))
-    let rotation: number = $state(0)
-    const getRotation: () => number = () => {
-        return rotation
-    }
+
+    // this is a writable store but not global state.
+    // passed down to the anchors using the 'useContext api'
+    let rotation: Writable<number> = writable(0)
+    let rotatedNodeName: Writable<string> = writable(nodeId)
+    let hasRotated: Writable<boolean> = writable(false)
 
     const nodeAction = (e: MouseEvent) => {
         const clickedEle = e.target as HTMLElement
@@ -53,17 +55,20 @@
                 'not a part of the node to preform a node action, in this case "rotate" '
             )
         } else {
-            rotation = (rotation + 90) % 360
+            $rotation = ($rotation + 90) % 360
         }
     }
-    setContext('rotation', getRotation)
     // #TODO tell the nodes NSEW. when changing direction
     // this solution is better. just need to fine tune it a bit.
     // its hacky but our data persists, vs with a {key } block we have rerender
+    setContext('rotation', rotation)
+    setContext('rotationNode', rotatedNodeName)
+    setContext('hasRotated', hasRotated)
+
     $effect(() => {
         // this if statement is weird bc effect is weird.
         // this code will run whenever rotation changes.
-        if (rotation || rotation === 0) {
+        if ($rotation || $rotation === 0) {
             if (nodeId.startsWith('Lamp')) {
                 rerenderInputAnchorHack('in_' + nodeId)
                 return
@@ -101,10 +106,11 @@ of the different components now I just need to do it here -->
         <div
             onmousedown={(e: MouseEvent) => {
                 if (!getRunning()) {
+                    $hasRotated = true
                     rejectMoveClick(e, nodeAction)
                 }
             }}
-            style="transform:rotate({rotation}deg)"
+            style="transform:rotate({$rotation}deg)"
         >
             <MyComponent {nodeId} {...nodeProps} />
         </div>

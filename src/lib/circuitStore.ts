@@ -105,6 +105,28 @@ type NodeInfoList = {
     position: { x: number; y: number }
 }[]
 
+// this function could be associated with the circuit store object
+export function findOutputAnchor(inputAnchorId: string) {
+    let outputAnchorId: outputAnchorName | undefined
+    // O(N*M) where N is number of output anchors
+    // and M is the number of connections per output anchor
+    // this could be faster.
+    for (const fromAnchorId in get(CircuitStore).connectors) {
+        // Filter out any connections that match the `toAnchorId`
+        // This logic would also remove duplicates, could be good or bad.
+        get(CircuitStore).connectors[
+            fromAnchorId as outputAnchorName
+        ].forEach(([inputNode, inputAnc]) => {
+            // console.log(inputAnc)
+            if (inputAnc === inputAnchorId) {
+                outputAnchorId = fromAnchorId as outputAnchorName
+            }
+        })
+    }
+    // console.log(outputAnchorTuple)
+    return outputAnchorId
+}
+
 // SAVE RELATED CODE //
 
 // filters the svelvet library store for the data that we need.
