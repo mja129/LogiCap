@@ -9,7 +9,7 @@
     }: { clearDeviceData: Function; setDeviceData: Function } = $props()
 
     const initTab = localStorage.getItem('currActiveTab') || 'init_circuit'
-    let currentTab = $state(initTab)
+    let currentTab: string = $state(initTab)
 
     let activeTabList = $state(
         (localStorage.getItem('activeTabList') &&
@@ -17,6 +17,8 @@
             initTab,
         ]
     )
+    // map 'circuitName' to 'transform: translate(x1_px x2_px) scale(x)'
+    let tabCameraPositions: Record<string, string> = $state({})
 
     // variables for incline renaming
     let editingTab = $state<string | null>(null)
@@ -35,16 +37,29 @@
         }
         localStorage.setItem(currentTab, newSave)
     }
+    function getCameraData() {
+        const graphWrapper: HTMLElement | null = document?.querySelector(
+            'div.svelvet-graph-wrapper'
+        )
+        if (!graphWrapper) return null
+
+        const { transform } = graphWrapper.style
+        return transform
+    }
+    // switches tab
     async function handleTabClick(tabName: string) {
         // saveCircuit()
-        if (editingTab === tabName) return
         if (currentTab === tabName) {
             return null
         }
 
         // save circuit to get the current positions saved.
         await backupTab(currentTab)
+        const oldTabCamera: string | null = getCameraData()
+        if (!oldTabCamera) return
+        tabCameraPositions[currentTab] = oldTabCamera
 
+        // clear the current circuit on the screen
         clearDeviceData()
         CircuitStore.reset()
 
@@ -57,6 +72,7 @@
             localStorage.setItem(tabName, loadedCircuit)
         }
 
+        const getCircuitPos = () => {}
         // load the tab into circuitStore
         localStorage.setItem('circuitStoreSave', loadedCircuit)
         // load circuitStore into $CircuitStore
@@ -67,7 +83,6 @@
 
         // sideEffects
         currentTab = tabName
-        localStorage.setItem('currActiveTab', tabName)
     }
     function makeNewTab() {
         // // Sort activeTabList
@@ -259,16 +274,16 @@
         flex: none; /* Prevent the tabs from shrinking */
     }
     .tab-title {
-      padding: 4px 12px; /* Padding adjusts the "clickable" area */
-      border-radius: 25px;
-      cursor: pointer;
-      background-color: var(--lightblue);
-      border: 2px solid black;
-      font-size: 14px; /* Adjust text size as needed */
-      text-align: center; /* Keep text centered */
+        padding: 4px 12px; /* Padding adjusts the "clickable" area */
+        border-radius: 25px;
+        cursor: pointer;
+        background-color: var(--lightblue);
+        border: 2px solid black;
+        font-size: 14px; /* Adjust text size as needed */
+        text-align: center; /* Keep text centered */
     }
     .tab-title:hover {
-      filter: brightness(90%);
+        filter: brightness(90%);
     }
     .delete-btn {
         background: transparent;

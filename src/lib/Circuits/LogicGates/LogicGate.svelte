@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { get } from 'svelte/store'
+    import { get, type Writable } from 'svelte/store'
 
     import { CircuitStore } from '@CircuitStore'
     import type { dualInputLogicTypes, logicGateTypes } from '@CircuitModel'
@@ -11,7 +11,7 @@
     import norGate from '@assets/svg/norgate.svg'
     import xorGate from '@assets/svg/xorgate.svg'
     import xnorGate from '@assets/svg/xnorgate.svg'
-    import { onMount } from 'svelte'
+    import { getContext, onMount } from 'svelte'
     import { getViewbox, makeEmptySvgEle, parseSvg } from '@Util/parseSvg'
     // import { transform } from 'custom_digitaljs'
 
@@ -66,6 +66,8 @@
     // it seems like functionality that should be in circuitStore.
     // finding an output anchor via an inputAnchor.
     // $inspect($savedConnections).with(console.log)
+
+    let rotation: Writable<number> = getContext('rotation')
 </script>
 
 <!-- Position property only works if cursor is set to false. -->

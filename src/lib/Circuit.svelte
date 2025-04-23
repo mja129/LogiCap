@@ -1,3 +1,10 @@
+<script lang="ts" module>
+    export let signalQ: Writable<Array<string>> = writable([])
+    // export let signalQ: Writable<
+    //     Array<[outputAnchorName, Record<string, boolean>]>
+    // > = writable([])
+</script>
+
 <script lang="ts">
     import { Node } from 'svelvet'
     import { rerenderInputAnchorHack } from '@src/lib/Util/cursors'
@@ -11,7 +18,7 @@
     import { rejectMoveClick } from './Util/cursors'
     import { get, writable, type Writable } from 'svelte/store'
 
-    import { CircuitStore } from '@CircuitStore'
+    import { CircuitStore, findOutputAnchor } from '@CircuitStore'
     import { getRunning } from './circuitEngine.svelte'
 
     // props that all nodes have in common.
@@ -40,7 +47,7 @@
     // passed down to the anchors using the 'useContext api'
     let rotation: Writable<number> = writable(0)
     let rotatedNodeName: Writable<string> = writable(nodeId)
-    let hasRotated: Writable<boolean> = writable(false)
+    let outputUpdate: Writable<boolean> = writable(false)
 
     const nodeAction = (e: MouseEvent) => {
         const clickedEle = e.target as HTMLElement
@@ -63,7 +70,7 @@
     // its hacky but our data persists, vs with a {key } block we have rerender
     setContext('rotation', rotation)
     setContext('rotationNode', rotatedNodeName)
-    setContext('hasRotated', hasRotated)
+    setContext('outputUpdate', outputUpdate)
 
     $effect(() => {
         // this if statement is weird bc effect is weird.
@@ -81,6 +88,11 @@
                 get(CircuitStore).connectors[
                     ('out_' + nodeId) as outputAnchorName
                 ]
+            // if this is an input, trigger 0,2 output nodes to rerender
+            // push the output node names into
+
+            // console.log(linkedToOutput_2?.substring(4), linkedToOutput_1)
+
             // if (outputConnections && outputConnections.length > 0) {
             //     outputConnections.forEach(([_, inAnc]) => {
             //         // console.warn(inAnc)
@@ -106,9 +118,27 @@ of the different components now I just need to do it here -->
         <div
             onmousedown={(e: MouseEvent) => {
                 if (!getRunning()) {
-                    $hasRotated = true
+                    // $hasRotated = true
                     rejectMoveClick(e, nodeAction)
                 }
+
+                const linkedToOutput_1 = findOutputAnchor('in1_' + nodeId)
+                const linkedToOutput_2 = findOutputAnchor('in2_' + nodeId)
+
+                if (linkedToOutput_1) {
+                    signalQ.update((curr) => {
+                        curr.push(linkedToOutput_1)
+                        return curr
+                    })
+                }
+
+                if (linkedToOutput_2) {
+                    signalQ.update((curr) => {
+                        curr.push(linkedToOutput_2)
+                        return curr
+                    })
+                }
+                console.log($signalQ)
             }}
             style="transform:rotate({$rotation}deg)"
         >

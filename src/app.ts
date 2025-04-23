@@ -23,17 +23,21 @@ export function captureCurrentZoom() {
 
     const { transform } = graphWrapper.style
 
-    const regex = /scale\((.+)\)/;
-    const match = transform.match(regex);
-
-    if (!match || !match[1]) return (console.warn('scale property not found on graph-wrapper'), null)
-
-    // first regex capture group (after 0th)
-    const scaleValue: number = parseFloat(match[1])
-
-    if (isNaN(scaleValue)) {
-        throw new Error('Scale value is not a valid integer.')
+    const getZoom = (transform: string) => {
+        const regex = /scale\((.+)\)/;
+        const match = transform.match(regex);
+        if (!match || !match[1]) return (console.warn('scale property not found on graph-wrapper'), null)
+        const scaleValue: number = parseFloat(match[1])
+        if (isNaN(scaleValue)) {
+            throw new Error('Scale value is not a valid integer.')
+        }
+        return scaleValue
     }
+
+    const scaleValue = getZoom(transform)
+    if (!scaleValue) return
+    // first regex capture group (after 0th)
+
 
     localStorage.setItem('SavedScale', scaleValue.toString())
 }

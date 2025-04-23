@@ -66,7 +66,7 @@
                         // create the element for the first time
 
                         // This function is injected into the code via, index.html
-                        //@ts-ignore
+                        // @ts-ignore
                         herekittykittykitty('Furnando')
                         hasKitty = true
                     }

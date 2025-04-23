@@ -1,16 +1,11 @@
-<script lang="ts" module>
-    import { writable, type Writable } from 'svelte/store'
-
-    export let signalQ: Writable<Array<string>> = writable([])
-</script>
-
 <script lang="ts">
     import { Anchor as SvelvetAnchor, type Direction } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
     import Wire from './Wire.svelte'
     import { getRunning } from '@CircuitEngine'
-    import { getContext } from 'svelte'
-    import { findOutputAnchor } from '@CircuitStore'
+    import { getContext, onMount } from 'svelte'
+    import { signalQ } from '@src/lib/Circuit.svelte'
+    import { get, type Writable } from 'svelte/store'
 
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -50,10 +45,9 @@
     }
     const anchorId = `${portName}_${id}`
     const rotation: Writable<number> = getContext('rotation')
-    const rotationNode: Writable<string> = getContext('rotationNode')
-    const hasRotated: Writable<boolean> = getContext('hasRotated')
-
-    console.log($hasRotated)
+    let customDirection: string | undefined = $state()
+    // const rotationNode: Writable<string> = getContext('rotationNode')
+    // const hasRotated: Writable<boolean> = getContext('hasRotated')
 
     function getDirection(rotation: number) {
         if (location[0] === 'left') {
@@ -102,53 +96,58 @@
     // and I might need to trigger two output rerenders
     // so make a global event q
 
-    let outputUpdateTrigger = $state(false)
+    let updateTrigger = $state(false)
 
     // an output anchor, this is important for rotations
     let linkedToInput: outputAnchorName | '' | undefined = ''
 
     // if you rotate a linked input anchor you need to do some convoluted stuff to get the output anchor to rerender.
-    $effect(() => {
-        // if ($signalQ.includes(linkedToInput as string)) {
-        //     linkedToInput = ''
-        //     return
-        // }
+    // console.log(io + '' + connections + '' + id)
+    // $inspect($signalQ).with(console.warn)
+    let isProcessing = false
 
-        if (id === $rotationNode && $hasRotated) {
-            if ($rotation || $rotation === 0) {
-                if (io === 'input') {
-                    linkedToInput = findOutputAnchor(anchorId)
-                    // console.log(linkedToInput)
+    function handleMouseUp() {
+        const queue = get(signalQ)
+        if (queue.includes(anchorId) && !isProcessing) {
+            isProcessing = true
 
-                    // the input anchor is unlinked "likely".
-                    if (linkedToInput === undefined) {
-                        console.log('didnt send signal')
-                        linkedToInput = ''
-                        return
-                    }
-
-                    signalQ.update((currQ) => {
-                        return [...currQ, linkedToInput as string]
-                    })
-                    console.log('signal sent')
-                }
-                // search $circuitStore.connections for the 1 or 2 corrisponding outputs
-                // add to a globalStoreQueue
-                // if io
-            }
+            // Delay the trigger slightly, as before
+            setTimeout(() => {
+                updateTrigger = !updateTrigger
+                signalQ.update((currQ) => {
+                    // push the associated input
+                    // currQ.push()
+                    return currQ.filter((signal) => signal !== anchorId)
+                })
+                isProcessing = false
+            }, 10)
         }
+    }
 
-        if (io === 'output' && $signalQ.includes(anchorId)) {
-            console.log('consume signal')
-            // console.log($signalQ)
-            outputUpdateTrigger = !outputUpdateTrigger
-            // signal was handled
-            signalQ.update((currQ) => {
-                return currQ.filter((id) => id !== anchorId)
-            })
+    onMount(() => {
+        window.addEventListener('mouseup', handleMouseUp)
+
+        return () => {
+            window.removeEventListener('mouseup', handleMouseUp)
         }
     })
-    console.log(io + '' + connections)
+
+    $inspect(direction).with(console.log)
+    // $effect(() => {
+    //     // update inputs
+    //     if ($signalQ.includes(anchorId) && !isProcessing) {
+    //         isProcessing = true
+    //         // I think some other rerenders need to be triggered before this should happen and therefore I have the set timeout.
+    //
+    //         setTimeout(() => {
+    //             outputUpdateTrigger = !outputUpdateTrigger
+    //             $signalQ = $signalQ.filter((nodeId) => nodeId !== anchorId)
+    //             isProcessing = false
+    //         }, 300)
+    //     }
+    // })
+    let rotateCursorActive = false
+    let manualTrigger = $state(false)
 </script>
 
 <!--
@@ -159,14 +158,24 @@
 -->
 
 {#snippet anchor()}
-    <div style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+        onclick={(e: MouseEvent) => {
+            if (rotateCursorActive) {
+                e.stopPropagation()
+            }
+        }}
+        style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}
+    >
         <SvelvetAnchor
             let:linked
             let:hovering
             let:connecting
             id={anchorId}
             key={anchorId}
-            direction={direction as Direction}
+            direction={(customDirection as Direction) ||
+                (direction as Direction)}
             output={(io === 'output' && true) || false}
             input={(io === 'input' && true) || false}
             locked={getRunning()}
@@ -180,12 +189,17 @@
 <!-- This property will automatically set the dragged anchor to the first available io that fits on the node you drag your mouse to -->
 <!-- nodeConnect={true} -->
 <!-- key block triggers a full component rerender when the 'key' value changes-->
-{#if io === 'output'}
-    {#key outputUpdateTrigger || $rotation || direction}
+
+<!-- {#key direction} -->
+<!--     {@render anchor()} -->
+<!-- {/key} -->
+
+{#key $rotation}
+    {#if io === 'input'}
         {@render anchor()}
-    {/key}
-{:else}
-    {#key $rotation}
-        {@render anchor()}
-    {/key}
-{/if}
+    {:else}
+        {#key updateTrigger}
+            {@render anchor()}
+        {/key}
+    {/if}
+{/key}
