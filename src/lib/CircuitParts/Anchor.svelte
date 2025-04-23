@@ -1,3 +1,10 @@
+<script lang="ts" module>
+    export let anchorSignalQ: Writable<Array<string>> = writable([])
+    // export let signalQ: Writable<
+    //     Array<[outputAnchorName, Record<string, boolean>]>
+    // > = writable([])
+</script>
+
 <script lang="ts">
     import { Anchor as SvelvetAnchor, type Direction } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
@@ -5,7 +12,8 @@
     import { getRunning } from '@CircuitEngine'
     import { getContext, onMount } from 'svelte'
     import { signalQ } from '@src/lib/Circuit.svelte'
-    import { get, type Writable } from 'svelte/store'
+    import { get, writable, type Writable } from 'svelte/store'
+    import { findOutputAnchor } from '../circuitStore'
 
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationX = 'left' | 'right' | 'center'
@@ -45,7 +53,10 @@
     }
     const anchorId = `${portName}_${id}`
     const rotation: Writable<number> = getContext('rotation')
-    let customDirection: string | undefined = $state()
+
+    // number that represents the current rotation of the wire relative to the anchor
+    // NSEW
+    let customDirection: number | undefined = $state()
     // const rotationNode: Writable<string> = getContext('rotationNode')
     // const hasRotated: Writable<boolean> = getContext('hasRotated')
 
@@ -98,20 +109,22 @@
 
     let updateTrigger = $state(false)
 
+    // gets remotly flipped by input anchors, causes out anchor to renrender when rotating wires around the anchors. (NSEW)
+    let wirePosTrigger = $state(false)
+
     // an output anchor, this is important for rotations
-    let linkedToInput: outputAnchorName | '' | undefined = ''
 
     // if you rotate a linked input anchor you need to do some convoluted stuff to get the output anchor to rerender.
     // console.log(io + '' + connections + '' + id)
     // $inspect($signalQ).with(console.warn)
     let isProcessing = false
 
-    function handleMouseUp() {
-        const queue = get(signalQ)
-        if (queue.includes(anchorId) && !isProcessing) {
+    // listen for a global mouse up event, to consume the queue, and cause
+    // output rerender when something happens to its coorisponding input node.
+    function consumeQupdate() {
+        if ($signalQ.includes(anchorId) && !isProcessing) {
             isProcessing = true
-
-            // Delay the trigger slightly, as before
+            // so this timeout is basically black magic
             setTimeout(() => {
                 updateTrigger = !updateTrigger
                 signalQ.update((currQ) => {
@@ -120,34 +133,59 @@
                     return currQ.filter((signal) => signal !== anchorId)
                 })
                 isProcessing = false
-            }, 10)
+            }, 1)
         }
+    }
+    function handleNodeRotate(e: MouseEvent) {
+        // console.log('global mouse up ')
+
+        consumeQupdate()
+        // Delay the trigger slightly, as before
     }
 
     onMount(() => {
-        window.addEventListener('mouseup', handleMouseUp)
+        window.addEventListener('mouseup', handleNodeRotate, {
+            capture: true,
+        })
+        // if (rotateCursorActive) {
+        //     window.addEventListener('mousedown', handleAnchorRotate, {
+        //         capture: true,
+        //     })
+        // }
 
         return () => {
-            window.removeEventListener('mouseup', handleMouseUp)
+            window.removeEventListener('mouseup', handleNodeRotate, {
+                capture: true,
+            })
+            // if (rotateCursorActive) {
+            //     window.removeEventListener('mousedown', handleAnchorRotate, {
+            //         capture: true,
+            //     })
+            // }
         }
     })
+    $inspect(customDirection).with(console.log)
+    let rotateCursorActive = true
+    // we can only have this effect if we didn't just change rotation
+    $effect(() => {
+        if ($anchorSignalQ.includes(anchorId)) {
+            // console.log('tried to consume from wire rotate' + anchorId)
+            updateTrigger = !updateTrigger
 
-    $inspect(direction).with(console.log)
-    // $effect(() => {
-    //     // update inputs
-    //     if ($signalQ.includes(anchorId) && !isProcessing) {
-    //         isProcessing = true
-    //         // I think some other rerenders need to be triggered before this should happen and therefore I have the set timeout.
-    //
-    //         setTimeout(() => {
-    //             outputUpdateTrigger = !outputUpdateTrigger
-    //             $signalQ = $signalQ.filter((nodeId) => nodeId !== anchorId)
-    //             isProcessing = false
-    //         }, 300)
-    //     }
-    // })
-    let rotateCursorActive = false
-    let manualTrigger = $state(false)
+            anchorSignalQ.update((currQ) => {
+                // push the associated input
+                // currQ.push()
+                return currQ.filter((signal) => signal !== anchorId)
+            })
+
+            if (!customDirection) {
+                console.log('NOT CUSTOM DIR')
+                customDirection = ($rotation + 90) % 360
+            } else {
+                customDirection = (customDirection + 90) % 360
+            }
+        }
+    })
 </script>
 
 <!--
@@ -160,10 +198,37 @@
 {#snippet anchor()}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- <button onclick={() => (customDirection = customDirection)}>{io}</button> -->
     <div
-        onclick={(e: MouseEvent) => {
+        onmousedowncapture={(e: MouseEvent) => {
+            e.preventDefault()
             if (rotateCursorActive) {
                 e.stopPropagation()
+                if (io === 'input') {
+                    const outputAnchorId = findOutputAnchor(anchorId)
+                    console.log(outputAnchorId)
+                    if (!outputAnchorId)
+                        return console.log('no linking found'), null
+                    if ($anchorSignalQ.includes(outputAnchorId))
+                        return (
+                            console.warn(
+                                'output id already exists in the signalQ'
+                            ),
+                            null
+                        )
+                    anchorSignalQ.update((curr) => [...curr, outputAnchorId])
+                }
+
+                // start with default value based off current position
+                // then move the value independently of the rotation of the node
+                if (!customDirection) {
+                    console.log('NOT CUSTOM DIR')
+                    customDirection = ($rotation + 90) % 360
+                } else {
+                    customDirection = (customDirection + 90) % 360
+                }
+                customDirection = customDirection
+                // console.log($anchorSignalQ, customDirection)
             }
         }}
         style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}
@@ -174,7 +239,8 @@
             let:connecting
             id={anchorId}
             key={anchorId}
-            direction={(customDirection as Direction) ||
+            direction={(customDirection &&
+                (getDirection(customDirection) as Direction)) ||
                 (direction as Direction)}
             output={(io === 'output' && true) || false}
             input={(io === 'input' && true) || false}
@@ -194,7 +260,7 @@
 <!--     {@render anchor()} -->
 <!-- {/key} -->
 
-{#key $rotation}
+{#key $rotation || customDirection}
     {#if io === 'input'}
         {@render anchor()}
     {:else}

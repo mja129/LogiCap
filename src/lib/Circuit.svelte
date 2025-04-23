@@ -75,31 +75,31 @@
     $effect(() => {
         // this if statement is weird bc effect is weird.
         // this code will run whenever rotation changes.
-        if ($rotation || $rotation === 0) {
-            if (nodeId.startsWith('Lamp')) {
-                rerenderInputAnchorHack('in_' + nodeId)
-                return
-            }
-
-            rerenderInputAnchorHack('out_' + nodeId)
-            rerenderInputAnchorHack('in1_' + nodeId)
-            rerenderInputAnchorHack('in2_' + nodeId)
-            const outputConnections =
-                get(CircuitStore).connectors[
-                    ('out_' + nodeId) as outputAnchorName
-                ]
-            // if this is an input, trigger 0,2 output nodes to rerender
-            // push the output node names into
-
-            // console.log(linkedToOutput_2?.substring(4), linkedToOutput_1)
-
-            // if (outputConnections && outputConnections.length > 0) {
-            //     outputConnections.forEach(([_, inAnc]) => {
-            //         // console.warn(inAnc)
-            //         rerenderInputAnchorHack(inAnc)
-            //     })
-            // }
-        }
+        // if ($rotation || $rotation === 0) {
+        //     if (nodeId.startsWith('Lamp')) {
+        //         rerenderInputAnchorHack('in_' + nodeId)
+        //         return
+        //     }
+        //
+        //     rerenderInputAnchorHack('out_' + nodeId)
+        //     rerenderInputAnchorHack('in1_' + nodeId)
+        //     rerenderInputAnchorHack('in2_' + nodeId)
+        //     const outputConnections =
+        //         get(CircuitStore).connectors[
+        //             ('out_' + nodeId) as outputAnchorName
+        //         ]
+        //     // if this is an input, trigger 0,2 output nodes to rerender
+        //     // push the output node names into
+        //
+        //     // console.log(linkedToOutput_2?.substring(4), linkedToOutput_1)
+        //
+        //     // if (outputConnections && outputConnections.length > 0) {
+        //     //     outputConnections.forEach(([_, inAnc]) => {
+        //     //         // console.warn(inAnc)
+        //     //         rerenderInputAnchorHack(inAnc)
+        //     //     })
+        //     // }
+        // }
     })
 </script>
 
@@ -116,29 +116,46 @@ of the different components now I just need to do it here -->
         id={nodeId}
     >
         <div
-            onmousedown={(e: MouseEvent) => {
+            onmousedowncapture={(e: MouseEvent) => {
                 if (!getRunning()) {
                     // $hasRotated = true
+                    // e.stopPropagation()
                     rejectMoveClick(e, nodeAction)
-                }
+                    // we should pass down anchor names on a node
 
-                const linkedToOutput_1 = findOutputAnchor('in1_' + nodeId)
-                const linkedToOutput_2 = findOutputAnchor('in2_' + nodeId)
+                    // NSEW rerendering signal send to (output) anchors from other nodes
+                    let anchors = [
+                        findOutputAnchor(`in1_${nodeId}`),
+                        findOutputAnchor(`in2_${nodeId}`),
+                    ].filter(Boolean) as string[]
 
-                if (linkedToOutput_1) {
-                    signalQ.update((curr) => {
-                        curr.push(linkedToOutput_1)
-                        return curr
-                    })
-                }
+                    // if ((!e.target) instanceof Element) return
 
-                if (linkedToOutput_2) {
-                    signalQ.update((curr) => {
-                        curr.push(linkedToOutput_2)
-                        return curr
-                    })
+                    // const clickedAnchorClass = [...e.target?.classList].find(
+                    //     (className) =>
+                    //         (className.startsWith('in') ||
+                    //             className.startsWith('out')) &&
+                    //         className.includes('_') &&
+                    //         className !== 'input' &&
+                    //         className !== 'output'
+                    // )
+                    // if (!clickedAnchorClass) return null
+
+                    // console.log(gateType)
+                    if (
+                        gateType === 'Lamp' ||
+                        gateType === 'Repeater' ||
+                        gateType === 'Not'
+                    ) {
+                        anchors = [findOutputAnchor(`in_${nodeId}`)].filter(
+                            Boolean
+                        ) as string[]
+                    }
+
+                    signalQ.update((curr) => [...curr, ...anchors])
+
+                    // console.log($signalQ)
                 }
-                console.log($signalQ)
             }}
             style="transform:rotate({$rotation}deg)"
         >
