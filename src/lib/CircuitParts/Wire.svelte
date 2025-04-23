@@ -7,6 +7,11 @@
     // probably with the inverted mapping I keep talking about.
     type WireSaveData = Record<WireId, WireType>
     let wireSaveData: Writable<WireSaveData> = writable({})
+    // save a few connections after deleting, mainly the most recent one, so
+    // that you can toggle a connection without it reverting to the default value
+    let deletedWireCache: Writable<Array<[WireId, WireType]> | []> = writable(
+        []
+    )
 </script>
 
 <script lang="ts">
@@ -19,6 +24,7 @@
         onWireChange,
         findWireInEngine,
     } from '@CircuitEngine'
+    import { CircuitStore } from '@CircuitStore'
 
     import { setAnchor, getWireIdFromDOM, setLamp } from './wireUtils.ts'
     import { createDragWire } from './manipulateWire.ts'
@@ -29,7 +35,7 @@
     let wireId: string = $state('')
 
     import { settingsStore } from '@AppComponents/SettingsMenu.svelte'
-    import { onMount } from 'svelte'
+    import { onDestroy, onMount } from 'svelte'
 
     let {
         initAncId,
@@ -43,12 +49,57 @@
     // Cache the wire type.
     // once a wire type is created once it will always be that type of wire unless edited with the cursor tool
     $inspect(wireId).with(console.log)
+
+    onDestroy(() => {
+        if (
+            wireId !== '' &&
+            !wireId.includes('cursor') &&
+            wireId in $wireSaveData
+        ) {
+            // const deletedWireType = structuredClone($wireSaveData[wireId])
+
+            wireSaveData.update((currData) => {
+                delete currData[wireId]
+                return currData
+            })
+
+            const cachedIds: string[] = $deletedWireCache.map(
+                ([id, type]) => id
+            )
+            if (cachedIds.includes(wireId)) return
+
+            $deletedWireCache = [[wireId, wireType], ...$deletedWireCache]
+
+            if ($deletedWireCache.length > 2) {
+                deletedWireCache.update((currCache) => {
+                    currCache.pop()
+                    return currCache
+                })
+            }
+            console.log()
+        }
+    })
     $effect(() => {
         if (wireId !== '') {
             // console.warn('WIREIDNOTNULL: ' + wireId)
+            // const inputId = wireId.split('-')[1]
             if (!(wireId in $wireSaveData)) {
-                $wireSaveData[wireId] = $settingsStore.wireType
+                let savedType: string | undefined
+                $deletedWireCache.forEach(([delId, delType]) => {
+                    if (wireId === delId) {
+                        savedType = delType
+                        return
+                    }
+                })
+                if (savedType) {
+                    console.warn('HIT cache')
+                    $wireSaveData[wireId] = savedType
+                } else {
+                    console.warn('HIT default store')
+                    $wireSaveData[wireId] = $settingsStore.wireType
+                }
             }
+            // bezier, strait, or step
             wireType = $wireSaveData[wireId]
         }
     })
