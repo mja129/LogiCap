@@ -1,12 +1,13 @@
-<!-- <script module lang="ts"> -->
-<!--     import { writable, type Writable } from 'svelte/store' -->
-<!--     type AnchorId = string -->
-<!--     type WireType = string -->
-<!--     // how do I avoid having these for input and outputs? -->
-<!--     // probably with the inverted mapping I keep talking about. -->
-<!--     type WireSaveData = Record<AnchorId, WireType> -->
-<!--     let wireSaveData: Writable<WireSaveData> = writable({}) -->
-<!-- </script> -->
+<script module lang="ts">
+    import { writable, type Writable } from 'svelte/store'
+    // out_Or_qBoVfe501f-in2_Xnor_OhSTyJtjsm
+    type WireId = string
+    type WireType = string
+    // how do I avoid having these for input and outputs?
+    // probably with the inverted mapping I keep talking about.
+    type WireSaveData = Record<WireId, WireType>
+    let wireSaveData: Writable<WireSaveData> = writable({})
+</script>
 
 <script lang="ts">
     import { Edge } from 'svelvet'
@@ -28,6 +29,7 @@
     let wireId: string = $state('')
 
     import { settingsStore } from '@AppComponents/SettingsMenu.svelte'
+    import { onMount } from 'svelte'
 
     let {
         initAncId,
@@ -40,12 +42,16 @@
     // $inspect($wireSaveData).with(console.log)
     // Cache the wire type.
     // once a wire type is created once it will always be that type of wire unless edited with the cursor tool
-    // onMount(() => {
-    //     if (!(initAncId in $wireSaveData)) {
-    //         $wireSaveData[initAncId] = $settingsStore.wireType
-    //     }
-    //     wireType = $wireSaveData[initAncId]
-    // })
+    $inspect(wireId).with(console.log)
+    $effect(() => {
+        if (wireId !== '') {
+            // console.warn('WIREIDNOTNULL: ' + wireId)
+            if (!(wireId in $wireSaveData)) {
+                $wireSaveData[wireId] = $settingsStore.wireType
+            }
+            wireType = $wireSaveData[wireId]
+        }
+    })
 
     function monitorWire(
         newId: string | null,

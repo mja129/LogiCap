@@ -122,6 +122,20 @@
     // listen for a global mouse up event, to consume the queue, and cause
     // output rerender when something happens to its coorisponding input node.
     function consumeQupdate() {
+        console.log('tried consume mouseup')
+        if ($anchorSignalQ.includes(anchorId)) {
+            // console.log('tried to consume from wire rotate' + anchorId)
+
+            console.log('anchor rotate consume')
+            setTimeout(() => {
+                updateTrigger = !updateTrigger
+                anchorSignalQ.update((currQ) => {
+                    // push the associated input
+                    // currQ.push()
+                    return currQ.filter((signal) => signal !== anchorId)
+                })
+            }, 300)
+        }
         if ($signalQ.includes(anchorId) && !isProcessing) {
             isProcessing = true
             // so this timeout is basically black magic
@@ -165,27 +179,9 @@
         }
     })
     $inspect(customDirection).with(console.log)
-    let rotateCursorActive = true
+    let rotateCursorActive = false
     // we can only have this effect if we didn't just change rotation
-    $effect(() => {
-        if ($anchorSignalQ.includes(anchorId)) {
-            // console.log('tried to consume from wire rotate' + anchorId)
-            updateTrigger = !updateTrigger
-
-            anchorSignalQ.update((currQ) => {
-                // push the associated input
-                // currQ.push()
-                return currQ.filter((signal) => signal !== anchorId)
-            })
-
-            if (!customDirection) {
-                console.log('NOT CUSTOM DIR')
-                customDirection = ($rotation + 90) % 360
-            } else {
-                customDirection = (customDirection + 90) % 360
-            }
-        }
-    })
+    $effect(() => {})
 </script>
 
 <!--
@@ -204,25 +200,11 @@
             e.preventDefault()
             if (rotateCursorActive) {
                 e.stopPropagation()
-                if (io === 'input') {
-                    const outputAnchorId = findOutputAnchor(anchorId)
-                    console.log(outputAnchorId)
-                    if (!outputAnchorId)
-                        return console.log('no linking found'), null
-                    if ($anchorSignalQ.includes(outputAnchorId))
-                        return (
-                            console.warn(
-                                'output id already exists in the signalQ'
-                            ),
-                            null
-                        )
-                    anchorSignalQ.update((curr) => [...curr, outputAnchorId])
-                }
 
                 // start with default value based off current position
                 // then move the value independently of the rotation of the node
                 if (!customDirection) {
-                    console.log('NOT CUSTOM DIR')
+                    // console.log('NOT CUSTOM DIR')
                     customDirection = ($rotation + 90) % 360
                 } else {
                     customDirection = (customDirection + 90) % 360
