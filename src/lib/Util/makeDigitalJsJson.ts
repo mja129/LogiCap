@@ -11,6 +11,7 @@ function makeLamp(
         inputs: number
         outputs: number
         position?: { x: number; y: number }
+        rotation?: number
     }
 ): Lamp {
     return {
@@ -27,6 +28,9 @@ function makeLamp(
                 y: options.position.y,
             },
         }),
+        ...(options?.rotation && {
+            rotation: options.rotation
+        }),
     }
 }
 
@@ -37,6 +41,7 @@ function makeButton(
         net?: string
         label?: string
         position?: { x: number; y: number }
+        rotation?: number
     }
 ): Button {
     return {
@@ -50,13 +55,16 @@ function makeButton(
                 y: options.position.y,
             },
         }),
+        ...(options?.rotation && {
+            rotation: options.rotation
+        }),
     }
 }
 
 function makeLogicNode(
     type: string,
     nodeName: string,
-    options?: { position?: { x: number; y: number } }
+    options?: { position?: { x: number; y: number }, rotation?: number }
 ): LogicGate {
     return {
         type,
@@ -67,6 +75,9 @@ function makeLogicNode(
                 x: options.position.x,
                 y: options.position.y,
             },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
         }),
     }
 }

@@ -20,6 +20,7 @@ const createCircuitStore = (): CircuitStoreType => {
         devices: {},
         connectors: {},
         subcircuits: {},
+        wireManipulations: {},
     }
     const { subscribe, set, update } = writable<Circuit>(initialCircuit)
 
@@ -33,6 +34,7 @@ const createCircuitStore = (): CircuitStoreType => {
                     devices: {},
                     connectors: {},
                     subcircuits: {},
+                    wireManipulations: {},
                 }
             }),
         addConnection: (fromId: outputAnchorName, toId: inputAnchorName) => {

@@ -46,6 +46,7 @@
         // All three of these ways work
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
+        console.log('remount')
         initialScale = parseFloat(localStorage.getItem('SavedScale') || '1')
 
         loadCircuit() // load circuit from LS into CircuitStore,

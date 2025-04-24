@@ -8,7 +8,8 @@ type Button = {
     position?: {
         x: number
         y: number
-    }
+    },
+    rotation?: number
 }
 
 type Lamp = {
@@ -22,7 +23,8 @@ type Lamp = {
     position?: {
         x: number
         y: number
-    }
+    },
+    rotation?: number
 }
 
 type LogicGate = {
@@ -32,7 +34,8 @@ type LogicGate = {
     position?: {
         x: number
         y: number
-    }
+    },
+    rotation?: number
 }
 
 type Device = Button | Lamp | LogicGate
@@ -85,11 +88,13 @@ type ConnectionList = Array<ConnectionTuple>
 // DIGITAL JS Circuit Input Json Type
 // Device manifest
 // Connection manifest
+type WireType = string
 type SvelvetConnectors = Record<outputAnchorName, ConnectionList>
 type Circuit = {
     devices: Devices
     connectors: SvelvetConnectors
     subcircuits: Record<string, Subcircuit>
+    wireManipulations: Record<string, WireType>
 }
 
 type DefaultCircuit = {

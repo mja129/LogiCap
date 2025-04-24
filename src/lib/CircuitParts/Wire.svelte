@@ -6,11 +6,13 @@
     // how do I avoid having these for input and outputs?
     // probably with the inverted mapping I keep talking about.
     type WireSaveData = Record<WireId, WireType>
+
     let wireSaveData: Writable<WireSaveData> = writable({})
     let lastDel: Writable<{ type: string; id: string }> = writable({
         type: '',
         id: '',
     })
+
     export let handleDisconnect: Writable<boolean> = writable(false)
     // save a few connections after deleting, mainly the most recent one, so
     // that you can toggle a connection without it reverting to the default value
@@ -46,6 +48,15 @@
         initAncId: string
         wireType?: string
     } = $props()
+
+    // keep track of length, this is more computation than necessary
+    // map works too map has .size
+    // set to save data on mount.
+    // this is what links to local storage
+    if (Object.keys($wireSaveData).length === 0) {
+        $wireSaveData = $CircuitStore.wireManipulations
+        $wireSaveData = $wireSaveData
+    }
 
     // $inspect($wireSaveData).with(console.log)
     // Cache the wire type.
@@ -213,6 +224,11 @@
             (digitalJsCircuit !== null && getMonitor(digitalJsCircuit)) ||
             (() => null)
         monitorFn()
+    })
+
+    wireSaveData.subscribe((newSaveData) => {
+        $CircuitStore.wireManipulations = newSaveData
+        $CircuitStore = $CircuitStore
     })
 
     // used for finding the html element with the connectionID

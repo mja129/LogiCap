@@ -45,7 +45,10 @@
 
     // this is a writable store but not global state.
     // passed down to the anchors using the 'useContext api'
-    let rotation: Writable<number> = writable(0)
+    // take the value from the store if it exists.
+    let rotation: Writable<number> = writable(
+        $CircuitStore.devices[nodeId].rotation || 0
+    )
     let rotatedNodeName: Writable<string> = writable(nodeId)
     let outputUpdate: Writable<boolean> = writable(false)
 
@@ -63,6 +66,12 @@
             )
         } else {
             $rotation = ($rotation + 90) % 360
+
+            // this should be very impossible
+            if (!(nodeId in $CircuitStore.devices)) return null
+
+            $CircuitStore.devices[nodeId].rotation = $rotation
+            $CircuitStore = $CircuitStore
         }
     }
     // #TODO tell the nodes NSEW. when changing direction
