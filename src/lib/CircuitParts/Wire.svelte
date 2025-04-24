@@ -65,13 +65,13 @@
             console.log('destory')
             console.log(initAncId)
 
-            // lastDelType.update(() => wireType)
+            lastDelType.update(() => wireType)
 
-            const cachedIds: string[] = $deletedWireCache.map(
-                ([id, type]) => id
-            )
-
-            if (cachedIds.includes(wireId)) return
+            // const cachedIds: string[] = $deletedWireCache.map(
+            //     ([id, type]) => id
+            // )
+            //
+            // if (cachedIds.includes(wireId)) return
 
             wireSaveData.update((currData) => {
                 delete currData[wireId]
@@ -79,7 +79,7 @@
             })
 
             // last destroyed input and its type
-            // lastDelType.update(() => wireType + '|' + wireId.split('-')[1])
+            // lastDelType.update(() => wireType)
 
             $deletedWireCache = [[wireId, wireType], ...$deletedWireCache]
 
@@ -98,32 +98,34 @@
             const inputId = wireId.split('-')[1]
 
             if (!(wireId in $wireSaveData)) {
+                if ($lastDelType !== '' && $handleDisconnect === false) {
+                    $wireSaveData[wireId] = $lastDelType
+                    wireType = $wireSaveData[wireId]
+                    $lastDelType = ''
+                    return
+                }
                 // the cache is okay for now but this is better
-                // if ($lastDelType !== '') {
-                //     $wireSaveData[wireId] = $settingsStore.wireType
-                //     wireType = $wireSaveData[wireId]
-                //     $lastDelType = ''
-                //     return
-                // }
-                let savedType: string | undefined
-                $deletedWireCache.forEach(([delId, delType]) => {
-                    if (wireId === delId) {
-                        savedType = delType
-                        return
-                    }
-                })
+                // We are about to drop a connecting that we just picked up from an input and caused a disconnect
+                // the next wire to be created should be of this type, if its type already exists overwrite it
+                // let savedType: string | undefined
+                // $deletedWireCache.forEach(([delId, delType]) => {
+                //     if (wireId === delId) {
+                //         savedType = delType
+                //         return
+                //     }
+                // })
                 // if (savedType) {
                 //     $wireSaveData[wireId] = savedType
                 // } else {
                 // }
-                $wireSaveData[wireId] = savedType || $settingsStore.wireType
+                $wireSaveData[wireId] = $settingsStore.wireType
                 console.warn('HIT default store')
             }
             wireType = $wireSaveData[wireId]
             // bezier, strait, or step
             // when you update a node
-        } else if (wireId.includes('cursor')) {
-            // console.log('Includes cursor: ' + wireType)
+        } else {
+            // wire id is in save data but we still use lastDelType
         }
     })
 
