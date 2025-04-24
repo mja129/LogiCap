@@ -2,6 +2,7 @@
     import { getRunning } from '@CircuitEngine'
     import { findAnchorTargetClassName, attemptLink } from './linkAnchors'
     import { CircuitStore } from '@CircuitStore'
+    import { handleDisconnect } from './Wire.svelte'
 
     let {
         linked,
@@ -71,6 +72,7 @@
             // Stack order removeConnection(anchorId)
             // now tell the connecting outputnode who you are
             CircuitStore.removeConnection(anchorId)
+            $handleDisconnect = true
             // reverse mapping.
         }
     }}

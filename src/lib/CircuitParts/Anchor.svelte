@@ -122,11 +122,11 @@
     // listen for a global mouse up event, to consume the queue, and cause
     // output rerender when something happens to its coorisponding input node.
     function consumeQupdate() {
-        console.log('tried consume mouseup')
+        // console.log('tried consume mouseup')
         if ($anchorSignalQ.includes(anchorId)) {
             // console.log('tried to consume from wire rotate' + anchorId)
 
-            console.log('anchor rotate consume')
+            // console.log('anchor rotate consume')
             setTimeout(() => {
                 updateTrigger = !updateTrigger
                 anchorSignalQ.update((currQ) => {
@@ -178,7 +178,7 @@
             // }
         }
     })
-    $inspect(customDirection).with(console.log)
+    // $inspect(customDirection).with(console.log)
     let rotateCursorActive = false
     // we can only have this effect if we didn't just change rotation
     $effect(() => {})

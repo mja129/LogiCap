@@ -58,7 +58,7 @@ function pushConnectionToCircuitStore(sourceClass: string, destClass: string) {
     // dest is output if THIS port is an input port
     const { fromOutputId, toInputId } = matchAnchors(sourceClass, destClass)
     // addLinking(<outputAnchorName>fromOutputId, <inputAnchorName>toInputId)
-    console.log("adding connection", fromOutputId, toInputId)
+    // console.log("adding connection", fromOutputId, toInputId)
     CircuitStore.addConnection(fromOutputId as outputAnchorName, toInputId as inputAnchorName)
 
     return makeWireId(fromOutputId, toInputId)

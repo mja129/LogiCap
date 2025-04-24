@@ -7,6 +7,8 @@
     // probably with the inverted mapping I keep talking about.
     type WireSaveData = Record<WireId, WireType>
     let wireSaveData: Writable<WireSaveData> = writable({})
+    let lastDelType: Writable<string> = writable('')
+    export let handleDisconnect: Writable<boolean> = writable(false)
     // save a few connections after deleting, mainly the most recent one, so
     // that you can toggle a connection without it reverting to the default value
     let deletedWireCache: Writable<Array<[WireId, WireType]> | []> = writable(
@@ -48,25 +50,36 @@
     // $inspect($wireSaveData).with(console.log)
     // Cache the wire type.
     // once a wire type is created once it will always be that type of wire unless edited with the cursor tool
-    $inspect(wireId).with(console.log)
+    // $inspect($lastDelType).with(console.log)
 
     onDestroy(() => {
+        // make sure that wire types persist correctly
+        // remove when input linking is removed.
         if (
+            $handleDisconnect &&
             wireId !== '' &&
             !wireId.includes('cursor') &&
             wireId in $wireSaveData
         ) {
             // const deletedWireType = structuredClone($wireSaveData[wireId])
+            console.log('destory')
+            console.log(initAncId)
+
+            // lastDelType.update(() => wireType)
+
+            const cachedIds: string[] = $deletedWireCache.map(
+                ([id, type]) => id
+            )
+
+            if (cachedIds.includes(wireId)) return
 
             wireSaveData.update((currData) => {
                 delete currData[wireId]
                 return currData
             })
 
-            const cachedIds: string[] = $deletedWireCache.map(
-                ([id, type]) => id
-            )
-            if (cachedIds.includes(wireId)) return
+            // last destroyed input and its type
+            // lastDelType.update(() => wireType + '|' + wireId.split('-')[1])
 
             $deletedWireCache = [[wireId, wireType], ...$deletedWireCache]
 
@@ -76,14 +89,22 @@
                     return currCache
                 })
             }
-            console.log()
+            $handleDisconnect = false
         }
     })
     $effect(() => {
-        if (wireId !== '') {
+        if (wireId !== '' && !wireId.includes('cursor')) {
             // console.warn('WIREIDNOTNULL: ' + wireId)
-            // const inputId = wireId.split('-')[1]
+            const inputId = wireId.split('-')[1]
+
             if (!(wireId in $wireSaveData)) {
+                // the cache is okay for now but this is better
+                // if ($lastDelType !== '') {
+                //     $wireSaveData[wireId] = $settingsStore.wireType
+                //     wireType = $wireSaveData[wireId]
+                //     $lastDelType = ''
+                //     return
+                // }
                 let savedType: string | undefined
                 $deletedWireCache.forEach(([delId, delType]) => {
                     if (wireId === delId) {
@@ -91,16 +112,18 @@
                         return
                     }
                 })
-                if (savedType) {
-                    console.warn('HIT cache')
-                    $wireSaveData[wireId] = savedType
-                } else {
-                    console.warn('HIT default store')
-                    $wireSaveData[wireId] = $settingsStore.wireType
-                }
+                // if (savedType) {
+                //     $wireSaveData[wireId] = savedType
+                // } else {
+                // }
+                $wireSaveData[wireId] = savedType || $settingsStore.wireType
+                console.warn('HIT default store')
             }
-            // bezier, strait, or step
             wireType = $wireSaveData[wireId]
+            // bezier, strait, or step
+            // when you update a node
+        } else if (wireId.includes('cursor')) {
+            // console.log('Includes cursor: ' + wireType)
         }
     })
 
@@ -116,7 +139,7 @@
 
         const wireConnecting: boolean = newId.includes('cursor')
 
-        wireConnecting && console.log('Connecting wire mounted')
+        // wireConnecting && console.log('Connecting wire mounted')
 
         if (wireConnecting) return null // don't create listeners for connecting wires
 
