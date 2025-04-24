@@ -66,12 +66,23 @@
             $lastDel.type = ''
             $lastDel.id = ''
             $lastDel = $lastDel
+            if (disableTapUpdate) {
+                wireSaveData.update((currData) => {
+                    delete currData[wireId]
+                    return currData
+                })
+            }
         }
         // remove yourself
         window.removeEventListener('mouseup', handleMouseUp, {
             capture: true,
         })
     }
+    // you must fully drop anchors to get the wireType change to the global settings type
+    // settings option
+    let disableTapUpdate = false
+    let disableInputCarryType = false
+
     onDestroy(async () => {
         // make sure that wire types persist correctly
         // remove when input linking is removed.
@@ -87,22 +98,25 @@
 
             window.addEventListener('mouseup', handleMouseUp, { capture: true })
 
-            wireSaveData.update((currData) => {
-                delete currData[wireId]
-                return currData
-            })
+            if (!disableTapUpdate) {
+                wireSaveData.update((currData) => {
+                    delete currData[wireId]
+                    return currData
+                })
+            }
 
             $handleDisconnect = false
         }
     })
-    let saveWireOption = false
     $effect(() => {
         if (wireId !== '' && !wireId.includes('cursor')) {
             // console.warn('WIREIDNOTNULL: ' + wireId)
 
             if (!(wireId in $wireSaveData)) {
                 if ($lastDel.type !== '' && $handleDisconnect === false) {
-                    $wireSaveData[wireId] = $lastDel.type
+                    $wireSaveData[wireId] = disableInputCarryType
+                        ? $settingsStore.wireType
+                        : $lastDel.type
                     wireType = $wireSaveData[wireId]
 
                     wireSaveData.update((currData) => {
