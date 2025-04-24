@@ -91,8 +91,10 @@
     }
     // you must fully drop anchors to get the wireType change to the global settings type
     // settings option
+
+    // these are also good defaults
     let disableTapUpdate = false
-    let disableInputCarryType = false
+    let disableCarryType = false
 
     onDestroy(async () => {
         // make sure that wire types persist correctly
@@ -125,7 +127,7 @@
 
             if (!(wireId in $wireSaveData)) {
                 if ($lastDel.type !== '' && $handleDisconnect === false) {
-                    $wireSaveData[wireId] = disableInputCarryType
+                    $wireSaveData[wireId] = disableCarryType
                         ? $settingsStore.wireType
                         : $lastDel.type
                     wireType = $wireSaveData[wireId]
@@ -226,6 +228,8 @@
         monitorFn()
     })
 
+    // TODO, refactor this so that it happens when save/sync/tabswitch happen.
+    // it doesn't need to be this often.
     wireSaveData.subscribe((newSaveData) => {
         $CircuitStore.wireManipulations = newSaveData
         $CircuitStore = $CircuitStore

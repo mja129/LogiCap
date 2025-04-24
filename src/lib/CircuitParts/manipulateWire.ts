@@ -1,3 +1,5 @@
+// set circuitStore manipulationStore, when you stop moving it
+// save the manipulation points and pass them in
 import { getDOMParent } from './wireUtils.ts'
 interface Point {
     x: number
@@ -14,6 +16,7 @@ const manipulationElementClassNames = [
     '#controlPoint2'
 ];
 
+// get the elements, that are a part of a manipulation
 const manipulationElementNames = manipulationElementClassNames.map(className => className.substring(1));
 
 /**
@@ -158,7 +161,7 @@ export function createControlPointCircle(
  * @param d The 'd' attribute string.
  * @returns An object with points p0, p1, p2, p3, or null if parsing fails.
  */
-function parseCubicBezierD(
+export function parseCubicBezierD(
     d: string | null
 ): { p0: Point; p1: Point; p2: Point; p3: Point } | null {
     // Added check for null or empty string
@@ -221,6 +224,17 @@ function parseCubicBezierD(
  * @returns True if initialization was successful, false otherwise.
  */
 
+export function hasTools(svg: SVGPathElement): boolean {
+    const domParent = getDOMParent(svg);
+
+    if (!domParent) throw new Error('Wire is not god');
+    
+    return (manipulationElementClassNames.find(className => {
+        const element = domParent.querySelector(className) as SVGElement;
+        return element && element.style?.display !== "none";
+    }) && true) || false;
+}
+
 export function toolsOn(svg: SVGPathElement) {
     const domParent = getDOMParent(svg);
 
@@ -233,6 +247,7 @@ export function toolsOn(svg: SVGPathElement) {
         }
     })
 }
+
 export function toolsOff(svg: SVGPathElement) {
     const domParent = getDOMParent(svg);
 
@@ -259,7 +274,7 @@ export function toggleManipulationTools(svg: SVGPathElement) {
 }
 
 
-export function createDragWire(svg: SVGPathElement, pathUpdate: string = "") {
+export function createDragWire(svg: SVGPathElement, stoppedEditingCallback: Function, pathUpdate: string = "") {
     // const svg: HTMLElement | null = document.getElementById(wireId)
     // const startPoint = document.getElementById('startPoint')
     // const endPoint = document.getElementById('endPoint')
@@ -275,26 +290,26 @@ export function createDragWire(svg: SVGPathElement, pathUpdate: string = "") {
 
     if (!initPoints) return console.log('unable to parse path'), null
 
-    if (updatePoints) {
-        // console.info(`P0-DIFF +${initPoints.p0.x-updatePoints}, ${initPoints.p0.x}`)
-        // console.info(`p0-X: +${updatePoints.p0.x}, ${initPoints.p0.x}`)
-        // console.info(`p3-X:+${updatePoints.p3.x}, ${initPoints.p3.x}`)
-        //
-        // console.info(`p0-Y: +${updatePoints.p0.y}, ${initPoints.p0.y}`)
-        // console.info(`p3-Y:+${updatePoints.p3.y}, ${initPoints.p3.y}`)
-        //
-        //  console.info(updatePoints.p3.x, initPoints.p3.x )
-        const vectorP0 = {
-            x: updatePoints.p0.x - initPoints.p0.x,
-            y: updatePoints.p0.y - initPoints.p0.y
-        };
-
-        const vectorP1 = {
-            x: updatePoints.p1.x - initPoints.p1.x,
-            y: updatePoints.p1.y - initPoints.p1.y
-        };
-        // console.log('Vector:', vectorP0, vectorP1);
-    }
+    // if (updatePoints) {
+    //     // console.info(`P0-DIFF +${initPoints.p0.x-updatePoints}, ${initPoints.p0.x}`)
+    //     // console.info(`p0-X: +${updatePoints.p0.x}, ${initPoints.p0.x}`)
+    //     // console.info(`p3-X:+${updatePoints.p3.x}, ${initPoints.p3.x}`)
+    //     //
+    //     // console.info(`p0-Y: +${updatePoints.p0.y}, ${initPoints.p0.y}`)
+    //     // console.info(`p3-Y:+${updatePoints.p3.y}, ${initPoints.p3.y}`)
+    //     //
+    //     //  console.info(updatePoints.p3.x, initPoints.p3.x )
+    //     const vectorP0 = {
+    //         x: updatePoints.p0.x - initPoints.p0.x,
+    //         y: updatePoints.p0.y - initPoints.p0.y
+    //     };
+    //
+    //     const vectorP1 = {
+    //         x: updatePoints.p1.x - initPoints.p1.x,
+    //         y: updatePoints.p1.y - initPoints.p1.y
+    //     };
+    //     // console.log('Vector:', vectorP0, vectorP1);
+    // }
 
     const domParent = getDOMParent(svg);
     if (!domParent) throw new Error('Wire is not god');
@@ -389,6 +404,8 @@ export function createDragWire(svg: SVGPathElement, pathUpdate: string = "") {
         x: number
         y: number
     }
+    // M -94483.12185202717, -142113.14411618107 C -94453.12185202717, -142113.14411618107 -94530.04669038924, -141989.65273687072 -94500.04669038924, -141989.65273687072
+    // M -94483.1142333334 -142113.1514683626 C -93883.10493273815 -142113.16076895784, -189578.38434464298 -284078.990808749, -94495.27011130958 -141965.83934038642
 
     // Store points data for easier updates
     let points = {
@@ -439,6 +456,8 @@ export function createDragWire(svg: SVGPathElement, pathUpdate: string = "") {
         elementsMap.get("handle2")?.setAttribute('y1', points.p3.y.toString())
         elementsMap.get("handle2")?.setAttribute('x2', points.p2.x.toString())
         elementsMap.get("handle2")?.setAttribute('y2', points.p2.y.toString())
+
+        return 
     }
 
     function getMousePosition(evt: MouseEvent | TouchEvent): Point | null {
@@ -529,7 +548,15 @@ export function createDragWire(svg: SVGPathElement, pathUpdate: string = "") {
     }
 
     function endDrag(evt: MouseEvent | TouchEvent) {
+        // update points at p1, p2
+        // just map all 4?
+        
+
+        const d = `M ${points.p0.x} ${points.p0.y} C ${points.p1.x} ${points.p1.y}, ${points.p2.x} ${points.p2.y}, ${points.p3.x} ${points.p3.y}`
+        stoppedEditingCallback(d)
+
         if (selectedElement) {
+            console.log('Ended manipulation drag')
             // Remove dragging listeners from the document
             document.removeEventListener('mousemove', drag)
             document.removeEventListener('touchmove', drag)

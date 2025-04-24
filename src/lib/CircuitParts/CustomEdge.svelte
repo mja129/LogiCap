@@ -1,14 +1,20 @@
+<script lang="ts" module>
+    import { writable, type Writable } from 'svelte/store'
+
+    type WireId = string
+    type ControlPoints = string
+    type toolsActive = boolean
+    let wireManipulationStore: Writable<
+        Record<WireId, [ControlPoints, toolsActive]>
+    > = writable({})
+    // wire with active wire editing tools, only one at once is allowed.
+    // empty means we are not editing any right now
+    // that doesnt mean there arent any saved edits.
+    // let editSingle: Writable<WireId> = writable('')
+</script>
+
 <script lang="ts">
     import { onDestroy, onMount } from 'svelte'
-    import type { Action } from 'svelte/action'
-
-    import { CustomHeadlessCircuit } from '@Util/CustomHeadlessCircuit'
-
-    import {
-        CircuitEngine,
-        onWireChange,
-        findWireInEngine,
-    } from '@CircuitEngine'
 
     import {
         setAnchor,
@@ -19,6 +25,8 @@
 
     import {
         createDragWire,
+        hasTools,
+        parseCubicBezierD,
         toggleManipulationTools,
         toolsOff,
         toolsOn,
@@ -40,21 +48,77 @@
 
     let edgeWrapper: SVGPathElement | null = $state(null)
     // $inspect(currentPath).with(console.log)
+    const saveManipulatedPoints = (controlPoints: string, wireId: string) => {
+        console.log('ranCallback')
+        if (wireId === '')
+            return (
+                console.warn('tried to save manipulations for empty wire id'),
+                null
+            )
+
+        // if (!(wireId in $wireManipulationStore)) {
+        //     // add wireId to wireManipulation sotre
+        //     $wireManipulationStore[wireId] = controlPoints
+        // }
+        // this code runs super often because of how often we are rerendering
+        if (
+            JSON.stringify($wireManipulationStore) !==
+            JSON.stringify(controlPoints)
+        ) {
+            $wireManipulationStore[wireId][0] = controlPoints
+            // $wireManipulationStore[wireId][1] = false
+            $wireManipulationStore = $wireManipulationStore
+        }
+    }
+    // $inspect($wireManipulationStore).with(console.log)
+    let wireId: string | undefined = $state(undefined)
+
     onMount(() => {
-        let [wireId, domWireId] = getWireIdFromDOM(edgeWrapper, initAncId)
+        wireId = getWireIdFromDOM(edgeWrapper, initAncId)[0]
         monitorWire(wireId)
 
         if (!edgeWrapper) return
-        if (editWire) {
-            createDragWire(edgeWrapper)
+
+        let savedElePath: string = ''
+
+        // wires not in the store are not edited.
+        if (!(wireId in $wireManipulationStore)) return
+
+        savedElePath = $wireManipulationStore[wireId][0]
+        // tool were off but we rerendered and now they turned on.
+
+        createDragWire(
+            edgeWrapper,
+            (points: string) => saveManipulatedPoints(points, wireId || ''),
+            savedElePath
+        )
+        // if its false turn off
+        if (!$wireManipulationStore[wireId][1]) {
+            toolsOff(edgeWrapper)
         }
     })
 
     $effect(() => {
         // createDragWire(edgeWrapper)
-        if (currentPath) {
-            if (!edgeWrapper || !editWire) return
-            createDragWire(edgeWrapper, currentPath)
+        if (
+            currentPath &&
+            edgeWrapper &&
+            wireId &&
+            wireId in $wireManipulationStore
+        ) {
+            let savedElePath: string | undefined
+            // if (wireId in $wireManipulationStore) {
+            //     // get p0 and p3
+            //     savedElePath = $wireManipulationStore[wireId]
+            // }
+            // console.log(hasTools(edgeWrapper))
+            // don't show edit tools for something that doesnt have them.
+
+            createDragWire(
+                edgeWrapper,
+                (points: string) => saveManipulatedPoints(points, wireId || ''),
+                savedElePath || currentPath
+            )
         }
     })
     // $inspect(currentPath).with(console.warn)
@@ -66,8 +130,6 @@
     // I know there is a less convoluted way to do this
     // I tried removing the inner function and just running monitorFn right away by default
     // It didn't work, very curious? I want to know why
-
-    let editWire: boolean = $state(false)
 </script>
 
 <!-- Invisible element -->
@@ -78,25 +140,34 @@
     role="presentation"
     class={wireActive === -1 ? '' : wireActive === 1 ? 'on' : 'off'}
     bind:this={edgeWrapper}
-    onclick={() => {
-        if (editWire && edgeWrapper) {
-            toggleManipulationTools(edgeWrapper)
-        } else {
-            editWire = true
-            if (!edgeWrapper) return
-            toolsOn(edgeWrapper)
+    onclick={(e: MouseEvent) => {
+        e.preventDefault()
+        // if
+        if (!wireId || !edgeWrapper) return
+
+        if (!(wireId in $wireManipulationStore)) {
+            console.log('haswire')
+            $wireManipulationStore[wireId] = ['', false]
+            $wireManipulationStore[wireId][0] = currentPath
+            $wireManipulationStore[wireId][1] = false
         }
+
+        $wireManipulationStore[wireId][1] = !$wireManipulationStore[wireId][1]
+        $wireManipulationStore = $wireManipulationStore
+        toggleManipulationTools(edgeWrapper)
     }}
     oncontextmenu={(e) => {
         e.preventDefault()
         const pathReset: any = getSvelvetEdgeEle(edgeWrapper)
         if (!pathReset || !edgeWrapper) return
-        editWire = false
         toolsOff(edgeWrapper)
+
+        if (wireId) {
+            delete $wireManipulationStore[wireId]
+            $wireManipulationStore = $wireManipulationStore
+        }
         edgeWrapper.setAttribute('d', pathReset.getAttribute('d'))
         // currentPath = pathReset.getAttribute('d')
-
-        console.warn(pathReset)
     }}
 />
 

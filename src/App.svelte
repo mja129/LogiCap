@@ -1,7 +1,7 @@
 <!-- https://coolorgS.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script module>
-    export function onWireConnection() {
-        console.log('CONNECTED IN APP')
+    export function onWireConnection(wireId: string) {
+        console.log('Success new connection made id: ' + wireId)
         // saveCircuit() // we could auto-save on wire linking
         // but save on reload pretty much covers us.
         return null
@@ -46,7 +46,6 @@
         // All three of these ways work
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
-        console.log('remount')
         initialScale = parseFloat(localStorage.getItem('SavedScale') || '1')
 
         loadCircuit() // load circuit from LS into CircuitStore,

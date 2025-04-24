@@ -124,7 +124,8 @@ export function attemptLink(sourceClassName: string, destClassList: string[], co
     )
 
     // callback Function in app.svelte
-    connectionCallback()
+    connectionCallback(wireName)
+
 
     return wireName
 
