@@ -18,13 +18,14 @@
         io?: string
     } = $props()
 
+    let wireName = $state('')
     const makeStickyConnectHandler = (anchorClass: string) => {
         function handleStickyConnect(event: any) {
             event.preventDefault()
             event.stopPropagation()
             // console.log('Click After sticky edge')
 
-            const statusMsg = attemptLink(anchorClass, event.target.classList)
+            wireName = attemptLink(anchorClass, event.target.classList)
 
             document.removeEventListener('mousedown', handleStickyConnect, true)
         }
@@ -44,7 +45,7 @@
         if (sourceAnchorClass !== null && sourceAnchorClass === anchorId) {
             setupStickyConnection(sourceAnchorClass)
         } else {
-            const statusMsg = attemptLink(anchorId, e.target.classList)
+            wireName = attemptLink(anchorId, e.target.classList)
         }
 
         // Clean up event listener

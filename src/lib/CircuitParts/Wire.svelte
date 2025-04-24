@@ -7,13 +7,13 @@
     // probably with the inverted mapping I keep talking about.
     type WireSaveData = Record<WireId, WireType>
     let wireSaveData: Writable<WireSaveData> = writable({})
-    let lastDelType: Writable<string> = writable('')
+    let lastDel: Writable<{ type: string; id: string }> = writable({
+        type: '',
+        id: '',
+    })
     export let handleDisconnect: Writable<boolean> = writable(false)
     // save a few connections after deleting, mainly the most recent one, so
     // that you can toggle a connection without it reverting to the default value
-    let deletedWireCache: Writable<Array<[WireId, WireType]> | []> = writable(
-        []
-    )
 </script>
 
 <script lang="ts">
@@ -61,71 +61,41 @@
             !wireId.includes('cursor') &&
             wireId in $wireSaveData
         ) {
-            // const deletedWireType = structuredClone($wireSaveData[wireId])
-            console.log('destory')
-            console.log(initAncId)
-
-            lastDelType.update(() => wireType)
-
-            // const cachedIds: string[] = $deletedWireCache.map(
-            //     ([id, type]) => id
-            // )
-            //
-            // if (cachedIds.includes(wireId)) return
+            lastDel.update(() => {
+                return { type: wireType, id: wireId }
+            })
 
             wireSaveData.update((currData) => {
                 delete currData[wireId]
                 return currData
             })
 
-            // last destroyed input and its type
-            // lastDelType.update(() => wireType)
-
-            $deletedWireCache = [[wireId, wireType], ...$deletedWireCache]
-
-            if ($deletedWireCache.length > 2) {
-                deletedWireCache.update((currCache) => {
-                    currCache.pop()
-                    return currCache
-                })
-            }
             $handleDisconnect = false
         }
     })
+    let saveWireOption = false
     $effect(() => {
         if (wireId !== '' && !wireId.includes('cursor')) {
             // console.warn('WIREIDNOTNULL: ' + wireId)
-            const inputId = wireId.split('-')[1]
 
             if (!(wireId in $wireSaveData)) {
-                if ($lastDelType !== '' && $handleDisconnect === false) {
-                    $wireSaveData[wireId] = $lastDelType
+                if ($lastDel.type !== '' && $handleDisconnect === false) {
+                    $wireSaveData[wireId] = $lastDel.type
                     wireType = $wireSaveData[wireId]
-                    $lastDelType = ''
+
+                    wireSaveData.update((currData) => {
+                        delete currData[$lastDel.id]
+                        return currData
+                    })
+                    $lastDel.type = ''
+                    $lastDel.id = ''
+                    $lastDel = $lastDel
                     return
                 }
-                // the cache is okay for now but this is better
-                // We are about to drop a connecting that we just picked up from an input and caused a disconnect
-                // the next wire to be created should be of this type, if its type already exists overwrite it
-                // let savedType: string | undefined
-                // $deletedWireCache.forEach(([delId, delType]) => {
-                //     if (wireId === delId) {
-                //         savedType = delType
-                //         return
-                //     }
-                // })
-                // if (savedType) {
-                //     $wireSaveData[wireId] = savedType
-                // } else {
-                // }
                 $wireSaveData[wireId] = $settingsStore.wireType
-                console.warn('HIT default store')
             }
+            // check map on every rerender, where the wire is linked
             wireType = $wireSaveData[wireId]
-            // bezier, strait, or step
-            // when you update a node
-        } else {
-            // wire id is in save data but we still use lastDelType
         }
     })
 
