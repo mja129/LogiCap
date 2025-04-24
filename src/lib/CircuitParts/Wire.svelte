@@ -52,7 +52,27 @@
     // once a wire type is created once it will always be that type of wire unless edited with the cursor tool
     // $inspect($lastDelType).with(console.log)
 
-    onDestroy(() => {
+    // after component is destroyed checks mouseup
+    async function handleMouseUp(e: MouseEvent) {
+        console.log('Mouse up target class:')
+        // after disconnecting a linked anchor did we connect it to something else or drop it somewhere random
+        // whatever we drop it onto will have the same type as the one we just removed.
+        // or we drop it nowhere and we empty lastDel and unset handleDisconnect
+        // dropped as opposed to 'connectedAfterDisconnect'
+        const connectedAfterDisconnect = Array.from(
+            (e.target as HTMLElement)?.classList
+        )?.includes('custom_anchor')
+        if (!connectedAfterDisconnect) {
+            $lastDel.type = ''
+            $lastDel.id = ''
+            $lastDel = $lastDel
+        }
+        // remove yourself
+        window.removeEventListener('mouseup', handleMouseUp, {
+            capture: true,
+        })
+    }
+    onDestroy(async () => {
         // make sure that wire types persist correctly
         // remove when input linking is removed.
         if (
@@ -64,6 +84,8 @@
             lastDel.update(() => {
                 return { type: wireType, id: wireId }
             })
+
+            window.addEventListener('mouseup', handleMouseUp, { capture: true })
 
             wireSaveData.update((currData) => {
                 delete currData[wireId]
