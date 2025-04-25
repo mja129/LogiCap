@@ -5,16 +5,19 @@
     type ControlPoints = string
     type toolsActive = boolean
     let wireManipulationStore: Writable<
-        Record<WireId, [ControlPoints, toolsActive]>
-    > = writable(
-        (localStorage.getItem('manipulations') &&
-            JSON.parse(localStorage.getItem('manipulations') || '{}')) ||
-            {}
-    )
+        Record<WireId, undefined | [ControlPoints, toolsActive]>
+    > = writable({})
+
     // wire with active wire editing tools, only one at once is allowed.
     // empty means we are not editing any right now
     // that doesnt mean there arent any saved edits.
     // let editSingle: Writable<WireId> = writable('')
+
+    // How does wire manipulation saving work
+    // when you end dragging there is be a callback that sets
+    // the current manipulation store.
+    // mount checks if a saved path exists and loads it in
+    // $effect() keeps the store updated when the points change
 </script>
 
 <script lang="ts">
@@ -35,6 +38,7 @@
         toolsOff,
         toolsOn,
     } from './manipulateWire.ts'
+    import { wireSaveData } from './Wire.svelte'
 
     let {
         initAncId,
@@ -52,7 +56,8 @@
 
     let edgeWrapper: SVGPathElement | null = $state(null)
     // $inspect(currentPath).with(console.log)
-    const saveManipulatedPoints = (controlPoints: string, wireId: string) => {
+    // this happens a lot
+    const saveManipulatedPoints = (svgPathStr: string, wireId: string) => {
         console.log('ranCallback')
         if (wireId === '')
             return (
@@ -60,16 +65,12 @@
                 null
             )
 
-        // if (!(wireId in $wireManipulationStore)) {
-        //     // add wireId to wireManipulation sotre
-        //     $wireManipulationStore[wireId] = controlPoints
-        // }
         // this code runs super often because of how often we are rerendering
         if (
-            JSON.stringify($wireManipulationStore) !==
-            JSON.stringify(controlPoints)
+            JSON.stringify($wireManipulationStore[wireId][0]) !==
+            JSON.stringify(svgPathStr)
         ) {
-            $wireManipulationStore[wireId][0] = controlPoints
+            $wireManipulationStore[wireId][0] = svgPathStr
             // $wireManipulationStore[wireId][1] = false
             $wireManipulationStore = $wireManipulationStore
         }
@@ -123,11 +124,6 @@
                 (points: string) => saveManipulatedPoints(points, wireId || ''),
                 savedElePath || currentPath
             )
-            // bad
-            localStorage.setItem(
-                'manipulations',
-                JSON.stringify($wireManipulationStore)
-            )
         }
     })
     // $inspect(currentPath).with(console.warn)
@@ -154,15 +150,18 @@
         // if
         if (!wireId || !edgeWrapper) return
 
-        if (!(wireId in $wireManipulationStore)) {
-            console.log('haswire')
-            $wireManipulationStore[wireId] = ['', false]
-            $wireManipulationStore[wireId][0] = currentPath
-            $wireManipulationStore[wireId][1] = false
+        // this wire has never been an edit wire before
+        if (wireId in $wireSaveData && !$wireSaveData[wireId].edit) {
+            $wireSaveData[wireId].edit = [currentPath, false]
         }
 
-        $wireManipulationStore[wireId][1] = !$wireManipulationStore[wireId][1]
-        $wireManipulationStore = $wireManipulationStore
+        // filp
+        wireSaveData.update((currData) => {
+            currData[wireId as string].edit[1] =
+                !currData[wireId as string].edit[1]
+            return currData
+        })
+
         toggleManipulationTools(edgeWrapper)
     }}
     oncontextmenu={(e) => {
@@ -172,7 +171,7 @@
         toolsOff(edgeWrapper)
 
         if (wireId) {
-            delete $wireManipulationStore[wireId]
+            $wireSaveData[wireId].edit = undefined
             $wireManipulationStore = $wireManipulationStore
         }
         edgeWrapper.setAttribute('d', pathReset.getAttribute('d'))
