@@ -2,8 +2,12 @@
 <script module lang="ts">
     import { writable, type Writable } from 'svelte/store'
     export let settingsStore: Writable<any> = writable({
-        wireType: 'bezier',
+        wireType: localStorage.getItem('wireType') || 'bezier',
         theme: localStorage.getItem('theme') === 'dark' ? 'dark' : 'light',
+        useTapUpdate: JSON.parse(
+            localStorage.getItem('useTapUpdate') || 'true'
+        ),
+        useCarry: JSON.parse(localStorage.getItem('useCarry') || 'true'),
     })
 </script>
 
@@ -16,6 +20,13 @@
     // $inspect($settingsStore).with(console.log)
 
     let hasKitty = $state(false)
+    settingsStore.subscribe((currStore) => {
+        localStorage.setItem('wireType', currStore.wireType)
+    })
+    $effect(() => {
+        localStorage.setItem('useCarry', $settingsStore.useCarry)
+        localStorage.setItem('useTapUpdate', $settingsStore.useTapUpdate)
+    })
 </script>
 
 <button class="launch-button" onclick={() => (show = !show)}>
@@ -42,6 +53,26 @@
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
             </select>
+        </div>
+
+        <div
+            style="display: flex;flex-direction: column;gap: 10px;align-items:flex-start"
+        >
+            <label style="display:flex;align-items:center">
+                <input
+                    style="margin-right:5px;margin-top:2px"
+                    type="checkbox"
+                    bind:checked={$settingsStore.useTapUpdate}
+                />
+                Use Tap Update Wire
+            </label>
+            <label style="display:flex;align-items:center">
+                <input
+                    style="margin-right:5px;margin-top:2px"
+                    type="checkbox"
+                    bind:checked={$settingsStore.useCarry}
+                />Carry Over Wire types
+            </label>
         </div>
 
         <div

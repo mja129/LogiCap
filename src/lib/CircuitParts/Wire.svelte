@@ -93,8 +93,8 @@
     // settings option
 
     // these are also good defaults
-    let disableTapUpdate = false
-    let disableCarryType = false
+    const disableTapUpdate = !$settingsStore.useTapUpdate
+    const disableCarryType = !$settingsStore.useCarry
 
     onDestroy(async () => {
         // make sure that wire types persist correctly
