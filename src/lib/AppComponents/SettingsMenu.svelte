@@ -27,7 +27,41 @@
         localStorage.setItem('useCarry', $settingsStore.useCarry)
         localStorage.setItem('useTapUpdate', $settingsStore.useTapUpdate)
     })
+    let activeWireType = $state($settingsStore.wireType)
 </script>
+
+<div
+    class="wireTypeSelect"
+    style="display: flex;flex-direction:column;align-items:flex-end;"
+>
+    <button
+        class="wire-btn wire-bez"
+        class:activeType={$settingsStore.wireType === 'bezier'}
+        onclick={() => {
+            $settingsStore.wireType = 'bezier'
+        }}
+    >
+        Curve
+    </button>
+    <button
+        class="wire-btn wire-step"
+        class:activeType={$settingsStore.wireType === 'step'}
+        onclick={() => {
+            $settingsStore.wireType = 'step'
+        }}
+    >
+        Step
+    </button>
+    <button
+        class="wire-btn wire-str"
+        class:activeType={$settingsStore.wireType === 'straight'}
+        onclick={() => {
+            $settingsStore.wireType = 'straight'
+        }}
+    >
+        Straight
+    </button>
+</div>
 
 <button class="launch-button" onclick={() => (show = !show)}>
     <SettingsIcon height={30} width={30} />
@@ -56,7 +90,7 @@
         </div>
 
         <div
-            style="display: flex;flex-direction: column;gap: 10px;align-items:flex-start"
+            style="display: flex;flex-direction: column;align-items:flex-start;margin-bottom:-5px"
         >
             <label style="display:flex;align-items:center">
                 <input
@@ -64,7 +98,7 @@
                     type="checkbox"
                     bind:checked={$settingsStore.useTapUpdate}
                 />
-                Use Tap Update Wire
+                Tap Anchor to Update Wire Type
             </label>
             <label style="display:flex;align-items:center">
                 <input
@@ -101,7 +135,7 @@
                         herekittykittykitty('Furnando')
                         hasKitty = true
                     }
-                }}>{hasKitty ? 'Despawn Kitty' : 'Spawn Kitty'}</button
+                }}>{hasKitty ? 'Despawn Kitty' : 'KITTY'}</button
             >
             <button
                 class="closeBtn"
@@ -119,15 +153,36 @@
     :root {
         --settings-menu-spacing: 5px;
     }
+    .wire-btn {
+        cursor: pointer;
+    }
+    .wire-btn:hover:not(.activeType) {
+        color: var(--pitt-yellow);
+    }
+    .activeType {
+        color: red;
+    }
+    .wireTypeSelect {
+        position: absolute;
+        right: 10px;
+        bottom: 50px;
+        z-index: 20;
+    }
+    .wireTypeSelect button {
+        background-color: transparent;
+        border: none;
+        outline: none;
+    }
     .launch-button {
         cursor: pointer;
         border-width: 4px;
         border-radius: 999px;
         position: absolute;
         background-color: var(--lightblue);
+        transform: scale(0.8);
         padding: var(--settings-menu-spacing);
-        right: 10px;
-        bottom: 10px;
+        right: 0px;
+        bottom: 0px;
         z-index: 20;
         /* width: 20px; */
         /* height: 20px; */
@@ -164,6 +219,7 @@
     }
     .kittyBtn {
         /* float is a magic property and the conditions for it working are determined by a higher power.*/
+        padding: 2px;
         margin-top: calc(var(--settings-menu-spacing) + 2px);
     }
     .closeBtn {

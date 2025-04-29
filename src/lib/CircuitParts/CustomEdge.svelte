@@ -53,7 +53,7 @@
     let edgeWrapper: SVGPathElement | null = $state(null)
     // $inspect(currentPath).with(console.log)
     const saveManipulatedPoints = (controlPoints: string, wireId: string) => {
-        console.log('ranCallback')
+        // console.log('ranCallback')
         if (wireId === '')
             return (
                 console.warn('tried to save manipulations for empty wire id'),
@@ -155,7 +155,6 @@
         if (!wireId || !edgeWrapper) return
 
         if (!(wireId in $wireManipulationStore)) {
-            console.log('haswire')
             $wireManipulationStore[wireId] = ['', false]
             $wireManipulationStore[wireId][0] = currentPath
             $wireManipulationStore[wireId][1] = false
