@@ -31,6 +31,8 @@
     import SingleIoLogic from './lib/Circuits/LogicGates/SingleIoLogic.svelte'
     import TabMenu from '@AppComponents/TabMenu.svelte'
     import SettingsMenu from '@AppComponents/SettingsMenu.svelte'
+    import ZoomThing from './lib/ZoomThing.svelte'
+    import {setScale, setTranslation} from '@Util/graphUtils'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
@@ -38,6 +40,22 @@
     const setDeviceData = (devs: Devices) => (currentDevicesData = devs)
 
     let initialScale: number = $state(1)
+    let initialTranslation: {x: number, y:number} = $state({x: 0, y:0})
+    
+    let observer: MutationObserver;
+
+    // Dom stuff to find svelvet transformation data
+    const querySelector = '[class^="svelvet-graph-wrapper"]';
+
+    function parseTransform(transform: string) {
+    // Some matching voodoo
+    const match = transform.match(/translate\(([-.\d]+)px,\s*([-.\d]+)px\)\s*scale\(([-.\d]+)\)/);
+    if (!match) return;
+
+    const [, x, y, scale] = match.map(Number);
+    localStorage.setItem('canvasZoom', scale.toString());
+    localStorage.setItem('canvasTranslation', JSON.stringify({ x, y }));
+    }
 
     // const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
 
@@ -46,20 +64,37 @@
         // All three of these ways work
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
-        initialScale = parseFloat(localStorage.getItem('SavedScale') || '1')
+        initialScale = parseFloat(localStorage.getItem('canvasZoom') || '1')
+        initialTranslation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0"}')
 
         loadCircuit() // load circuit from LS into CircuitStore,
         currentDevicesData = $CircuitStore.devices
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
+        //Needs to wait until the dom catches up
+        requestAnimationFrame(() => {
+            const el = document.querySelector(querySelector) as HTMLElement;
 
+            if (!el) {
+            console.warn('ZoomTrackerDOM: Svelvet wrapper not found');
+            return;
+            }
+
+            parseTransform(el.style.transform);
+
+            observer = new MutationObserver(() => {
+            parseTransform(el.style.transform);
+            });
+
+            observer.observe(el, { attributes: true, attributeFilter: ['style'] });
+        });
         // restrictFitViewZoom()
     })
 
     // save circuit on page reload.
     window.addEventListener('beforeunload', () => {
         saveCircuit()
-        captureCurrentZoom() // sets 'SavedScale' in localStorage
     })
+
 
     // create new node in the global store for circuitStore digital js backend.
     // sync the devices list with the currentDevicesData variable.
@@ -104,10 +139,13 @@
     <Svelvet
         theme="LogiCap"
         zoom={initialScale}
+        translation={initialTranslation}
         editable={false}
         disableSelection={false}
         controls
-    >
+    >   <ZoomThing>
+
+        </ZoomThing>
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}

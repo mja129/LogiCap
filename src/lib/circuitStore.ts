@@ -1,5 +1,6 @@
 import { writable, get, type Writable } from 'svelte/store'
 import { deviceJsonFactoryMap } from './Util/makeDigitalJsJson'
+import { setScale, setTranslation} from '@Util/graphUtils'
 
 // Explains the json representation
 // https://github.com/tilk/digitaljs
@@ -243,16 +244,26 @@ export function loadCircuit(circuitText: string = 'default') {
     let savedCircuitText: string | null = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
     if (!savedCircuitText) return
 
-    const savedCircuit = JSON.parse(savedCircuitText) as {
-        devices: {}
-        connectors: {}
-        subcircuits: {}
-    }
+    const savedCircuit = JSON.parse(savedCircuitText)
 
     validateSavedCircuit(savedCircuit)
 
-    CircuitStore.set(savedCircuit)
+    CircuitStore.set({
+        devices: savedCircuit.devices,
+        connectors: savedCircuit.connectors,
+        subcircuits: savedCircuit.subcircuits,
+        wireManipulations: savedCircuit.wireManipulations
+    });
 
+    if(savedCircuit.translation)
+    {
+        setTranslation(savedCircuit.translation)
+    }
+    if(savedCircuit.zoom)
+    {
+        console.log(savedCircuit.zoom)
+        setScale(savedCircuit.zoom)
+    }
     // setDevices(savedCircuit.devices)
 }
 
@@ -289,8 +300,11 @@ export function downloadCircuit(filename: string){
 	    console.log('Tried to load empty circuit');
 	    return null;
 	}
-	
 	const circuitJson = JSON.parse(getItem);
+    const zoom = parseFloat(localStorage.getItem('canvasZoom') || '1');
+    const translation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0"}');
+    circuitJson.zoom = zoom;
+    circuitJson.translation = translation;
 	const prettyCircuitJson = JSON.stringify(circuitJson, null, 2);
 	
 	const circuitBlob = new Blob([prettyCircuitJson], { type: 'application/json' });
