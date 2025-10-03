@@ -1,5 +1,5 @@
 <!-- https://coolorgS.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
-<script module>
+<script module lang="ts">
     export function onWireConnection(wireId: string) {
         console.log('Success new connection made id: ' + wireId)
         // saveCircuit() // we could auto-save on wire linking
@@ -65,7 +65,7 @@
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
         initialScale = parseFloat(localStorage.getItem('canvasZoom') || '1')
-        initialTranslation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0"}')
+        initialTranslation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0}')
 
         loadCircuit() // load circuit from LS into CircuitStore,
         currentDevicesData = $CircuitStore.devices
