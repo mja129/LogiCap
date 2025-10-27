@@ -13,6 +13,7 @@ interface CircuitStoreType extends Writable<Circuit> {
     ): void
     removeConnection(inputAnchorId: string): void
     addCircuitDevice(gateType: string, uuid: string, options?: any): Devices
+    removeCircuitDevice(gateTypePlus_uuid:string) : Devices
 }
 
 // create a custom svelte store
@@ -95,6 +96,18 @@ const createCircuitStore = (): CircuitStoreType => {
                 throw new Error('devices null after setting devices')
             }
             return newDevices
+        },
+        removeCircuitDevice(gateTypePlus_uuid:string) {
+            let newDevices: Devices | null = null
+            update((currCircuit) => {
+                delete currCircuit.devices[gateTypePlus_uuid];
+                newDevices = currCircuit.devices
+                return currCircuit
+            })
+            if (newDevices === null) {
+                throw new Error('devices null after setting devices')
+            }
+            return newDevices;
         },
     }
 }

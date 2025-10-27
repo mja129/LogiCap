@@ -69,6 +69,7 @@
 
         loadCircuit() // load circuit from LS into CircuitStore,
         currentDevicesData = $CircuitStore.devices
+        
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
         //Needs to wait until the dom catches up
         requestAnimationFrame(() => {
@@ -122,6 +123,30 @@
 
     let setDevices = (d: Devices) => (currentDevicesData = d)
     let currCircuitName = $state('')
+
+    function deletedSelectedNodes(){
+        let domEls = Object.keys(currentDevicesData)
+                    .map(x=>"N-"+x)
+                    .map(x=>document.getElementById(x))
+
+        let selected = domEls.filter(x=> x === null ? false : x.classList.contains("selected"));
+        let not_selected = domEls.filter(x=> x === null ? false : !x.classList.contains("selected"));
+        
+        
+        let newDeviceList = currentDevicesData;
+
+        let ids_to_del = selected.map(x=> x === null ? "" : x.id.substring(2));
+        ids_to_del.forEach(id=>{
+            newDeviceList = CircuitStore.removeCircuitDevice(id);
+            // delete newDeviceList[id]
+        })
+        currentDevicesData = newDeviceList;
+        // setDevices(newDeviceList);
+        saveCircuit();
+
+        // console.log(selected);
+        debugger;
+    }
 </script>
 
 <main id="logicap">
@@ -132,7 +157,7 @@
         {currCircuitName}
         setCanvas={setDevices}
     />
-    <CommandMenu {createCanvasDevice} />
+    <CommandMenu {createCanvasDevice} {deletedSelectedNodes} />
     <TabMenu {clearDeviceData} {setDeviceData} />
 
     <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->

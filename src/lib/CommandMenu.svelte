@@ -75,12 +75,19 @@
                 event.preventDefault() // prevents - from being typed when you use press to toggle menu
                 toggleMenu()
             }
+            
+            else if (event.key === 'Delete'){
+                console.log("Delete!");
+                deletedSelectedNodes();
+            }
         })
     })
 
     export let createCanvasDevice: (
         e: MouseEvent & { gateType: string }
     ) => void
+
+    export let deletedSelectedNodes: () => void
 
     function createGhost(item: menuJsonElement) {
         if (ghostElement) return // Avoid creating multiple ghost elements

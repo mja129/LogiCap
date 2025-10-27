@@ -123,8 +123,10 @@ of the different components now I just need to do it here -->
         {position}
         editable={false}
         id={nodeId}
+        let:selected
+        let:node    
     >
-        <div
+        <div class:selected={selected} 
             onmousedowncapture={(e: MouseEvent) => {
                 if (!getRunning()) {
                     // $hasRotated = true
@@ -170,6 +172,7 @@ of the different components now I just need to do it here -->
         >
             <MyComponent {nodeId} {...nodeProps} />
         </div>
+
     </Node>
 {/snippet}
 
@@ -201,5 +204,10 @@ of the different components now I just need to do it here -->
     }
     :global(.dark .svelvet-node svg) {
         filter: unset;
+    }
+
+    /* Give some visual indication if gate is selected */
+    .selected {
+        background-color: blue;
     }
 </style>
