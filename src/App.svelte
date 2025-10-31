@@ -18,7 +18,12 @@
     import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
+    import {
+        CircuitStore,
+        loadCircuit,
+        saveCircuit,
+        circuitStoreSaveName,
+    } from '@CircuitStore'
 
     import type { logicGateTypes } from '@CircuitModel'
 
@@ -32,7 +37,7 @@
     import TabMenu from '@AppComponents/TabMenu.svelte'
     import SettingsMenu from '@AppComponents/SettingsMenu.svelte'
     import ZoomThing from './lib/ZoomThing.svelte'
-    import {setScale, setTranslation} from '@Util/graphUtils'
+    import { setScale, setTranslation } from '@Util/graphUtils'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
@@ -40,21 +45,23 @@
     const setDeviceData = (devs: Devices) => (currentDevicesData = devs)
 
     let initialScale: number = $state(1)
-    let initialTranslation: {x: number, y:number} = $state({x: 0, y:0})
-    
-    let observer: MutationObserver;
+    let initialTranslation: { x: number; y: number } = $state({ x: 0, y: 0 })
+
+    let observer: MutationObserver
 
     // Dom stuff to find svelvet transformation data
-    const querySelector = '[class^="svelvet-graph-wrapper"]';
+    const querySelector = '[class^="svelvet-graph-wrapper"]'
 
     function parseTransform(transform: string) {
-    // Some matching voodoo
-    const match = transform.match(/translate\(([-.\d]+)px,\s*([-.\d]+)px\)\s*scale\(([-.\d]+)\)/);
-    if (!match) return;
+        // Some matching voodoo
+        const match = transform.match(
+            /translate\(([-.\d]+)px,\s*([-.\d]+)px\)\s*scale\(([-.\d]+)\)/
+        )
+        if (!match) return
 
-    const [, x, y, scale] = match.map(Number);
-    localStorage.setItem('canvasZoom', scale.toString());
-    localStorage.setItem('canvasTranslation', JSON.stringify({ x, y }));
+        const [, x, y, scale] = match.map(Number)
+        localStorage.setItem('canvasZoom', scale.toString())
+        localStorage.setItem('canvasTranslation', JSON.stringify({ x, y }))
     }
 
     // const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
@@ -65,29 +72,34 @@
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
         initialScale = parseFloat(localStorage.getItem('canvasZoom') || '1')
-        initialTranslation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0}')
+        initialTranslation = JSON.parse(
+            localStorage.getItem('canvasTranslation') || '{"x":0,"y":0}'
+        )
 
         loadCircuit() // load circuit from LS into CircuitStore,
         currentDevicesData = $CircuitStore.devices
-        
+
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
         //Needs to wait until the dom catches up
         requestAnimationFrame(() => {
-            const el = document.querySelector(querySelector) as HTMLElement;
+            const el = document.querySelector(querySelector) as HTMLElement
 
             if (!el) {
-            console.warn('ZoomTrackerDOM: Svelvet wrapper not found');
-            return;
+                console.warn('ZoomTrackerDOM: Svelvet wrapper not found')
+                return
             }
 
-            parseTransform(el.style.transform);
+            parseTransform(el.style.transform)
 
             observer = new MutationObserver(() => {
-            parseTransform(el.style.transform);
-            });
+                parseTransform(el.style.transform)
+            })
 
-            observer.observe(el, { attributes: true, attributeFilter: ['style'] });
-        });
+            observer.observe(el, {
+                attributes: true,
+                attributeFilter: ['style'],
+            })
+        })
         // restrictFitViewZoom()
     })
 
@@ -95,7 +107,6 @@
     window.addEventListener('beforeunload', () => {
         saveCircuit()
     })
-
 
     // create new node in the global store for circuitStore digital js backend.
     // sync the devices list with the currentDevicesData variable.
@@ -126,26 +137,116 @@
 
     function deletedSelectedNodes(){
         let domEls = Object.keys(currentDevicesData)
-                    .map(x=>"N-"+x)
-                    .map(x=>document.getElementById(x))
+            .map((x) => 'N-' + x)
+            .map((x) => document.getElementById(x))
 
-        let selected = domEls.filter(x=> x === null ? false : x.classList.contains("selected"));
-        let not_selected = domEls.filter(x=> x === null ? false : !x.classList.contains("selected"));
-        
-        
-        let newDeviceList = currentDevicesData;
+        let selected = domEls.filter((x) =>
+            x === null ? false : x.classList.contains('selected')
+        )
+        let not_selected = domEls.filter((x) =>
+            x === null ? false : !x.classList.contains('selected')
+        )
 
-        let ids_to_del = selected.map(x=> x === null ? "" : x.id.substring(2));
-        ids_to_del.forEach(id=>{
-            newDeviceList = CircuitStore.removeCircuitDevice(id);
+        let newDeviceList = currentDevicesData
+
+        let ids_to_del = selected.map((x) =>
+            x === null ? '' : x.id.substring(2)
+        )
+        ids_to_del.forEach((id) => {
+            newDeviceList = CircuitStore.removeCircuitDevice(id)
             // delete newDeviceList[id]
         })
-        currentDevicesData = newDeviceList;
+        currentDevicesData = newDeviceList
         // setDevices(newDeviceList);
-        saveCircuit();
+        saveCircuit()
+    }
 
-        // console.log(selected);
-        debugger;
+    async function copySelectedNodes() {
+        let domEls = Object.keys(currentDevicesData)
+            .map((x) => 'N-' + x)
+            .map((x) => document.getElementById(x))
+
+        let selected = domEls.filter((x) =>
+            x === null ? false : x.classList.contains('selected')
+        )
+        let ids_to_copy = selected.map((x) =>
+            x === null ? '' : x.id.substring(2)
+        )
+
+        // TODO redo this
+        saveCircuit()
+
+        let save = JSON.parse(localStorage.getItem(circuitStoreSaveName) ?? '')
+
+        let copiedCircuits: any = {
+            devices: {},
+            connectors: {},
+        }
+
+        copiedCircuits.devices = Object.fromEntries(
+            Object.entries(save.devices).filter(([key]) =>
+                ids_to_copy.includes(key)
+            )
+        )
+
+        copiedCircuits.connectors = save.connectors
+        for (const src of Object.keys(copiedCircuits.connectors)) {
+            if (ids_to_copy.includes(src.slice('out_'.length))) {
+                let filtered = copiedCircuits.connectors[src].filter(
+                    (arr: any) => {
+                        // arr should be [deviceName, devicePort]
+                        return ids_to_copy.includes(arr[0])
+                    }
+                )
+                copiedCircuits.connectors[src] = filtered
+            } else {
+                delete copiedCircuits.connectors[src]
+            }
+        }
+
+        await navigator.clipboard.writeText(JSON.stringify(copiedCircuits))
+        // debugger;
+    }
+
+    function pasteNodes() {
+        navigator.clipboard.readText().then((text) => {
+            let circuitToPaste = JSON.parse(text)
+
+            let circuitRenaming: any = {}
+
+            for (let devName of Object.keys(circuitToPaste.devices)) {
+                circuitRenaming[devName] =
+                    devName.split('_')[0] + '_' + generateNonce()
+                let gateType = circuitToPaste.devices[devName].type
+                currentDevicesData = CircuitStore.addCircuitDevice(
+                    gateType,
+                    circuitRenaming[devName].split('_')[1]
+                )
+            }
+
+            for (let srcName of Object.keys(circuitToPaste.connectors)) {
+                let renamedSrcName: any = 'out_' + circuitRenaming[srcName.slice('out_'.length)]
+
+                for (let target of circuitToPaste.connectors[srcName]) {
+                    let renamedTargetName = circuitRenaming[target[0]]
+                    let renamedTargetPort = target[1].replace(
+                        target[0],
+                        renamedTargetName
+                    )
+
+                    console.log('adding',renamedSrcName,renamedTargetPort);
+                    CircuitStore.addConnection(
+                        renamedSrcName,
+                        renamedTargetPort
+                    )
+                }
+            }
+            console.log('rename',circuitRenaming);
+            saveCircuit();
+
+        })
+        // debugger;
+        // we need to randomize the circuitName before we paste it in
     }
 </script>
 
@@ -157,7 +258,12 @@
         {currCircuitName}
         setCanvas={setDevices}
     />
-    <CommandMenu {createCanvasDevice} {deletedSelectedNodes} />
+    <CommandMenu
+        {createCanvasDevice}
+        {deletedSelectedNodes}
+        {copySelectedNodes}
+        {pasteNodes}
+    />
     <TabMenu {clearDeviceData} {setDeviceData} />
 
     <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->
@@ -168,9 +274,8 @@
         editable={false}
         disableSelection={false}
         controls
-    >   <ZoomThing>
-
-        </ZoomThing>
+    >
+        <ZoomThing></ZoomThing>
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}

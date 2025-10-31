@@ -107,6 +107,7 @@ const createCircuitStore = (): CircuitStoreType => {
             if (newDevices === null) {
                 throw new Error('devices null after setting devices')
             }
+            // todo remove orphaned wire connection
             return newDevices;
         },
     }

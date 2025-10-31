@@ -80,6 +80,15 @@
                 console.log("Delete!");
                 deletedSelectedNodes();
             }
+
+            else if (event.key === 'c') {
+                copySelectedNodes();
+            } 
+
+            else if (event.key === 'v'){
+                pasteNodes();
+            }
+            
         })
     })
 
@@ -87,7 +96,11 @@
         e: MouseEvent & { gateType: string }
     ) => void
 
-    export let deletedSelectedNodes: () => void
+    export let deletedSelectedNodes: () => void;
+    export let copySelectedNodes: () => void;
+    export let pasteNodes: () => void
+
+
 
     function createGhost(item: menuJsonElement) {
         if (ghostElement) return // Avoid creating multiple ghost elements
