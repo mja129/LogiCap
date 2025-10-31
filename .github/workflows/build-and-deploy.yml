@@ -33,8 +33,8 @@ jobs:
       env:
         CI: false
         
-    - name: Copy custom_digitaljs to dist
-      run: cp -r custom_digitaljs ./dist/
+    # - name: Copy custom_digitaljs to dist
+    #   run: cp -r custom_digitaljs ./dist/
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
