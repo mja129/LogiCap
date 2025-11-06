@@ -63,5 +63,10 @@
           const data = traverse(graph);
 	        return JSON.stringify(data, domRectReplacer);
         }
+
+        (window as any).getCursor = () => {
+            let cur = get(graph.cursor) as any
+            return { x: cur.x, y: cur.y }
+        }
     })
 </script>

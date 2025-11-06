@@ -214,15 +214,35 @@
 
             let circuitRenaming: any = {}
 
+            const positions = Object.values(circuitToPaste.devices).map((d: any) => d.position);
+            const xMin = Math.min(...positions.map(p => p.x));
+            const xMax = Math.max(...positions.map(p => p.x));
+            const yMin = Math.min(...positions.map(p => p.y));
+            const yMax = Math.max(...positions.map(p => p.y));
+
+            let cur = (window as any).getCursor();
+
+            let newDeviceData = null;
             for (let devName of Object.keys(circuitToPaste.devices)) {
                 circuitRenaming[devName] =
                     devName.split('_')[0] + '_' + generateNonce()
-                let gateType = circuitToPaste.devices[devName].type
-                currentDevicesData = CircuitStore.addCircuitDevice(
+                let gateType = circuitToPaste.devices[devName].type;
+
+                let relativeX =  circuitToPaste.devices[devName].position.x - xMin;
+                let relativeY =  circuitToPaste.devices[devName].position.y - yMin;
+
+                newDeviceData = CircuitStore.addCircuitDevice(
                     gateType,
-                    circuitRenaming[devName].split('_')[1]
+                    circuitRenaming[devName].split('_')[1],
+                    {
+                        position: {
+                            x: cur.x + relativeX,
+                            y: cur.y + relativeY
+                        }
+                    }
                 )
             }
+            currentDevicesData = newDeviceData as Devices;
 
             for (let srcName of Object.keys(circuitToPaste.connectors)) {
                 let renamedSrcName: any = 'out_' + circuitRenaming[srcName.slice('out_'.length)]
