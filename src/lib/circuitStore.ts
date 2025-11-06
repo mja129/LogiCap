@@ -194,7 +194,9 @@ function savePositionsToCircuitStore() {
     CircuitStore.update((currCircuit) => {
         savedNodeNames.forEach(({ nodeType, uuid, position }) => {
             const nodeName = `${nodeType}_${uuid}`
-            currCircuit.devices[nodeName].position = position
+            if(nodeName in currCircuit.devices){
+                currCircuit.devices[nodeName].position = position
+            }
         })
         return currCircuit
     })
