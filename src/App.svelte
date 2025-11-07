@@ -228,13 +228,16 @@
                     devName.split('_')[0] + '_' + generateNonce()
                 let gateType = circuitToPaste.devices[devName].type;
 
-                let relativeX =  circuitToPaste.devices[devName].position.x - xMin;
-                let relativeY =  circuitToPaste.devices[devName].position.y - yMin;
+                let device = circuitToPaste.devices[devName];
+
+                let relativeX =  device.position.x - xMin;
+                let relativeY =  device.position.y - yMin;
 
                 newDeviceData = CircuitStore.addCircuitDevice(
                     gateType,
                     circuitRenaming[devName].split('_')[1],
                     {
+                        rotation: device.rotation,
                         position: {
                             x: cur.x + relativeX,
                             y: cur.y + relativeY
