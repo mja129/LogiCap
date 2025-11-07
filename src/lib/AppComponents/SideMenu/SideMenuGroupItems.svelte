@@ -11,7 +11,7 @@
         subMenuHeader = 'Logic Gates',
     }: {
         zIndex: number
-        createCanvasDevice: (e: MouseEvent & { gateType: string }) => void
+        createCanvasDevice: (e: MouseEvent & { gateType: string, celltype?: string }) => void
         subMenuHeader?: string
     } = $props()
 
@@ -27,7 +27,7 @@
     // yeah this should be replaced with the menu.ts
     // depending in the title prop passed in, use that json representation
     const menuItems: Array<menuJsonElement> =
-        menuJsonData[subMenuHeader as NodeMenuGroups]['groupElements']
+        $derived($menuJsonData[subMenuHeader as NodeMenuGroups]['groupElements'])
 
     let draggingItem: menuJsonElement | null = null
     let ghostElement: HTMLElement | null = null
@@ -102,9 +102,18 @@
             const droppedOnCanvas = sideMenu?.contains(dropTarget)
 
             if (droppedOnCanvas) {
-                const e: MouseEvent & { gateType: string } = {
-                    ...event,
-                    gateType: draggingItem.nodeType,
+                var e: MouseEvent & { gateType: string, celltype?: string}
+                if (draggingItem.nodeType == 'Subcircuit') {
+                  e = {
+                      ...event,
+                      gateType: draggingItem.nodeType,
+                      celltype: draggingItem.name
+                  }
+                } else {
+                  e = {
+                      ...event,
+                      gateType: draggingItem.nodeType,
+                  }
                 }
                 createCanvasDevice(e)
             }

@@ -1,5 +1,7 @@
 import { type ComponentProps } from 'svelte'
 
+import { writable, type Writable } from 'svelte/store'
+
 import andIcon from '@icons/circuits/And.webp'
 import bufferIcon from '@icons/circuits/Buffer.webp'
 import orIcon from '@icons/circuits/Or.webp'
@@ -16,18 +18,19 @@ import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
 import SingleIoLogic from '@Circuits/LogicGates/SingleIoLogic.svelte'
 import Lamp from '@Circuits/InputOutputNodes/Lamp.svelte'
 import ButtonNode from '@Circuits/InputOutputNodes/ButtonNode.svelte'
+import Subcomponent from '@Circuits/Subcomponent.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
 // or their grouping in the menu
-export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'GhostElement'
+export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Subcomponents' | 'GhostElement'
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes
 
 export type ioNodeTypes = 'Button' | 'Lamp'
-export type allNodeTypes = logicGateTypes | ioNodeTypes
+export type allNodeTypes = logicGateTypes | ioNodeTypes | 'Subcircuit'
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte
@@ -45,6 +48,7 @@ export type menuJsonType = Record<NodeMenuGroups, menuJsonItem>
 type LogicGateProps = ComponentProps<typeof LogicGate>
 type OutputResultNodeProps = ComponentProps<typeof Lamp>
 type ButtonInputNodeProps = ComponentProps<typeof ButtonNode>
+type SubcomponentProps = ComponentProps<typeof Subcomponent>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -57,12 +61,13 @@ export type AllNodePropsWithoutId =
     | Omit<LogicGateProps, 'nodeId'>
     | Omit<OutputResultNodeProps, 'nodeId'>
     | Omit<ButtonInputNodeProps, 'nodeId'>
+    | Omit<SubcomponentProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
 
 // This maybe should be just a json file but I want it to be in this folder and that is maybe problematic
-export const menuJsonData: menuJsonType = {
+export const menuJsonData: Writable<menuJsonType> = writable({
     'Logic Gates': {
         svg: undefined,
         groupElements: [
@@ -83,11 +88,15 @@ export const menuJsonData: menuJsonType = {
             { name: 'Button', nodeType: 'Button', icon: inputIcon },
         ],
     },
+    'Subcomponents': {
+        svg: undefined,
+        groupElements: [], 
+    },
     GhostElement: {
         svg: undefined,
         groupElements: [],
     },
-}
+})
 
 // This function is here as opposed to inside of SimNode.svelte
 // This is in order to simplify the process of adding a new component
@@ -115,6 +124,8 @@ export function getComponent(type: allNodeTypes) {
             return ButtonNode
         case 'Lamp':
             return Lamp
+        case 'Subcircuit':
+            return Subcomponent
         default:
             return null
     }

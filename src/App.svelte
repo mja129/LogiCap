@@ -100,7 +100,7 @@
     // sync the devices list with the currentDevicesData variable.
 
     // called on "drop" in sidemenugroupitem.svelte
-    function createCanvasDevice(e: MouseEvent & { gateType: string }) {
+    function createCanvasDevice(e: MouseEvent & { gateType: string, celltype?: string }) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         // this gate will update the store and then the subscribe will update the
         // list of circuits currently active on the screen
@@ -109,10 +109,20 @@
         const uuid = generateNonce()
 
         // create new gate on global circuit store on drop
-        const newDeviceList = CircuitStore.addCircuitDevice(
-            gateType,
-            uuid
-        ) as Devices
+        var newDeviceList
+        if (e.celltype) {  
+          newDeviceList = CircuitStore.addCircuitDevice(
+              gateType,
+              uuid,
+              undefined,
+              e.celltype
+          ) as Devices
+        } else {
+          newDeviceList = CircuitStore.addCircuitDevice(
+              gateType,
+              uuid
+          ) as Devices
+        }
         currentDevicesData = newDeviceList
 
         // save on every addition of a new node.

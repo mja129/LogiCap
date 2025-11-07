@@ -3,6 +3,7 @@
 // export a function map from this function, then depending on the type, create this json in app.svelte
 function makeLamp(
     nodeName: string,
+    celltype: string | null,
     options?: {
         bits: number
         net: string
@@ -36,6 +37,7 @@ function makeLamp(
 
 function makeButton(
     nodeName: string,
+    celltype: string | null,
     options?: {
         bits?: number
         net?: string
@@ -82,28 +84,52 @@ function makeLogicNode(
     }
 }
 
+function makeSubcomponentNode(
+    nodeName: string,
+    celltype: string,
+    options?: { position?: { x: number; y: number }, rotation?: number }
+): Subcomponent {
+    return {
+        type: 'Subcircuit',
+        label: nodeName,
+        inputs: 3,
+        celltype: celltype,
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
+        }),
+    }
+}
+
 export const deviceJsonFactoryMap: Record<
     string,
-    (nodeName: string, options?: any) => Device
+    (nodeName: string, celltype: string | null, options?: any) => Device
 > = {
     Button: makeButton,
     Lamp: makeLamp,
-    And: (nodeName, options?) =>
+    And: (nodeName, celltype, options?) =>
         makeLogicNode('And', nodeName, ...(options ? [options] : [])),
-    Nand: (nodeName, options?) =>
+    Nand: (nodeName, celltype, options?) =>
         makeLogicNode('Nand', nodeName, ...(options ? [options] : [])),
-    Or: (nodeName, options?) =>
+    Or: (nodeName, celltype, options?) =>
         makeLogicNode('Or', nodeName, ...(options ? [options] : [])),
-    Nor: (nodeName, options?) =>
+    Nor: (nodeName, celltype, options?) =>
         makeLogicNode('Nor', nodeName, ...(options ? [options] : [])),
-    Xor: (nodeName, options?) =>
+    Xor: (nodeName, celltype, options?) =>
         makeLogicNode('Xor', nodeName, ...(options ? [options] : [])),
-    Xnor: (nodeName, options?) =>
+    Xnor: (nodeName, celltype, options?) =>
         makeLogicNode('Xnor', nodeName, ...(options ? [options] : [])),
-    Not: (nodeName, options?) =>
+    Not: (nodeName, celltype, options?) =>
         makeLogicNode('Not', nodeName, ...(options ? [options] : [])),
-    Repeater: (nodeName, options?) =>
+    Repeater: (nodeName, celltype, options?) =>
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
+    Subcircuit: (nodeName, celltype, options?) => 
+        makeSubcomponentNode(nodeName, celltype as string, ...(options ? [options] : [])), 
 }
 
 // // Example usage

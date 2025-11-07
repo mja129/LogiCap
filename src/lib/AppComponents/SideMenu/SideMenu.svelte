@@ -5,7 +5,6 @@
 
     import {
         menuJsonData,
-        type menuJsonType,
         type NodeMenuGroups,
     } from '@CircuitModel'
 
@@ -26,7 +25,7 @@
     let {
         createCanvasDevice,
     }: {
-        createCanvasDevice: (e: MouseEvent & { gateType: string }) => void
+        createCanvasDevice: (e: MouseEvent & { gateType: string, celltype?: string }) => void
     } = $props()
 
     // import CollapseIcon from '../assets/icons/collapse.webp'
@@ -44,8 +43,8 @@
 
     // just a selection of ones I want for the random line under the menu items.
 
-    const menuJson: menuJsonType = menuJsonData
-    const menuGroupNames = Object.keys(menuJson)
+    const menuEntries = $derived(Object.entries($menuJsonData))
+    const menuGroupNames = $derived(Object.keys($menuJsonData))
 
     const randomLineSelectionGroup = [15, 23, 24, 25, 27, 17, 19, 21, 29]
 
@@ -71,7 +70,7 @@
             const selection: number = randomLineSelectionGroup[randNum]
 
             const svgImport = getSvgLineFileName(selection)
-            menuJson[groupName as NodeMenuGroups]['svg'] = svgImport
+            $menuJsonData[groupName as NodeMenuGroups]['svg'] = svgImport
 
             // remove this number from the selection list.
             // Don't pick any duplicates.
@@ -90,7 +89,7 @@
             const currentMenuGroup = menuGroupNames[index]
             const svgImport = getSvgLineFileName(parseInt(selection, 10))
             if (currentMenuGroup !== undefined) {
-                menuJson[currentMenuGroup as NodeMenuGroups]['svg'] = svgImport
+                $menuJsonData[currentMenuGroup as NodeMenuGroups]['svg'] = svgImport
             }
         })
     }
@@ -123,7 +122,7 @@
     </div>
     <ul>
         <!-- Use <li> for each menu item -->
-        {#each menuGroupNames as groupName, index}
+        {#each menuEntries as [key, value], index (key)}
             <li
                 id="menu_group_{index}"
                 style={getAnimationStyle(showSubMenu, index)}
@@ -134,21 +133,21 @@
                         onmousedown={() => {
                             showSubMenu[index] = !showSubMenu[index]
                         }}
-                        ><span style="margin-left:5%;">{groupName}</span
+                        ><span style="margin-left:5%;">{key}</span
                         ></button
                     >
                     <!-- style={showSubMenu ? 'display:none' : 'display:block'} -->
 
                     <img
                         class="sketch_bar"
-                        src={menuJson[groupName as NodeMenuGroups].svg}
-                        alt="sketched line bottom border for main app bar section {groupName}"
+                        src={value.svg}
+                        alt="sketched line bottom border for main app bar section {key}"
                     />
                 </div>
                 <SideMenuGroupItems
                     {createCanvasDevice}
                     zIndex={index}
-                    subMenuHeader={groupName}
+                    subMenuHeader={key}
                 />
             </li>
         {/each}

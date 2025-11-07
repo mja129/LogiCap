@@ -12,7 +12,7 @@ interface CircuitStoreType extends Writable<Circuit> {
         toAnchorId: inputAnchorName
     ): void
     removeConnection(inputAnchorId: string): void
-    addCircuitDevice(gateType: string, uuid: string, options?: any): Devices
+    addCircuitDevice(gateType: string, uuid: string, options?: any, celltype?: string): Devices
 }
 
 // create a custom svelte store
@@ -20,7 +20,7 @@ const createCircuitStore = (): CircuitStoreType => {
     const initialCircuit: Circuit = {
         devices: {},
         connectors: {},
-        subcircuits: {},
+        subcircuits: [],
         wireManipulations: {},
     }
     const { subscribe, set, update } = writable<Circuit>(initialCircuit)
@@ -34,7 +34,7 @@ const createCircuitStore = (): CircuitStoreType => {
                 return {
                     devices: {},
                     connectors: {},
-                    subcircuits: {},
+                    subcircuits: [],
                     wireManipulations: {},
                 }
             }),
@@ -77,16 +77,17 @@ const createCircuitStore = (): CircuitStoreType => {
                 return currCircuit
             })
         },
-        addCircuitDevice: (gateType: string, uuid: string, options?: any) => {
+        addCircuitDevice: (gateType: string, uuid: string, options?: any, celltype?: any) => {
             const nodeName: string = `${gateType}_${uuid}`
             let newDevices: Devices | null = null
             update((currCircuit) => {
                 const newDevice: Device =
                     options === undefined
-                        ? deviceJsonFactoryMap[gateType](nodeName)
-                        : deviceJsonFactoryMap[gateType](nodeName, options)
+                        ? deviceJsonFactoryMap[gateType](nodeName, celltype ? celltype : null)
+                        : deviceJsonFactoryMap[gateType](nodeName, celltype ? celltype : null, options)
 
                 currCircuit.devices[nodeName] = newDevice
+                if (celltype && currCircuit.subcircuits.indexOf(celltype) == -1) currCircuit.subcircuits.push(celltype)
                 newDevices = currCircuit.devices
 
                 return currCircuit
@@ -292,7 +293,7 @@ export function backupDelete() {
 
 // Downloads the circuitsStoreSave to the user's machine
 export function downloadCircuit(filename: string){
-	saveCircuit();
+  saveCircuit();
 	// => Turn the current Circuit into a file ...
 	
 	const getItem = getLsItem('circuitStoreSave');
@@ -302,7 +303,7 @@ export function downloadCircuit(filename: string){
 	}
 	const circuitJson = JSON.parse(getItem);
     const zoom = parseFloat(localStorage.getItem('canvasZoom') || '1');
-    const translation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0"}');
+    const translation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0}');
     circuitJson.zoom = zoom;
     circuitJson.translation = translation;
 	const prettyCircuitJson = JSON.stringify(circuitJson, null, 2);

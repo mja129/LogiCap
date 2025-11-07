@@ -38,8 +38,22 @@ type LogicGate = {
     rotation?: number
 }
 
-type Device = Button | Lamp | LogicGate
+type Subcomponent = {
+    type: 'Subcircuit'
+    celltype: string
+    label: string
+    inputs: number
+    position?: {
+        x: number
+        y: number
+    },
+    rotation?: number
+}
+
+type Device = Button | Lamp | LogicGate | Subcomponent
 type Devices = Record<string, Device>
+
+type IODevice = Button | Lamp
 
 // DIGITALJS link node connection types
 
@@ -66,11 +80,16 @@ type ConnectorName = Record<'name', string>
 
 type Connector = ConnectorFrom & ConnectorTo & ConnectorName
 
+type DJSConnector = {
+  from: LinkData
+  to: LinkData
+  name: string
+}
 
 // DIGITALJS Subcircuit Type
 type Subcircuit = {
     devices: Devices
-    connectors: Connector[]
+    connectors: DJSConnector[]
 }
 
 
@@ -93,7 +112,7 @@ type SvelvetConnectors = Record<outputAnchorName, ConnectionList>
 type Circuit = {
     devices: Devices
     connectors: SvelvetConnectors
-    subcircuits: Record<string, Subcircuit>
+    subcircuits: string[]
     wireManipulations: Record<string, WireType>
 }
 

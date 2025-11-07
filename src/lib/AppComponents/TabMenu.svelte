@@ -2,6 +2,8 @@
     // fitView={true}
     import AddTab from '~icons/material-symbols/tab-new-right-outline-rounded'
     import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
+    import { menuJsonData, type menuJsonElement, type menuJsonType } from '@CircuitModel';
+    import subcomponentIcon from '@icons/circuits/outputIcon.png'
 
     let {
         clearDeviceData,
@@ -83,6 +85,7 @@
 
         // sideEffects
         currentTab = tabName
+        localStorage.setItem('currActiveTab', tabName)
     }
     function makeNewTab() {
         // // Sort activeTabList
@@ -193,6 +196,31 @@
         editingTab = null
         tabNewName = ''
     }
+    
+    function addSubcircuit(): void {
+      var tab = localStorage.getItem('currActiveTab')
+      menuJsonData.update(old => {
+        if (!tab) return old
+        var dupe = false
+        old.Subcomponents.groupElements.forEach((ele) => {
+          if (ele['name'] == tab) dupe = true
+        })
+        if (dupe) return old
+
+        return {
+          'Logic Gates': { ...old['Logic Gates'] },
+          'Input/Output': { ...old['Input/Output'] },
+          Subcomponents: {
+            svg: old.Subcomponents.svg,
+            groupElements: [
+              ...(old.Subcomponents.groupElements || []),
+              { name: tab, nodeType: 'Subcircuit', icon: subcomponentIcon } as menuJsonElement
+            ]
+          },
+          GhostElement: { ...old.GhostElement }
+        } as menuJsonType;
+      })
+    }
 </script>
 
 <div class="tabs">
@@ -209,7 +237,7 @@
                         }}
                         onblur={commitRename}
                         autofocus
-                    />
+                    /> 
                 {:else}
                     <button
                         type="button"
@@ -220,6 +248,14 @@
                         {tabName}
                     </button>
                 {/if}
+                <!-- <button
+                  type="button"
+                  class="tab-btn"
+                  onclick={(e: MouseEvent) => {
+                      e.stopPropagation()
+                      makeSubcomponent(index)
+                  }}
+                >+</button> -->
                 <button
                     type="button"
                     class="delete-btn"
@@ -236,6 +272,9 @@
     </div>
     <button type="button" class="new-tab-btn" onclick={() => makeNewTab()}>
         <AddTab />
+    </button>
+    <button type="button" class="add-subcircuit-btn" onclick={() => addSubcircuit()}>
+        Make Subcircuit
     </button>
 </div>
 
