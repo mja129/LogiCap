@@ -114,8 +114,7 @@ const createCircuitStore = (): CircuitStoreType => {
     }
 }
 
-export const CircuitStore: CircuitStoreType = createCircuitStore();
-export const circuitStoreSaveName = "circuitStoreSave_"+ window.location.hash; 
+export const CircuitStore: CircuitStoreType = createCircuitStore()
 
 // the info that we will extract from the svelvet save.
 type NodeInfoList = {
@@ -178,10 +177,8 @@ function savePositionsToCircuitStore() {
     // this is an arrow function because this function kinda loads -> and saves
     // and it could be a separate function, I want it to be at least named getSvelvetSave
     // so im wrapping for the naming.
-    // const getSvelvetSave = () => getLsItem('state')
-    // const saveJsonText = getSvelvetSave()
-
-    const saveJsonText = (window as any).getState();
+    const getSvelvetSave = () => getLsItem('state')
+    const saveJsonText = getSvelvetSave()
 
     // early return, state not found in localStorage
     if (!saveJsonText) return console.warn('svelvet save unsucessful'), null
@@ -205,13 +202,13 @@ function savePositionsToCircuitStore() {
 
 // save the current circuit store to localStorage
 export function saveCircuitStoreToLS() {
-    const CircuitStoreSave: string | null = getLsItem(circuitStoreSaveName)
+    const CircuitStoreSave: string | null = getLsItem('circuitStoreSave')
 
     // getLsItem might warn that circuitStoreSave does not exist, in this case
     // we are creating it for the first time, thats okay
     // const currCircuitStore = get(CircuitStore)
 
-    localStorage.setItem(circuitStoreSaveName, JSON.stringify(get(CircuitStore)))
+    localStorage.setItem('circuitStoreSave', JSON.stringify(get(CircuitStore)))
 }
 
 export function clickSvelvetSave() {
@@ -232,7 +229,7 @@ export async function saveCircuit() {
     // and now we trigger it with css, after it triggers we use the svelvet json positions to set our digitial js positions
     // the digitalJS save is the main save and we are just piggybacking off the svelvet save a bit
     // the svelvet save does save our camera position and stuff though.
-    // clickSvelvetSave()
+    clickSvelvetSave()
 
     savePositionsToCircuitStore()
 
@@ -261,7 +258,7 @@ function validateSavedCircuit(savedCircuit: any) {
 
 export function loadCircuit(circuitText: string = 'default') {
 
-    let savedCircuitText: string | null = circuitText === 'default' ? getLsItem(circuitStoreSaveName) : circuitText
+    let savedCircuitText: string | null = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
     if (!savedCircuitText) return
 
     const savedCircuit = JSON.parse(savedCircuitText)
@@ -293,7 +290,7 @@ export function backupDelete() {
     // what if they clear an empty canvas.
     saveCircuit()
 
-    const saveDeleted = localStorage.getItem(circuitStoreSaveName)
+    const saveDeleted = localStorage.getItem('circuitStoreSave')
     if (!saveDeleted) {
         console.warn('we saved before deleting so this should not be possible')
     } else if (
@@ -306,7 +303,7 @@ export function backupDelete() {
     } else {
         localStorage.setItem('prevCircuitStore', saveDeleted)
     }
-    localStorage.removeItem(circuitStoreSaveName)
+    localStorage.removeItem('circuitStoreSave')
 }
 
 
@@ -315,7 +312,7 @@ export function downloadCircuit(filename: string){
   saveCircuit();
 	// => Turn the current Circuit into a file ...
 	
-	const getItem = getLsItem(circuitStoreSaveName);
+	const getItem = getLsItem('circuitStoreSave');
 	if (!getItem) {
 	    console.log('Tried to load empty circuit');
 	    return null;
