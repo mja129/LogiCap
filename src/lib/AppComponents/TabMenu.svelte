@@ -199,8 +199,16 @@
     
     function addSubcircuit(): void {
       var tab = localStorage.getItem('currActiveTab')
+      if (!tab) {
+        alert('Invalid tab')
+        return
+      }
+      var subcircuits = JSON.parse(localStorage.getItem('subcircuits') || '[]')
+      if (subcircuits.indexOf(tab) == -1) {
+        subcircuits.push(tab)
+        localStorage.setItem('subcircuits', JSON.stringify(subcircuits))
+      }
       menuJsonData.update(old => {
-        if (!tab) return old
         var dupe = false
         old.Subcomponents.groupElements.forEach((ele) => {
           if (ele['name'] == tab) dupe = true

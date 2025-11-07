@@ -90,6 +90,7 @@ type DJSConnector = {
 type Subcircuit = {
     devices: Devices
     connectors: DJSConnector[]
+    subcircuits: string[]
 }
 
 

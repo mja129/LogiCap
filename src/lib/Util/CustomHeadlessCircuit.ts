@@ -54,16 +54,17 @@ function subcircuitParse(circuitJson: any): Subcircuit {
   outputs.forEach((device: IODevice, i: number) => {
     device['net'] = 'out' + (i != 0 ? i : '' as string)
   })
-  return {'devices': circuitJson['devices'], 'connectors': transformConnections(circuitJson['connectors'])}
+  return {'devices': circuitJson['devices'], 'connectors': transformConnections(circuitJson['connectors']), 'subcircuits': circuitJson['subcircuits']}
 }
 
-function loadSubcircuits(subcircuits: string[]): Record<string, Subcircuit> {
-  let subcircuitsJson: Record<string, Subcircuit> = {}
+function loadSubcircuits(subcircuits: string[], subjson?: Record<string, Subcircuit>): Record<string, Subcircuit> {
+  let subcircuitsJson: Record<string, Subcircuit> = subjson || {}
   subcircuits.forEach((circuit: string) => {
     var circ = localStorage.getItem(circuit)
     if (circ) {
       subcircuitsJson[circuit] = subcircuitParse(JSON.parse(circ))
-    } else {alert(`Subcircuit not found: ${circuit}`)}
+      loadSubcircuits(subcircuitsJson[circuit]['subcircuits'], subcircuitsJson)
+    } else alert(`Subcircuit not found: ${circuit}`)
   })
   return subcircuitsJson
 }
