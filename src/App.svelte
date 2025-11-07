@@ -22,7 +22,6 @@
         CircuitStore,
         loadCircuit,
         saveCircuit,
-        circuitStoreSaveName,
     } from '@CircuitStore'
 
     import type { logicGateTypes } from '@CircuitModel'
@@ -186,7 +185,7 @@
         // TODO redo this
         saveCircuit()
 
-        let save = JSON.parse(localStorage.getItem(circuitStoreSaveName) ?? '')
+        let save = JSON.parse(localStorage.getItem('circuitStoreSave') ?? '')
 
         let copiedCircuits: any = {
             devices: {},
