@@ -63,18 +63,21 @@
     location={['left', 'top']}
     id={nodeId}
     io="input"
+    ioId="1"
     offset={logicGateAnchorOffsets['in1']}
 />
 <SimulationNodeAnchor
     location={['left', 'mid']}
     id={nodeId}
     io="input"
+    ioId="2"
     offset={logicGateAnchorOffsets['in2']}
 />
 <SimulationNodeAnchor
     location={['left', 'bot']}
     id={nodeId}
     io="input"
+    ioId="3"
     offset={logicGateAnchorOffsets['in3']}
 />
 <!-- This code solves a problem that there were two ways to solve, 
@@ -99,6 +102,7 @@ rerender only the output anchor, very demure very minimal.
     location={['right', 'mid']}
     id={nodeId}
     io="output"
+    ioId=""
     offset={logicGateAnchorOffsets['out']}
     connections={get(CircuitStore).connectors[
         ('out_' + nodeId) as outputAnchorName

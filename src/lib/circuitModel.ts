@@ -1,4 +1,4 @@
-import { type ComponentProps } from 'svelte'
+import { type Component, type ComponentProps } from 'svelte'
 
 import { writable, type Writable } from 'svelte/store'
 
@@ -108,7 +108,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
 // 5. add it to the switch statement below.
 // If your component has specific required props: this may be an issue, lmk.
 // this function is used to getComponent when dropping and create the correct component.
-export function getComponent(type: allNodeTypes) {
+export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
     switch (type) {
         case 'And':
         case 'Nor':
@@ -126,7 +126,5 @@ export function getComponent(type: allNodeTypes) {
             return Lamp
         case 'Subcircuit':
             return Subcomponent
-        default:
-            return null
     }
 }

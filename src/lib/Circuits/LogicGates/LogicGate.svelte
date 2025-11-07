@@ -75,16 +75,18 @@
 <svg bind:this={circuitSvgEle} class="circuitSvgContainer"></svg>
 
 <SimulationNodeAnchor
-    location={['left', 'bot']}
-    id={nodeId}
-    io="input"
-    offset={logicGateAnchorOffsets['in2']}
-/>
-<SimulationNodeAnchor
     location={['left', 'top']}
     id={nodeId}
     io="input"
+    ioId="1"
     offset={logicGateAnchorOffsets['in1']}
+/>
+<SimulationNodeAnchor
+    location={['left', 'bot']}
+    id={nodeId}
+    io="input"
+    ioId="2"
+    offset={logicGateAnchorOffsets['in2']}
 />
 <!-- This code solves a problem that there were two ways to solve, 
 Rotating the node via the svelvet rotation property on a node, only works dynamically if you rerender
@@ -108,6 +110,7 @@ rerender only the output anchor, very demure very minimal.
     location={['right', 'mid']}
     id={nodeId}
     io="output"
+    ioId=""
     offset={logicGateAnchorOffsets['out']}
     connections={get(CircuitStore).connectors[
         ('out_' + nodeId) as outputAnchorName

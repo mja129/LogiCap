@@ -90,6 +90,7 @@
     location={['right', 'mid']}
     id={nodeId}
     io="output"
+    ioId=""
     connections={get(CircuitStore).connectors[
         ('out_' + nodeId) as outputAnchorName
     ]}

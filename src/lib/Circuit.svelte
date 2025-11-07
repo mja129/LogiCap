@@ -8,9 +8,8 @@
         type allNodeTypes,
     } from '@CircuitModel'
     import { writable, type Writable } from 'svelte/store'
-    import { CircuitStore, findOutputAnchor } from '@CircuitStore'
+    import { CircuitStore } from '@CircuitStore'
     import { getRunning } from '@CircuitEngine'
-    import { anchorRendererQ } from '@CircuitParts/Anchor.svelte'
 
     // TODO can this be further simplified
     interface SimNodeProps {
@@ -62,28 +61,6 @@ of the different components now I just need to do it here -->
             // do not set Node rotation property, see below
             //event.detail.node.rotation.set($rotation);
             $CircuitStore.devices[nodeId].rotation = $rotation;
-
-            // trigger re-render of gate outputting to this one
-            // TODO move to generic function
-            let anchors;
-            switch (gateType) {
-                case 'Lamp':
-                case 'Repeater':
-                case 'Not':
-                    anchors = [
-                        findOutputAnchor(`in_${nodeId}`)
-                    ].filter(Boolean) as string[];
-                    break;
-                default:
-                    anchors = [
-                        findOutputAnchor(`in1_${nodeId}`),
-                        findOutputAnchor(`in2_${nodeId}`),
-                    ].filter(Boolean) as string[];
-                    break;
-            }
-            if (anchors.length > 0) {
-                anchorRendererQ.update((curr) => [...curr, ...anchors]);
-            }
         }}
     >
         <!--

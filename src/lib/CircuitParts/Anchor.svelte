@@ -6,12 +6,11 @@
     import { getContext, onMount } from 'svelte'
     import { writable, type Writable } from 'svelte/store'
 
-    export let anchorRendererQ: Writable<Array<string>> = writable([]);
+    let anchorRendererQ: Writable<Array<string>> = writable([]);
 
     type LocationX = 'left' | 'right' | 'center'
     type LocationY = 'top' | 'bot' | 'mid'
     type LocationTuple = [LocationX, LocationY]
-    type portNames = `in${number}` | 'out' | 'in' | ''
 
     // TODO these functions should probably be elsewhere
     function getDirection(locationX: string, rotation: number) : Direction {
@@ -32,44 +31,35 @@
                 return 'west' as Direction;
         }
     }
-    function getPortName(location: LocationTuple) : portNames {
-        switch (location[0]) {
-            case 'left':
-                switch (location[1]) {
-                    case 'top':
-                        return 'in1';
-                    case 'bot':
-                        return 'in2';
-                    case 'mid':
-                        return 'in';
-                }
-            case 'right':
-                return 'out';
-            case 'center':
-                // TODO this doesn't seem right
-                return '';
-        }
-    }
 </script>
 
 <script lang="ts">
+    import { findOutputAnchor } from '@CircuitStore'
+
     let {
         location = ['left', 'top'],
         id,
         io,
+        ioId,
         offset = [],
         connections,
     }: {
         location: LocationTuple
         id: string
         io: 'input' | 'output'
+        ioId: string
         offset?: [number, number] | []
         connections?: any
     } = $props()
+    const anchorId = `${io === 'input' ? 'in' : 'out'}${ioId}_${id}`
 
-    let portName: portNames = getPortName(location);
-    const anchorId = `${portName}_${id}`
     const rotation: Writable<number> = getContext('rotation')
+    rotation.subscribe(() => {
+        let outputId = findOutputAnchor(anchorId);
+        if (outputId) { // if we have an output
+            anchorRendererQ.update((curr) => [...curr, outputId]);
+        }
+    });
 
     /*
      * when a component's input anchors are rotated, the connection(s) to those input anchors are lost.

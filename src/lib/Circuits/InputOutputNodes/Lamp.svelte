@@ -53,6 +53,7 @@
     location={['left', 'mid']}
     id={nodeId}
     io="input"
+    ioId=""
 />
 
 <style>

@@ -59,6 +59,7 @@
     location={['left', 'mid']}
     id={nodeId}
     io="input"
+    ioId=""
     offset={singleIoGateAnchorOffests['in']}
 />
 
@@ -66,6 +67,7 @@
     location={['right', 'mid']}
     id={nodeId}
     io="output"
+    ioId=""
     offset={singleIoGateAnchorOffests['out']}
     connections={get(CircuitStore).connectors[
         ('out_' + nodeId) as outputAnchorName
