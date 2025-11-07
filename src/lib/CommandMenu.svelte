@@ -75,12 +75,32 @@
                 event.preventDefault() // prevents - from being typed when you use press to toggle menu
                 toggleMenu()
             }
+            
+            else if (event.key === 'Delete'){
+                console.log("Delete!");
+                deletedSelectedNodes();
+            }
+
+            else if (event.key === 'c') {
+                copySelectedNodes();
+            } 
+
+            else if (event.key === 'v'){
+                pasteNodes();
+            }
+            
         })
     })
 
     export let createCanvasDevice: (
         e: MouseEvent & { gateType: string }
     ) => void
+
+    export let deletedSelectedNodes: () => void;
+    export let copySelectedNodes: () => void;
+    export let pasteNodes: () => void
+
+
 
     function createGhost(item: menuJsonElement) {
         if (ghostElement) return // Avoid creating multiple ghost elements

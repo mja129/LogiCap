@@ -248,7 +248,7 @@
 >
     {#if wireType === 'bezier'}
         <CustomEdge {initAncId} currentPath={path} {wireActive} {monitorWire} />
-    {:else if wireType === 'step' || wireType == 'straight'}
+    {:else if wireType === 'step' || wireType === 'straight'}
         <NormalEdge {initAncId} currentPath={path} {wireActive} {monitorWire} />
     {/if}
 </Edge>
