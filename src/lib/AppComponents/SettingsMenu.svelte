@@ -2,7 +2,7 @@
 <script module lang="ts">
     import { writable, type Writable } from 'svelte/store'
     export let settingsStore: Writable<any> = writable({
-        wireType: localStorage.getItem('wireType') || 'bezier',
+        wireType: localStorage.getItem('wireType') || 'step',
         theme: localStorage.getItem('theme') === 'dark' ? 'dark' : 'light',
         useTapUpdate: JSON.parse(
             localStorage.getItem('useTapUpdate') || 'true'
