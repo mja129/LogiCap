@@ -50,7 +50,7 @@
 
 <SimulationNodeAnchor
     offset={lampOffset}
-    location={['left', 'mid']}
+    side="west"
     id={nodeId}
     io="input"
     ioId=""

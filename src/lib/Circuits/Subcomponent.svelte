@@ -60,21 +60,21 @@
 <svg bind:this={circuitSvgEle} class="circuitSvgContainer"></svg>
 
 <SimulationNodeAnchor
-    location={['left', 'top']}
+    side="west"
     id={nodeId}
     io="input"
     ioId="1"
     offset={logicGateAnchorOffsets['in1']}
 />
 <SimulationNodeAnchor
-    location={['left', 'mid']}
+    side="west"
     id={nodeId}
     io="input"
     ioId="2"
     offset={logicGateAnchorOffsets['in2']}
 />
 <SimulationNodeAnchor
-    location={['left', 'bot']}
+    side="west"
     id={nodeId}
     io="input"
     ioId="3"
@@ -99,7 +99,7 @@ this passing the rotation as a bindable prop in all components is the best solut
 rerender only the output anchor, very demure very minimal.
 -->
 <SimulationNodeAnchor
-    location={['right', 'mid']}
+    side="east"
     id={nodeId}
     io="output"
     ioId=""

@@ -56,7 +56,7 @@
 <svg bind:this={circuitSvgEle} class="circuitSvgContainer"></svg>
 
 <SimulationNodeAnchor
-    location={['left', 'mid']}
+    side="west"
     id={nodeId}
     io="input"
     ioId=""
@@ -64,7 +64,7 @@
 />
 
 <SimulationNodeAnchor
-    location={['right', 'mid']}
+    side="east"
     id={nodeId}
     io="output"
     ioId=""

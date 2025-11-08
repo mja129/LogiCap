@@ -8,15 +8,19 @@
 
     let anchorRendererQ: Writable<Array<string>> = writable([]);
 
-    type LocationX = 'left' | 'right' | 'center'
-    type LocationY = 'top' | 'bot' | 'mid'
-    type LocationTuple = [LocationX, LocationY]
-
-    // TODO these functions should probably be elsewhere
-    function getDirection(locationX: string, rotation: number) : Direction {
-        if (locationX === 'right') {
-            rotation = (rotation + 180) % 360; // invert
+    function getDirection(offset: Direction, rotation: number) : Direction {
+        switch (offset) { // adjust for offset
+            case 'north':
+                rotation += 90;
+                break;
+            case 'east':
+                rotation += 180;
+                break;
+            case 'south':
+                rotation += 270;
+                break;
         }
+        rotation %= 360; // ensure within bounds (0, 90, 180, 270)
         switch (rotation) {
             case 0:
                 return 'west' as Direction;
@@ -37,14 +41,14 @@
     import { findOutputAnchor } from '@CircuitStore'
 
     let {
-        location = ['left', 'top'],
+        side,
         id,
         io,
         ioId,
         offset = [],
         connections,
     }: {
-        location: LocationTuple
+        side: Direction
         id: string
         io: 'input' | 'output'
         ioId: string
@@ -96,7 +100,7 @@
             let:connecting
             id={anchorId}
             key={anchorId}
-            direction={getDirection(location[0], $rotation)}
+            direction={getDirection(side, $rotation)}
             output={(io === 'output' && true) || false}
             input={(io === 'input' && true) || false}
             locked={getRunning()}

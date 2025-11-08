@@ -87,7 +87,7 @@
 
 <SimulationNodeAnchor
     offset={buttonOffset}
-    location={['right', 'mid']}
+    side="east"
     id={nodeId}
     io="output"
     ioId=""
