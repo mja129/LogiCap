@@ -42,6 +42,7 @@ of the different components now I just need to do it here -->
         drop={position !== undefined ? false : 'cursor'}
         {position}
         editable={false}
+        locked={getRunning()}
         id={nodeId}
         let:selected
         on:nodeClicked={(event) => {

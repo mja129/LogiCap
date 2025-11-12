@@ -3,6 +3,7 @@
     import { menuJsonData } from '@CircuitModel'
     import type { NodeMenuGroups } from '@CircuitModel'
     import type { menuJsonElement } from '@CircuitModel'
+    import { getRunning } from '@CircuitEngine'
 
     // this will be a required prop but it is optional right now.
     let {
@@ -73,6 +74,9 @@
 
     function handleMouseDown(item: menuJsonElement, event: MouseEvent): void {
         event.preventDefault()
+        if (getRunning()) { // block adding components while running simulation
+            return;
+        }
         draggingItem = item
         createGhost(item, event.pageX, event.pageY)
     }
@@ -147,7 +151,7 @@
         <li onmousedown={(event) => handleMouseDown(item, event)}>
             <button
                 class="gate-button"
-                style="background:none; border:none; padding:0; cursor:pointer;"
+                style="background:none; border:none; padding:0; cursor:inherit;"
             >
                 <img src={item.icon} alt="{item.name} logic gate, hand-drawn" />
             </button>
@@ -236,5 +240,9 @@
     .side_menu_group li:hover {
         border: 2px solid transparent;
         outline: 4px solid red;
+        cursor: pointer;
+    }
+    :global(.running .side_menu_group li:hover) {
+        cursor: not-allowed;
     }
 </style>
