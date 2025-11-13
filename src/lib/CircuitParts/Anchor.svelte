@@ -41,19 +41,19 @@
     import { findOutputAnchor } from '@CircuitStore'
 
     let {
-        side,
-        id,
         io,
         ioId,
-        offset = [],
+        id,
         connections,
+        side,
+        offset = [],
     }: {
-        side: Direction
-        id: string
         io: 'input' | 'output'
         ioId: string
-        offset?: [number, number] | []
+        id: string
         connections?: any
+        side: Direction
+        offset?: [number, number] | []
     } = $props()
     const anchorId = `${io === 'input' ? 'in' : 'out'}${ioId}_${id}`
 

@@ -4,7 +4,7 @@
     import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
 
-    const buttonOffset: [number, number] = [95, 40.4];
+    const anchorOffset: [number, number] = [95, 40.4];
 </script>
 
 <script lang="ts">
@@ -80,14 +80,14 @@
 </svg>
 
 <SimulationNodeAnchor
-    offset={buttonOffset}
-    side="east"
-    id={nodeId}
     io="output"
     ioId=""
+    id={nodeId}
     connections={get(CircuitStore).connectors[
         ('out_' + nodeId) as outputAnchorName
     ]}
+    side="east"
+    offset={anchorOffset}
 />
 
 <style>

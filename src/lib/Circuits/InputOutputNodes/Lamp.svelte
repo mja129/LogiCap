@@ -1,7 +1,7 @@
 <script lang="ts" module>
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
 
-    const lampOffset: [number, number] = [-5, 35.43];
+    const anchorOffset: [number, number] = [-5, 35.43];
 
     interface SVGLamp extends SVGSVGElement {
         setLampState(this: SVGSVGElement, state: number): void;
@@ -40,10 +40,10 @@
     function setLampState(this: SVGSVGElement, state: number): void {
         signalOn = state == 1;
     }
-    let lampSVG : SVGSVGElement;
+    let lampSVGElement : SVGSVGElement;
     onMount(() => {
         // assign property
-        Object.assign(lampSVG, { setLampState });
+        Object.assign(lampSVGElement, { setLampState });
     })
 
     CircuitEngine.subscribe((circuit) => {
@@ -62,7 +62,7 @@
         viewBox="-12 0 95 100"
         xmlns="http://www.w3.org/2000/svg"
         class={'LampSVG'}
-        bind:this={lampSVG}
+        bind:this={lampSVGElement}
     >
         <line
             x1="-50"
@@ -86,9 +86,9 @@
 </div>
 
 <SimulationNodeAnchor
-    offset={lampOffset}
-    side="west"
-    id={nodeId}
     io="input"
     ioId=""
+    id={nodeId}
+    side="west"
+    offset={anchorOffset}
 />
