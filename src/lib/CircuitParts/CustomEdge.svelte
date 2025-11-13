@@ -23,7 +23,6 @@
     import {
         setAnchor,
         getWireIdFromDOM,
-        setLamp,
         getSvelvetEdgeEle,
     } from './wireUtils.ts'
 

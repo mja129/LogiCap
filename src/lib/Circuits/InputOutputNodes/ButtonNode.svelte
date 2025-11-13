@@ -1,11 +1,13 @@
-<script lang="ts">
+<script lang="ts" module>
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
     import { CircuitEngine, inputSetter, getRunning } from '@CircuitEngine'
     import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
-    import { rejectMoveClick } from '@Util/cursors.ts'
-    // import Switch from './Switch.svelte'
 
+    const buttonOffset: [number, number] = [95, 40.4];
+</script>
+
+<script lang="ts">
     let {
         width = 80,
         height = 50,
@@ -16,32 +18,25 @@
         nodeId: string
     } = $props()
 
-    let signalOn: boolean = $state(false)
+    let signalOn: boolean = $state(false);
 
     let buttonColor = $derived({
-        color: signalOn ? 'green' : 'red',
-        outlineColor: signalOn ? 'var(--lime-green)' : 'var(--lime-red)',
+        fill: getRunning() ? signalOn ? 'green' : 'red' : 'gray',
+        stroke: getRunning() ? signalOn ? 'var(--lime-green)' : 'var(--lime-red)' : 'lightgray',
     })
 
-    const buttonOffset: [number, number] = [95, 40.4]
-
-    // after a mouse down, if you start dragging, don't flip the signal
-    // if after mousedown you get mouseUp, flip the signal
-    // After you get either of them, both listeners are killed and created again on the next mousedown.
-    function buttonSwitch() {
+    function toggleButton() {
         if (getRunning()) {
-            // Flip the signal only if it was a click, not a drag, and its on
-            // console.log(getRunning())
-            signalOn = !signalOn
-            inputSetter(nodeId)
+            signalOn = !signalOn;
+            inputSetter(nodeId);
         }
     }
 
-    CircuitEngine.subscribe((digitalJsCircuit) => {
-        //Turn off buttons on stop
-        if (digitalJsCircuit === null) {
-            signalOn = false
-            return
+    CircuitEngine.subscribe((circuit) => {
+        // Turn off buttons on simulation stop
+        if (circuit === null) {
+            signalOn = false;
+            return;
         }
     })
 </script>
@@ -58,7 +53,7 @@
         width="100"
         height="100"
         fill="black"
-        stroke={buttonColor.outlineColor}
+        stroke={buttonColor.stroke}
         stroke-width="2"
     />
     <line
@@ -66,24 +61,23 @@
         x2="190"
         y1="50"
         y2="50"
-        stroke={buttonColor.outlineColor}
+        stroke={buttonColor.stroke}
         stroke-width="8"
     />
 
     <!-- Circle -->
-    <circle
-        onmousedowncapture={(e: MouseEvent) => rejectMoveClick(e, buttonSwitch)}
+    <circle class="button-circle"
+        onclick={toggleButton}
         role="presentation"
         cx="50"
         cy="50"
         r="30"
         aria-label="input button node toggle"
-        fill={buttonColor.color}
-        stroke={buttonColor.outlineColor}
+        fill={buttonColor.fill}
+        stroke={buttonColor.stroke}
         stroke-width="7"
     />
 </svg>
-<!-- <Switch signalOn {toggleButton} /> -->
 
 <SimulationNodeAnchor
     offset={buttonOffset}
@@ -95,3 +89,9 @@
         ('out_' + nodeId) as outputAnchorName
     ]}
 />
+
+<style>
+    :global(.running .button-circle:hover) {
+        cursor: pointer;
+    }
+</style>

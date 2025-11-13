@@ -74,29 +74,9 @@
 
         if (appMainTag.classList.contains('running')) {
             appMainTag.classList.remove('running')
-            turnOffLamps()
         } else {
             appMainTag.classList.add('running')
         }
-    }
-
-    function turnOffLamps() {
-        let circleElement: SVGElement | null
-        let lineElement: SVGElement | null
-        const lampOffColors: string[] = ['red', 'var(--lime-red)']
-        const lamps: NodeListOf<HTMLElement> | null =
-            document.querySelectorAll("[id^='N-Lamp']")
-        if (lamps === null) {
-            return
-        }
-        lamps.forEach((lamp) => {
-            circleElement = lamp.querySelector('circle')
-            lineElement = lamp.querySelector('line')
-            if (circleElement === null || lineElement === null) return
-            circleElement.setAttribute('stroke', lampOffColors[1])
-            circleElement.setAttribute('fill', lampOffColors[0])
-            lineElement.setAttribute('stroke', lampOffColors[0])
-        })
     }
 
     // button click functions

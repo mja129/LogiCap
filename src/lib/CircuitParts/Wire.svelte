@@ -30,7 +30,7 @@
     } from '@CircuitEngine'
     import { CircuitStore } from '@CircuitStore'
 
-    import { setAnchor, getWireIdFromDOM, setLamp } from './wireUtils.ts'
+    import { setAnchor, getWireIdFromDOM } from './wireUtils.ts'
     import { createDragWire } from './manipulateWire.ts'
     import CustomEdge from './CustomEdge.svelte'
     import NormalEdge from './NormalEdge.svelte'
@@ -40,6 +40,8 @@
 
     import { settingsStore } from '@AppComponents/SettingsMenu.svelte'
     import { onDestroy, onMount } from 'svelte'
+
+    import { setLampState } from '@Circuits/InputOutputNodes/Lamp.svelte'
 
     let {
         initAncId,
@@ -207,7 +209,8 @@
 
                 if (!labelOutputTo) return null
 
-                setLamp(connectedTo, wireChange)
+                // TODO find a way to abstract this better
+                setLampState(connectedTo, wireChange);
             })
         return monitorFn
     }
