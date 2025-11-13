@@ -108,28 +108,28 @@ function makeSubcomponentNode(
 
 export const deviceJsonFactoryMap: Record<
     string,
-    (nodeName: string, celltype: string | null, options?: any) => Device
+    (nodeName: string, options?: any) => Device
 > = {
     Button: makeButton,
     Lamp: makeLamp,
-    And: (nodeName, celltype, options?) =>
+    And: (nodeName, options?) =>
         makeLogicNode('And', nodeName, ...(options ? [options] : [])),
-    Nand: (nodeName, celltype, options?) =>
+    Nand: (nodeName, options?) =>
         makeLogicNode('Nand', nodeName, ...(options ? [options] : [])),
-    Or: (nodeName, celltype, options?) =>
+    Or: (nodeName, options?) =>
         makeLogicNode('Or', nodeName, ...(options ? [options] : [])),
-    Nor: (nodeName, celltype, options?) =>
+    Nor: (nodeName, options?) =>
         makeLogicNode('Nor', nodeName, ...(options ? [options] : [])),
-    Xor: (nodeName, celltype, options?) =>
+    Xor: (nodeName, options?) =>
         makeLogicNode('Xor', nodeName, ...(options ? [options] : [])),
-    Xnor: (nodeName, celltype, options?) =>
+    Xnor: (nodeName, options?) =>
         makeLogicNode('Xnor', nodeName, ...(options ? [options] : [])),
-    Not: (nodeName, celltype, options?) =>
+    Not: (nodeName, options?) =>
         makeLogicNode('Not', nodeName, ...(options ? [options] : [])),
-    Repeater: (nodeName, celltype, options?) =>
+    Repeater: (nodeName, options?) =>
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
-    Subcircuit: (nodeName, celltype, options?) => 
-        makeSubcomponentNode(nodeName, celltype as string, ...(options ? [options] : [])), 
+    Subcircuit: (nodeName, options?) => 
+        makeSubcomponentNode(nodeName, options.celltype as string, ...(options ? [options] : [])), 
 }
 
 // // Example usage

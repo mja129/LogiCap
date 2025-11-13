@@ -43,7 +43,7 @@ function subcircuitParse(circuitJson: any): Subcircuit {
     return 0
   })
   inputs.forEach((device: IODevice, i: number) => {
-    device['net'] = 'in' + (i != 0 ? i : '' as string)
+    device['net'] = `in${i+1}`
   })
   outputs.sort((a, b) => {
     if (a['position'] && b['position']) {

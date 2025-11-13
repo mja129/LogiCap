@@ -81,11 +81,18 @@ const createCircuitStore = (): CircuitStoreType => {
         addCircuitDevice: (gateType: string, uuid: string, options?: any, celltype?: any) => {
             const nodeName: string = `${gateType}_${uuid}`
             let newDevices: Devices | null = null
+            if (celltype) {
+              if (options) {
+                options.celltype = celltype
+              } else {
+                options = {'celltype': celltype}
+              }
+            }
             update((currCircuit) => {
                 const newDevice: Device =
                     options === undefined
-                        ? deviceJsonFactoryMap[gateType](nodeName, celltype ? celltype : null)
-                        : deviceJsonFactoryMap[gateType](nodeName, celltype ? celltype : null, options)
+                        ? deviceJsonFactoryMap[gateType](nodeName)
+                        : deviceJsonFactoryMap[gateType](nodeName, options)
 
                 currCircuit.devices[nodeName] = newDevice
                 if (celltype && currCircuit.subcircuits.indexOf(celltype) == -1) currCircuit.subcircuits.push(celltype)
