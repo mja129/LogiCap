@@ -78,14 +78,15 @@ const createCircuitStore = (): CircuitStoreType => {
                 return currCircuit
             })
         },
-        addCircuitDevice: (gateType: string, uuid: string, options?: any, celltype?: any) => {
+        addCircuitDevice: (gateType: string, uuid: string, options?: any, celltype?: any, inputs?: number) => {
             const nodeName: string = `${gateType}_${uuid}`
             let newDevices: Devices | null = null
             if (celltype) {
               if (options) {
                 options.celltype = celltype
+                options.inputs = inputs
               } else {
-                options = {'celltype': celltype}
+                options = {'celltype': celltype, 'inputs': inputs}
               }
             }
             update((currCircuit) => {

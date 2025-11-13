@@ -43,6 +43,7 @@ type Subcomponent = {
     celltype: string
     label: string
     inputs: number
+    outputs: number
     position?: {
         x: number
         y: number

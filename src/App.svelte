@@ -111,7 +111,7 @@
     // sync the devices list with the currentDevicesData variable.
 
     // called on "drop" in sidemenugroupitem.svelte
-    function createCanvasDevice(e: MouseEvent & { gateType: string, celltype?: string }) {
+    function createCanvasDevice(e: MouseEvent & { gateType: string, celltype?: string, inputs?: number }) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         // this gate will update the store and then the subscribe will update the
         // list of circuits currently active on the screen
@@ -126,7 +126,8 @@
               gateType,
               uuid,
               undefined,
-              e.celltype
+              e.celltype,
+              e.inputs
           ) as Devices
         } else {
           newDeviceList = CircuitStore.addCircuitDevice(
@@ -319,6 +320,7 @@
                     ...(device.type && { gateType: device.type }),
                     width: 80,
                     height: 50,
+                    ...((device as Subcomponent).celltype && { celltype: (device as Subcomponent).celltype, inputs: (device as Subcomponent).inputs, outputs: (device as Subcomponent).outputs }),
                     // Add any other specific props your node components need
                 }}
             />

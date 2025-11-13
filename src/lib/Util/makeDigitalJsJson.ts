@@ -87,12 +87,15 @@ function makeLogicNode(
 function makeSubcomponentNode(
     nodeName: string,
     celltype: string,
+    inputs: number,
+    outputs: number,
     options?: { position?: { x: number; y: number }, rotation?: number }
 ): Subcomponent {
     return {
         type: 'Subcircuit',
         label: nodeName,
-        inputs: 3,
+        inputs: inputs,
+        outputs: outputs,
         celltype: celltype,
         ...(options?.position && {
             position: {
@@ -129,7 +132,7 @@ export const deviceJsonFactoryMap: Record<
     Repeater: (nodeName, options?) =>
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
     Subcircuit: (nodeName, options?) => 
-        makeSubcomponentNode(nodeName, options.celltype as string, ...(options ? [options] : [])), 
+        makeSubcomponentNode(nodeName, options.celltype as string, options.inputs as number, options.outputs as number, ...(options ? [options] : [])), 
 }
 
 // // Example usage

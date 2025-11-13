@@ -13,21 +13,32 @@
         width = 80,
         height = 50,
         nodeId,
+        celltype,
+        inputs,
+        outputs
     }: {
         width?: number
         height?: number
         gateType?: 'Subcircuit'
         nodeId: string
+        celltype: string
+        inputs: number
+        outputs: number
     } = $props()
 
-    const logicGateAnchorOffsets: Record<LogicGateAnchors, [number, number]> = {
-        in3: [-7.5, 68.5],
-        in1: [-7.5, 37.58],
-        in2: [-7.5, 6.66],
-        out: [95, 37.58],
+    let inputOffsets: Record<string, [number, number]> = {}
+    for (let i = 1; i <= inputs; i++) {
+      inputOffsets[`in${i}`] = [-7.5, 6.66 + ((i - 1) * 61.84 / (inputs - 1))]
+    }
+    let outputOffsets: Record<string, [number, number]> = {}
+    if (outputs > 1) {
+      for (let i = 1; i <= inputs; i++) {
+        outputOffsets[`out${i}`] = [95, 6.66 + ((i - 1) * 61.84 / (outputs - 1))]
+      }
+    } else {
+      outputOffsets['out'] = [95, 37.58]
     }
 
-    type LogicGateAnchors = 'in1' | 'in2' | 'in3' | 'out'
 
     // the svg image coorisponding to the 'gateType' passed in.
     let circuitSvg = gatesvg
@@ -55,56 +66,30 @@
     let rotation: Writable<number> = getContext('rotation')
 </script>
 
+<h3 style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5;'>{celltype}</h3>
+
 <!-- Position property only works if cursor is set to false. -->
 <!-- <circuitSvgElement /> -->
 <svg bind:this={circuitSvgEle} class="circuitSvgContainer"></svg>
 
+{#each Object.entries(inputOffsets) as [name, offset]}
 <SimulationNodeAnchor
     side="west"
     id={nodeId}
     io="input"
-    ioId="1"
-    offset={logicGateAnchorOffsets['in1']}
+    ioId={name[2]}
+    offset={offset}
 />
-<SimulationNodeAnchor
-    side="west"
-    id={nodeId}
-    io="input"
-    ioId="2"
-    offset={logicGateAnchorOffsets['in2']}
-/>
-<SimulationNodeAnchor
-    side="west"
-    id={nodeId}
-    io="input"
-    ioId="3"
-    offset={logicGateAnchorOffsets['in3']}
-/>
-<!-- This code solves a problem that there were two ways to solve, 
-Rotating the node via the svelvet rotation property on a node, only works dynamically if you rerender
-the entire node, this sucessfully reloads the wires too, but because of the way position: works, the node 
-ends up snapping back after we rerender it like that. 
-
-the position data is only used for reloading saved nodes
-So when you refresh the page, 
-Or load from a file
-Or go to a new tab
-
-the only problem with rerendering the entire node is that position is defined when triggering the rotation
-and rerendering the entire node
-
-We could just unset position on node rotation.
-It does work but its chunky and teleports for some reason
-this passing the rotation as a bindable prop in all components is the best solution
-rerender only the output anchor, very demure very minimal.
--->
+{/each}
+{#each Object.entries(outputOffsets) as [name, offset]}
 <SimulationNodeAnchor
     side="east"
     id={nodeId}
     io="output"
     ioId=""
-    offset={logicGateAnchorOffsets['out']}
+    offset={offset}
     connections={get(CircuitStore).connectors[
         ('out_' + nodeId) as outputAnchorName
     ]}
 />
+{/each}
