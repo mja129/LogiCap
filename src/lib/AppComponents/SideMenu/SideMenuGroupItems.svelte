@@ -247,13 +247,19 @@
 
         border-radius: 20px;
         border: 2px solid black;
-        /* box-shadow: 4px 4px 0px 0px #000000; */
+        box-shadow: 4px 4px 0 0 black;
     }
 
     .side_menu_group li:hover {
-        border: 2px solid transparent;
-        outline: 4px solid red;
         cursor: pointer;
+        scale: 1.1;
+        transition: scale 0.1s ease-in-out;
+    }
+    :global(.light .side_menu_group li:hover) {
+        background-color: var(--dark-cream);
+    }
+    :global(.dark .side_menu_group li:hover) {
+        background-color: var(--neon-purple);
     }
     :global(.running .side_menu_group li:hover) {
         cursor: not-allowed;

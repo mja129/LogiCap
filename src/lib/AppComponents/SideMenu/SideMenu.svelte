@@ -273,6 +273,7 @@
         text-align: left;
     }
     .menu_group_section {
+        padding-top: 8px;
         position: relative;
         z-index: 40;
     }
