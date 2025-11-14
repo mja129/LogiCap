@@ -14,7 +14,7 @@
         nodeId,
         celltype,
         inputs,
-        outputs = 1 // TODO remove default definition once multiple outputs are supported
+        outputs
     }: {
         gateType?: 'Subcircuit'
         nodeId: string

@@ -87,7 +87,7 @@
         currentTab = tabName
         localStorage.setItem('currActiveTab', tabName)
     }
-    function makeNewTab() {
+    function makeNewTab() : string {
         // // Sort activeTabList
         // activeTabList = activeTabList.sort((a, b) => a.localeCompare(b));
 
@@ -112,7 +112,7 @@
         if (unnamedNumbers.length === 0 || unnamedNumbers[0] !== 0) {
             activeTabList.push(`unnamed_circuit`)
             localStorage.setItem('activeTabList', JSON.stringify(activeTabList))
-            return
+            return 'unnamed_circuit'
         }
 
         let nextNumber = 1
@@ -127,9 +127,7 @@
         activeTabList.push(`unnamed_circuit_${nextNumber}`)
         localStorage.setItem('activeTabList', JSON.stringify(activeTabList))
 
-        // assume that they will always be sequential.
-        // add the last one to
-        // let activeTabList = $state(['Tab1_circuitStoreSave'])
+        return `unnamed_circuit_${nextNumber}`;
     }
 
     function deleteTab(index: number): void {
@@ -145,6 +143,9 @@
         )
         localStorage.setItem('activeTabList', JSON.stringify(activeTabList))
         localStorage.removeItem(deletedTab)
+
+        // remove subcomponent
+        removeSubcircuit(deletedTab);
 
         // If the deleted tab is the current tab, switch to the first remaining tab.
         if (currentTab === deletedTab) {
@@ -193,41 +194,62 @@
             currentTab = trimmedName
             localStorage.setItem('currActiveTab', trimmedName)
         }
+
+        // update subcomponent
+        removeSubcircuit(editingTab);
+        addSubcircuit(trimmedName);
+
+        // reset for next rename
         editingTab = null
         tabNewName = ''
     }
-    
-    function addSubcircuit(): void {
-      var tab = localStorage.getItem('currActiveTab')
-      if (!tab) {
-        alert('Invalid tab')
-        return
-      }
-      var subcircuits = JSON.parse(localStorage.getItem('subcircuits') || '[]')
-      if (subcircuits.indexOf(tab) == -1) {
-        subcircuits.push(tab)
-        localStorage.setItem('subcircuits', JSON.stringify(subcircuits))
-      }
-      menuJsonData.update(old => {
-        var dupe = false
-        old.Subcomponents.groupElements.forEach((ele) => {
-          if (ele['name'] == tab) dupe = true
-        })
-        if (dupe) return old
 
-        return {
-          'Logic Gates': { ...old['Logic Gates'] },
-          'Input/Output': { ...old['Input/Output'] },
-          Subcomponents: {
-            svg: old.Subcomponents.svg,
-            groupElements: [
-              ...(old.Subcomponents.groupElements || []),
-              { name: tab, nodeType: 'Subcircuit', icon: subcomponentIcon } as menuJsonElement
-            ]
-          },
-          GhostElement: { ...old.GhostElement }
-        } as menuJsonType;
-      })
+    function addSubcircuit(name: string | null): void {
+      if (!name) {
+        alert('Invalid tab');
+        return;
+      }
+
+      // update subcircuits json
+      const subcircuits = JSON.parse(localStorage.getItem('subcircuits') || '[]');
+      if (subcircuits.indexOf(name) != -1) { // already exists
+          return;
+      }
+      subcircuits.push(name);
+      localStorage.setItem('subcircuits', JSON.stringify(subcircuits));
+
+      refreshMenu(subcircuits);
+    }
+
+    function removeSubcircuit(name: string): void {
+        // update subcircuits json
+        const subcircuits = JSON.parse(localStorage.getItem('subcircuits') || '[]');
+        const index = subcircuits.indexOf(name);
+        if (index == -1) { // nothing to remove
+            return;
+        }
+        subcircuits.splice(index, 1);
+        localStorage.setItem('subcircuits', JSON.stringify(subcircuits));
+
+        refreshMenu(subcircuits);
+    }
+
+    function refreshMenu(subcircuits: any): void {
+        menuJsonData.update(old => {
+            return {
+                'Logic Gates': { ...old['Logic Gates'] },
+                'Input/Output': { ...old['Input/Output'] },
+                'Subcomponents': {
+                    svg: old.Subcomponents.svg,
+                    groupElements: [
+                        ...(subcircuits.map((subcircuit: string) => {
+                            return { name: subcircuit, nodeType: 'Subcircuit', icon: subcomponentIcon} as menuJsonElement;
+                        })),
+                    ]
+                },
+                GhostElement: { ...old.GhostElement }
+            } as menuJsonType;
+        })
     }
 </script>
 
@@ -256,33 +278,27 @@
                         {tabName}
                     </button>
                 {/if}
-                <!-- <button
-                  type="button"
-                  class="tab-btn"
-                  onclick={(e: MouseEvent) => {
-                      e.stopPropagation()
-                      makeSubcomponent(index)
-                  }}
-                >+</button> -->
-                <button
-                    type="button"
-                    class="delete-btn"
-                    onclick={(e: MouseEvent) => {
+                {#if tabName !== 'init_circuit'}
+                    <button
+                        type="button"
+                        class="delete-btn"
+                        onclick={(e: MouseEvent) => {
                         e.stopPropagation()
                         deleteTab(index)
                     }}
-                    title="Delete Tab"
-                >
-                    ×
-                </button>
+                        title="Delete Tab"
+                    >
+                        ×
+                    </button>
+                {/if}
             </div>
         {/each}
     </div>
-    <button type="button" class="new-tab-btn" onclick={() => makeNewTab()}>
+    <button type="button" class="new-tab-btn" onclick={() => {
+        const tabName = makeNewTab();
+        addSubcircuit(tabName);
+    }}>
         <AddTab />
-    </button>
-    <button type="button" class="add-subcircuit-btn" onclick={() => addSubcircuit()}>
-        Make Subcircuit
     </button>
 </div>
 
