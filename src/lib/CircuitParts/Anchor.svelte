@@ -47,6 +47,7 @@
         connections,
         side,
         offset = [],
+        usePixelOffset = false,
     }: {
         io: 'input' | 'output'
         ioId: string
@@ -54,6 +55,7 @@
         connections?: any
         side: Direction
         offset?: [number, number] | []
+        usePixelOffset?: boolean
     } = $props()
     const anchorId = `${io === 'input' ? 'in' : 'out'}${ioId}_${id}`
 
@@ -92,7 +94,7 @@
 
 {#snippet anchor()}
     <div
-        style={`position:absolute;left: ${offset[0]}%; top: ${offset[1]}%;`}
+        style={`position:absolute;left: ${offset[0]}${usePixelOffset ? "px" : "%"}; top: ${offset[1]}${usePixelOffset ? "px" : "%"};`}
     >
         <SvelvetAnchor
             let:linked
