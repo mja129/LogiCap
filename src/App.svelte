@@ -6,6 +6,46 @@
         // but save on reload pretty much covers us.
         return null
     }
+
+    // TODO these might be better put elsewhere
+    // TODO stop using local storage for subcircuits once a better save format exists
+    let subcomponents : string[] = $state(JSON.parse((localStorage.getItem('subcircuits') || '')));
+    export function createSubcomponent(name: string) {
+        // update subcircuits json
+        if (subcomponents.indexOf(name) != -1) { // already exists
+            return;
+        }
+        subcomponents.push(name);
+        localStorage.setItem('subcircuits', JSON.stringify(subcomponents));
+        localStorage.setItem(name, '');
+    }
+
+    export function deleteSubcomponent(name: string) {
+        // update subcircuits json
+        const index = subcomponents.indexOf(name);
+        if (index == -1) { // nothing to remove
+            return;
+        }
+        subcomponents.splice(index, 1);
+        localStorage.setItem('subcircuits', JSON.stringify(subcomponents));
+        localStorage.removeItem(name);
+    }
+
+    export function renameSubcomponent(name: string, newName: string) {
+        const index = subcomponents.indexOf(name);
+        const tabContent = localStorage.getItem(name);
+        if (tabContent === null || index == -1) {
+            return;
+        }
+        subcomponents[index] = newName;
+        localStorage.setItem('subcircuits', JSON.stringify(subcomponents));
+        localStorage.removeItem(name);
+        localStorage.setItem(newName, tabContent);
+    }
+
+    export function getSubcomponents() : string[] {
+        return subcomponents;
+    }
 </script>
 
 <script lang="ts">

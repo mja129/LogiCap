@@ -1,3 +1,27 @@
+<script lang="ts" module>
+    import subcomponentIcon from '@icons/circuits/outputIcon.png'
+    import type { menuJsonElement, menuJsonType } from '@CircuitModel'
+    import { getSubcomponents } from '@src/App.svelte'
+
+    export function refreshSideMenu(): void {
+        menuJsonData.update(old => {
+            return {
+                'Logic Gates': { ...old['Logic Gates'] },
+                'Input/Output': { ...old['Input/Output'] },
+                'Subcomponents': {
+                    svg: old.Subcomponents.svg,
+                    groupElements: [
+                        ...(getSubcomponents().map((subcircuit: string) => {
+                            return { name: subcircuit, nodeType: 'Subcircuit', icon: subcomponentIcon} as menuJsonElement;
+                        })),
+                    ]
+                },
+                GhostElement: { ...old.GhostElement }
+            } as menuJsonType;
+        })
+    }
+</script>
+
 <!-- https://coolors.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script lang="ts">
     import SideMenuHeader from './SideMenuHeader.svelte'
@@ -19,6 +43,7 @@
     import SketchyLine_19 from '@assets/svg/sketchLineSvg/line_19.svg'
     import SketchyLine_21 from '@assets/svg/sketchLineSvg/line_21.svg'
     import SketchyLine_29 from '@assets/svg/sketchLineSvg/line_29.svg'
+    import { onMount } from 'svelte'
 
     // function passed down from app.svelte that will run after circuit is dropped on the canvas
     // passed further down to the SideMenuGroupItems.svelte
@@ -106,6 +131,12 @@
             return 'transition: max-height .4s ease-in; max-height:405px'
         }
     }
+
+    onMount(() => {
+        // TODO ideally we do not have to do this
+        // this is mainly done to pull subcomponents
+        refreshSideMenu();
+    })
 </script>
 
 <nav class="side_menu noselect" aria-label="Side Menu">

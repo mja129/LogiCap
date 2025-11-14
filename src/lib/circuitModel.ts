@@ -66,14 +66,6 @@ export type AllNodePropsWithoutId =
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
 
-let subcircuits = (localStorage.getItem('subcircuits') &&
-                  JSON.parse(localStorage.getItem('subcircuits') || '')) || []
-
-let menuSubcircuits: menuJsonElement[] = []
-subcircuits.forEach((sub: string) => {
-  menuSubcircuits.push({ name: sub, nodeType: 'Subcircuit', icon: outputIcon})
-})
-
 // This maybe should be just a json file but I want it to be in this folder and that is maybe problematic
 export const menuJsonData: Writable<menuJsonType> = writable({
     'Logic Gates': {
@@ -98,7 +90,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
     },
     'Subcomponents': {
         svg: undefined,
-        groupElements: menuSubcircuits, 
+        groupElements: [],
     },
     GhostElement: {
         svg: undefined,

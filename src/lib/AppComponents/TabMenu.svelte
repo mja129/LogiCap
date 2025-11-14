@@ -1,303 +1,186 @@
-<script lang="ts">
-    // fitView={true}
+<script lang="ts" module>
     import AddTab from '~icons/material-symbols/tab-new-right-outline-rounded'
     import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
-    import { menuJsonData, type menuJsonElement, type menuJsonType } from '@CircuitModel';
-    import subcomponentIcon from '@icons/circuits/outputIcon.png'
+    import { createSubcomponent, deleteSubcomponent, getSubcomponents } from '@src/App.svelte'
+    import { refreshSideMenu } from '@AppComponents/SideMenu/SideMenu.svelte'
+
+    const primaryTabName = 'primary circuit';
+</script>
+
+<script lang="ts">
+    import { renameSubcomponent } from '@src/App.svelte'
 
     let {
         clearDeviceData,
         setDeviceData,
-    }: { clearDeviceData: Function; setDeviceData: Function } = $props()
+    }: {
+        clearDeviceData: Function
+        setDeviceData: Function
+    } = $props();
 
-    const initTab = localStorage.getItem('currActiveTab') || 'init_circuit'
-    let currentTab: string = $state(initTab)
+    let currentTabs: string[] = $derived(getSubcomponents());
+    let currentTab: string = $state(localStorage.getItem('currActiveTab') || primaryTabName);
 
-    let activeTabList = $state(
-        (localStorage.getItem('activeTabList') &&
-            JSON.parse(localStorage.getItem('activeTabList') || '')) || [
-            initTab,
-        ]
-    )
-    // map 'circuitName' to 'transform: translate(x1_px x2_px) scale(x)'
-    let tabCameraPositions: Record<string, string> = $state({})
+    function createTab(): void {
+        const nextTabId = getSubcomponents()
+            .map((tab: string) => {
+                const match = tab.match(/^sub_(\d+)$/);
+                return match ? parseInt(match[1]) : null;
+            })
+            .filter((num: number | null) => num !== null)
+            .reduce((a, b) => a > b ? a : b, 0) + 1;
+        createSubcomponent(`sub_${nextTabId}`);
+        refreshSideMenu();
+    }
 
-    // variables for incline renaming
-    let editingTab = $state<string | null>(null)
-    let tabNewName = $state<string>('')
-
-    async function backupTab(currentTab: string) {
-        await saveCircuit()
-
-        // load circuitStoreSave into tab save
-        const newSave = localStorage.getItem('circuitStoreSave')
-        if (!newSave) {
-            console.log(
-                "empty after trying to save, not possible I don't think"
-            )
-            return
+    async function deleteTab(tabName: string): Promise<void> {
+        if (!currentTabs.includes(tabName)) {
+            alert(`Subcomponent '${tabName}' not found!`);
+            return;
         }
-        localStorage.setItem(currentTab, newSave)
-    }
-    function getCameraData() {
-        const graphWrapper: HTMLElement | null = document?.querySelector(
-            'div.svelvet-graph-wrapper'
-        )
-        if (!graphWrapper) return null
 
-        const { transform } = graphWrapper.style
-        return transform
-    }
-    // switches tab
-    async function handleTabClick(tabName: string) {
-        // saveCircuit()
+        // if the deleted tab is the current tab, switch to the primary tab
         if (currentTab === tabName) {
-            return null
+            // TODO need to await?
+            await setCurrentTab(primaryTabName);
         }
 
-        // save circuit to get the current positions saved.
-        await backupTab(currentTab)
-        const oldTabCamera: string | null = getCameraData()
-        if (!oldTabCamera) return
-        tabCameraPositions[currentTab] = oldTabCamera
+        // delete the subcomponent
+        deleteSubcomponent(tabName);
+        refreshSideMenu();
+    }
 
-        // clear the current circuit on the screen
-        clearDeviceData()
-        CircuitStore.reset()
-
-        let loadedCircuit = localStorage.getItem(tabName)
-
-        if (!loadedCircuit) {
-            // this code doesn't make a lot of sense to me.
-            // setting it to an empty json object causes issues.
-            loadedCircuit = ''
-            localStorage.setItem(tabName, loadedCircuit)
+    // TODO this function (or what it does) should be somewhere else
+    async function setCurrentTab(tabName: string): Promise<void> {
+        if (currentTab === tabName) { // no need to do anything
+            return;
         }
 
-        const getCircuitPos = () => {}
-        // load the tab into circuitStore
+        // ensure new circuit exists
+        let loadedCircuit = localStorage.getItem(tabName);
+        if (loadedCircuit === null) {
+            alert(`Subcomponent '${tabName}' not found!`);
+            return;
+        }
+
+        // save the circuit
+        await saveCircuit();
+        const newSave = localStorage.getItem('circuitStoreSave');
+        if (!newSave) {
+            console.log("Empty after trying to save (this should not happen!)");
+            return;
+        }
+        localStorage.setItem(currentTab, newSave);
+
+        // load the new circuit
         localStorage.setItem('circuitStoreSave', loadedCircuit)
-        // load circuitStore into $CircuitStore
-        loadCircuit()
-        // set current devices
-        // currentDevicesData = $CircuitStore.devices
-        setDeviceData($CircuitStore.devices)
+        loadCircuit();
+        setDeviceData($CircuitStore.devices);
 
-        // sideEffects
+        // ready to go, update current tab
         currentTab = tabName
         localStorage.setItem('currActiveTab', tabName)
     }
-    function makeNewTab() : string {
-        // // Sort activeTabList
-        // activeTabList = activeTabList.sort((a, b) => a.localeCompare(b));
 
-        // const currActiveTabList = localStorage.getItem('activeTabList')
-        // if (!currActiveTabList)
-        //     console.log('activeTabList is not set in localStorage'), null
-        // Extract numbers from 'unnamed_circuit_\d+' and find the first gap
-        const unnamedNumbers = activeTabList
-            .map((tab: string) => {
-                // unnamed_circuit is implied 0th pos
-                if (tab === 'unnamed_circuit') {
-                    return 0
-                }
-                const match = tab.match(/^unnamed_circuit_(\d+)$/)
-                return match ? parseInt(match[1]) : null
-            })
-            .filter((num: number) => num !== null)
-            .sort((a: number, b: number) => a - b)
-
-        // I don't love this logic, I think it could be made simpler, how much of an edge case is it really?
-        // I am pretty sure its accurate though
-        if (unnamedNumbers.length === 0 || unnamedNumbers[0] !== 0) {
-            activeTabList.push(`unnamed_circuit`)
-            localStorage.setItem('activeTabList', JSON.stringify(activeTabList))
-            return 'unnamed_circuit'
-        }
-
-        let nextNumber = 1
-        for (const num of unnamedNumbers) {
-            if (num > nextNumber) {
-                break
-            }
-            nextNumber = num + 1
-        }
-
-        // Add the new unnamed circuit with the next available number
-        activeTabList.push(`unnamed_circuit_${nextNumber}`)
-        localStorage.setItem('activeTabList', JSON.stringify(activeTabList))
-
-        return `unnamed_circuit_${nextNumber}`;
-    }
-
-    function deleteTab(index: number): void {
-        if (activeTabList.length <= 1) {
-            alert('Cannot delete the last tab.')
-            return
-        }
-        // Get the tab name of the tab being deleted.
-        const deletedTab = activeTabList[index]
-        // Remove just the one tab using its index.
-        activeTabList = activeTabList.filter(
-            (_: string, i: number): boolean => i !== index
-        )
-        localStorage.setItem('activeTabList', JSON.stringify(activeTabList))
-        localStorage.removeItem(deletedTab)
-
-        // remove subcomponent
-        removeSubcircuit(deletedTab);
-
-        // If the deleted tab is the current tab, switch to the first remaining tab.
-        if (currentTab === deletedTab) {
-            const newActiveTab = activeTabList[0]
-            currentTab = newActiveTab
-            localStorage.setItem('currActiveTab', newActiveTab)
-            let loadedCircuit = localStorage.getItem(newActiveTab) || ''
-            localStorage.setItem('circuitStoreSave', loadedCircuit)
-            loadCircuit()
-            setDeviceData($CircuitStore.devices)
-        }
-    }
+    // tab being edited
+    let editingTab = $state<string | null>(null);
+    // new name for tab being edited
+    let tabNewName = $state<string>('');
 
     function startEditing(tabName: string) {
-        editingTab = tabName
-        tabNewName = tabName // Initialize the new name with the current tab name
+        editingTab = tabName;
+        tabNewName = tabName;
     }
 
     function cancelEditing(): void {
-        editingTab = null // Cancel editing mode
-        tabNewName = '' // Clear the new name input
+        editingTab = null;
+        tabNewName = '';
     }
 
     function commitRename(): void {
-        if (!editingTab) return
-        const trimmedName = tabNewName.trim()
-        if (!trimmedName) return
-        if (activeTabList.includes(trimmedName) && trimmedName !== editingTab) {
-            alert('Tab name already exists! Please choose a different name.')
-            return
+        if (!editingTab) {
+            alert("There is no tab being edited! ");
+            return;
         }
-        // update the tab name in list and localStorage
-        activeTabList = activeTabList.map((name: string) =>
-            name === editingTab ? trimmedName : name
-        )
-        localStorage.setItem('activeTabList', JSON.stringify(activeTabList))
 
-        // rename associated to stored content if exists
-        const tabContent = localStorage.getItem(editingTab)
-        if (tabContent !== null) {
-            localStorage.removeItem(editingTab) // Remove old name
-            localStorage.setItem(trimmedName, tabContent) // Set new name with content
+        const newTabName = tabNewName.trim();
+        if (!newTabName) {
+            return;
         }
-        // update current tab if necessary
-        if (currentTab === editingTab) {
-            currentTab = trimmedName
-            localStorage.setItem('currActiveTab', trimmedName)
+
+        if (currentTabs.includes(newTabName)) { // this tab already exists
+            if (editingTab === newTabName) { // the user kept the tab name the same
+                cancelEditing();
+            } else {
+                alert('Subcomponent name already exists! Please choose a different name.');
+            }
+            return;
         }
 
         // update subcomponent
-        removeSubcircuit(editingTab);
-        addSubcircuit(trimmedName);
+        renameSubcomponent(editingTab, newTabName);
+        refreshSideMenu();
+
+        // update current tab if necessary
+        if (editingTab === currentTab) {
+            currentTab = newTabName;
+            localStorage.setItem('currActiveTab', newTabName);
+        }
 
         // reset for next rename
-        editingTab = null
-        tabNewName = ''
+        cancelEditing();
     }
 
-    function addSubcircuit(name: string | null): void {
-      if (!name) {
-        alert('Invalid tab');
-        return;
-      }
-
-      // update subcircuits json
-      const subcircuits = JSON.parse(localStorage.getItem('subcircuits') || '[]');
-      if (subcircuits.indexOf(name) != -1) { // already exists
-          return;
-      }
-      subcircuits.push(name);
-      localStorage.setItem('subcircuits', JSON.stringify(subcircuits));
-
-      refreshMenu(subcircuits);
-    }
-
-    function removeSubcircuit(name: string): void {
-        // update subcircuits json
-        const subcircuits = JSON.parse(localStorage.getItem('subcircuits') || '[]');
-        const index = subcircuits.indexOf(name);
-        if (index == -1) { // nothing to remove
-            return;
-        }
-        subcircuits.splice(index, 1);
-        localStorage.setItem('subcircuits', JSON.stringify(subcircuits));
-
-        refreshMenu(subcircuits);
-    }
-
-    function refreshMenu(subcircuits: any): void {
-        menuJsonData.update(old => {
-            return {
-                'Logic Gates': { ...old['Logic Gates'] },
-                'Input/Output': { ...old['Input/Output'] },
-                'Subcomponents': {
-                    svg: old.Subcomponents.svg,
-                    groupElements: [
-                        ...(subcircuits.map((subcircuit: string) => {
-                            return { name: subcircuit, nodeType: 'Subcircuit', icon: subcomponentIcon} as menuJsonElement;
-                        })),
-                    ]
-                },
-                GhostElement: { ...old.GhostElement }
-            } as menuJsonType;
-        })
-    }
 </script>
 
 <div class="tabs">
     <div class="scrollable-tabs">
-        {#each activeTabList as tabName, index (tabName + index)}
-            <div class="tab-item">
+        <div class="tab-item">
+            <button
+                type="button"
+                class="tab-title {currentTab === primaryTabName ? 'tab-selected' : ''}"
+                onclick={async () => await setCurrentTab(primaryTabName)}
+            >
+                {primaryTabName}
+            </button>
+        </div>
+        {#each currentTabs as tabName, index (tabName + index)}
+            <div class="tab-item {currentTab === tabName ? 'tab-selected' : ''}">
                 {#if editingTab === tabName}
                     <input
                         type="text"
                         bind:value={tabNewName}
-                        onkeydown={(e: KeyboardEvent) => {
-                            if (e.key === 'Enter') commitRename()
-                            else if (e.key === 'Escape') cancelEditing()
+                        onkeydown={(event: KeyboardEvent) => {
+                            if (event.key === 'Enter') {
+                                commitRename();
+                            } else if (event.key === 'Escape') {
+                                cancelEditing();
+                            }
                         }}
-                        onblur={commitRename}
-                        autofocus
+                        onblur={cancelEditing}
                     /> 
                 {:else}
                     <button
                         type="button"
                         class="tab-title"
-                        onclick={async () => await handleTabClick(tabName)}
+                        onclick={async () => await setCurrentTab(tabName)}
                         ondblclick={() => startEditing(tabName)}
                     >
                         {tabName}
                     </button>
                 {/if}
-                {#if tabName !== 'init_circuit'}
-                    <button
-                        type="button"
-                        class="delete-btn"
-                        onclick={(e: MouseEvent) => {
-                        e.stopPropagation()
-                        deleteTab(index)
-                    }}
-                        title="Delete Tab"
-                    >
-                        ×
-                    </button>
-                {/if}
+                <button
+                    type="button"
+                    class="delete-btn"
+                    onclick={() => deleteTab(tabName)}
+                    title="Delete Tab"
+                >
+                    ×
+                </button>
             </div>
         {/each}
     </div>
-    <button type="button" class="new-tab-btn" onclick={() => {
-        const tabName = makeNewTab();
-        addSubcircuit(tabName);
-    }}>
+    <button type="button" class="new-tab-btn" onclick={createTab}>
         <AddTab />
     </button>
 </div>
@@ -345,7 +228,7 @@
         font-size: 14px; /* Adjust text size as needed */
         text-align: center; /* Keep text centered */
     }
-    .tab-title:hover {
+    .tab-title:hover, .tab-selected {
         filter: brightness(90%);
     }
     .delete-btn {
