@@ -3,7 +3,6 @@
 // export a function map from this function, then depending on the type, create this json in app.svelte
 function makeLamp(
     nodeName: string,
-    celltype: string | null,
     options?: {
         bits: number
         net: string
@@ -37,7 +36,6 @@ function makeLamp(
 
 function makeButton(
     nodeName: string,
-    celltype: string | null,
     options?: {
         bits?: number
         net?: string

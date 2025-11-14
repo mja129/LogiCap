@@ -243,16 +243,17 @@
                 let relativeX =  device.position.x - xMin;
                 let relativeY =  device.position.y - yMin;
 
+                let newOptions = {...device};
+
+                newOptions.position = {
+                    x: cur.x + relativeX,
+                    y: cur.y + relativeY
+                }
+                
                 newDeviceData = CircuitStore.addCircuitDevice(
                     gateType,
                     circuitRenaming[devName].split('_')[1],
-                    {
-                        rotation: device.rotation,
-                        position: {
-                            x: cur.x + relativeX,
-                            y: cur.y + relativeY
-                        }
-                    }
+                    newOptions
                 )
             }
             currentDevicesData = newDeviceData as Devices;
@@ -278,8 +279,6 @@
             saveCircuit();
 
         })
-        // debugger;
-        // we need to randomize the circuitName before we paste it in
     }
 </script>
 
