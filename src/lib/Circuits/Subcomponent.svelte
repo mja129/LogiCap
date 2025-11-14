@@ -70,10 +70,10 @@
 {#each { length: outputs } as _, index}
     <SimulationNodeAnchor
         io="output"
-        ioId=""
+        ioId={(index + 1).toString()}
         id={nodeId}
         connections={get(CircuitStore).connectors[
-            ('out_' + nodeId) as outputAnchorName
+            (`out${index+1}_` + nodeId) as outputAnchorName
         ]}
         side="east"
         offset={[width - 5, outputOffset + ((anchorDiameter + anchorPadding) * index)]}

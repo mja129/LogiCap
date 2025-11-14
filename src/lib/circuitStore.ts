@@ -78,17 +78,19 @@ const createCircuitStore = (): CircuitStoreType => {
                 return currCircuit
             })
         },
-        addCircuitDevice: (gateType: string, uuid: string, options?: any, celltype?: any, inputs?: number) => {
+        addCircuitDevice: (gateType: string, uuid: string, options?: any) => {
             const nodeName: string = `${gateType}_${uuid}`
-            let newDevices: Devices | null = null
-            if (celltype) {
-              if (options) {
-                options.celltype = celltype
-                options.inputs = inputs
-              } else {
-                options = {'celltype': celltype, 'inputs': inputs}
-              }
-            }
+            let newDevices: Devices | null = null;
+            let celltype = options?.celltype;
+            // if (celltype) {
+            //   if (options) {
+            //     options.celltype = celltype
+            //     options.inputs = inputs
+            //     options.outputs = outputs
+            //   } else {
+            //     options = {'celltype': celltype, 'inputs': inputs}
+            //   }
+            // }
             update((currCircuit) => {
                 const newDevice: Device =
                     options === undefined

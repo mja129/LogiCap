@@ -52,7 +52,7 @@ function subcircuitParse(circuitJson: any): Subcircuit {
     return 0
   })
   outputs.forEach((device: IODevice, i: number) => {
-    device['net'] = 'out' + (i != 0 ? i : '' as string)
+    device['net'] = `out${i+1}`;
   })
   return {'devices': circuitJson['devices'], 'connectors': transformConnections(circuitJson['connectors']), 'subcircuits': circuitJson['subcircuits']}
 }

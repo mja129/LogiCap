@@ -111,7 +111,7 @@
     // sync the devices list with the currentDevicesData variable.
 
     // called on "drop" in sidemenugroupitem.svelte
-    function createCanvasDevice(e: MouseEvent & { gateType: string, celltype?: string, inputs?: number }) {
+    function createCanvasDevice(e: MouseEvent & { gateType: string, celltype?: string, inputs?: number, outputs?: number }) {
         const gateType: logicGateTypes = e.gateType as logicGateTypes
         // this gate will update the store and then the subscribe will update the
         // list of circuits currently active on the screen
@@ -125,9 +125,11 @@
           newDeviceList = CircuitStore.addCircuitDevice(
               gateType,
               uuid,
-              undefined,
-              e.celltype,
-              e.inputs
+              {
+                celltype: e.celltype,
+                inputs: e.inputs,
+                outputs: e.outputs
+              }
           ) as Devices
         } else {
           newDeviceList = CircuitStore.addCircuitDevice(
@@ -199,9 +201,14 @@
             )
         )
 
+
+        let anyEndsWith = (query:string , possibleSuffixes: string[]) =>{
+            return possibleSuffixes.some((x: string)=>query.endsWith(x))
+        }
+
         copiedCircuits.connectors = save.connectors
         for (const src of Object.keys(copiedCircuits.connectors)) {
-            if (ids_to_copy.includes(src.slice('out_'.length))) {
+            if (anyEndsWith(src,ids_to_copy) ) {
                 let filtered = copiedCircuits.connectors[src].filter(
                     (arr: any) => {
                         // arr should be [deviceName, devicePort]
@@ -215,7 +222,6 @@
         }
 
         await navigator.clipboard.writeText(JSON.stringify(copiedCircuits))
-        // debugger;
     }
 
     function pasteNodes() {
@@ -249,6 +255,9 @@
                     x: cur.x + relativeX,
                     y: cur.y + relativeY
                 }
+
+                delete newOptions.label;
+                delete newOptions.net;
                 
                 newDeviceData = CircuitStore.addCircuitDevice(
                     gateType,
@@ -259,7 +268,9 @@
             currentDevicesData = newDeviceData as Devices;
 
             for (let srcName of Object.keys(circuitToPaste.connectors)) {
-                let renamedSrcName: any = 'out_' + circuitRenaming[srcName.slice('out_'.length)]
+                // let renamedSrcName: any = 'out_' + circuitRenaming[srcName.slice('out_'.length)]
+
+                let renamedSrcName: any = srcName.split("_")[0] + "_" + circuitRenaming[srcName.split("_").slice(1).join('_')];
 
                 for (let target of circuitToPaste.connectors[srcName]) {
                     let renamedTargetName = circuitRenaming[target[0]]

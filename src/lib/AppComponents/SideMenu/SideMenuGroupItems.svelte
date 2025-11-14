@@ -106,15 +106,19 @@
             const droppedOnCanvas = sideMenu?.contains(dropTarget)
 
             if (droppedOnCanvas) {
-                var e: MouseEvent & { gateType: string, celltype?: string, inputs?: number}
+                var e: MouseEvent & { gateType: string, celltype?: string, inputs?: number, outputs?:number}
                 if (draggingItem.nodeType == 'Subcircuit') {
-                  let inputs = 0
+                  let inputs = 0;
+                  let outputs = 0;
                   let circuit = localStorage.getItem(draggingItem.name)
                   if (circuit) {
                     let circJSON = JSON.parse(circuit)
                     let devices = circJSON['devices'] as Record<string, Device>
                     Object.keys(devices).forEach((key) => {
                       if (devices[key].type == 'Button') {inputs += 1}
+                    })
+                    Object.keys(devices).forEach((key) => {
+                      if (devices[key].type == 'Lamp') {outputs += 1}
                     })
                   } else {
                     alert('Critical: subcircuit not found')
@@ -124,7 +128,8 @@
                       ...event,
                       gateType: draggingItem.nodeType,
                       celltype: draggingItem.name,
-                      inputs
+                      inputs,
+                      outputs
                   }
                 } else {
                   e = {
