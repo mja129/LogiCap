@@ -16,14 +16,19 @@ interface CircuitStoreType extends Writable<Circuit> {
     removeCircuitDevice(gateTypePlus_uuid:string) : Devices
 }
 
-// create a custom svelte store
-const createCircuitStore = (): CircuitStoreType => {
-    const initialCircuit: Circuit = {
+// TODO put somewhere better?
+export function createEmptyCircuit(): Circuit {
+    return {
         devices: {},
         connectors: {},
         subcircuits: [],
         wireManipulations: {},
-    }
+    };
+}
+
+// create a custom svelte store
+const createCircuitStore = (): CircuitStoreType => {
+    const initialCircuit: Circuit = createEmptyCircuit();
     const { subscribe, set, update } = writable<Circuit>(initialCircuit)
 
     return {
@@ -234,7 +239,7 @@ export function clickSvelvetSave() {
 
 // this is essentially a sync with localStorage.
 // Sync svelvet by clicking its button through clickListener, (I could probably find the function they use on this button lol, sounds like a good idea)
-export async function saveCircuit() {
+export function saveCircuit() {
     // click on the hidden svelvet button, the button is in "theme toggle" but I set it to display: none,
     // and now we trigger it with css, after it triggers we use the svelvet json positions to set our digitial js positions
     // the digitalJS save is the main save and we are just piggybacking off the svelvet save a bit
@@ -266,32 +271,27 @@ function validateSavedCircuit(savedCircuit: any) {
     }
 }
 
-export function loadCircuit(circuitText: string = 'default') {
-
-    let savedCircuitText: string | null = circuitText === 'default' ? getLsItem('circuitStoreSave') : circuitText
-    if (!savedCircuitText) return
-
-    const savedCircuit = JSON.parse(savedCircuitText)
-
-    validateSavedCircuit(savedCircuit)
+export function loadCircuit(circuit: Circuit) {
+    validateSavedCircuit(circuit);
 
     CircuitStore.set({
-        devices: savedCircuit.devices,
-        connectors: savedCircuit.connectors,
-        subcircuits: savedCircuit.subcircuits,
-        wireManipulations: savedCircuit.wireManipulations
+        devices: circuit.devices,
+        connectors: circuit.connectors,
+        subcircuits: circuit.subcircuits,
+        wireManipulations: circuit.wireManipulations
     });
 
-    if(savedCircuit.translation)
-    {
-        setTranslation(savedCircuit.translation)
+    // TODO improve this...
+    if ((circuit as any).translation) {
+        setTranslation((circuit as any).translation);
     }
-    if(savedCircuit.zoom)
-    {
-        console.log(savedCircuit.zoom)
-        setScale(savedCircuit.zoom)
+    if ((circuit as any).zoom) {
+        console.log((circuit as any).zoom);
+        setScale((circuit as any).zoom);
     }
-    // setDevices(savedCircuit.devices)
+
+    // just in case
+    saveCircuitStoreToLS();
 }
 
 // remove circuitStore save and backup to prevCircuitStore, iff you aren't deleting an empty circuit.
@@ -315,7 +315,6 @@ export function backupDelete() {
     }
     localStorage.removeItem('circuitStoreSave')
 }
-
 
 // Downloads the circuitsStoreSave to the user's machine
 export function downloadCircuit(filename: string){
@@ -401,6 +400,6 @@ async function loadInput(inputEl: HTMLInputElement): Promise<void>{
             reader.readAsText(file);
     })
     console.log(text)
-    loadCircuit(text)
+    loadCircuit(JSON.parse(text));
 
 }

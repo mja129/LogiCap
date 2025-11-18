@@ -1,7 +1,7 @@
 <script lang="ts" module>
     import subcomponentIcon from '@icons/circuits/outputIcon.png'
     import type { menuJsonElement, menuJsonType } from '@CircuitModel'
-    import { getSubcomponents } from '@src/App.svelte'
+    import { circuitSave } from '@src/App.svelte'
 
     export function refreshSideMenu(): void {
         menuJsonData.update(old => {
@@ -11,7 +11,7 @@
                 'Subcomponents': {
                     svg: old.Subcomponents.svg,
                     groupElements: [
-                        ...(getSubcomponents().map((subcircuit: string) => {
+                        ...(circuitSave.getSubcomponents().map((subcircuit: string) => {
                             return { name: subcircuit, nodeType: 'Subcircuit', icon: subcomponentIcon} as menuJsonElement;
                         })),
                     ]

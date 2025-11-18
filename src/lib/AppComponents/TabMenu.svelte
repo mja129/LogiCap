@@ -1,39 +1,37 @@
 <script lang="ts" module>
     import AddTab from '~icons/material-symbols/tab-new-right-outline-rounded'
-    import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
-    import { createSubcomponent, deleteSubcomponent, getSubcomponents } from '@src/App.svelte'
+    import { circuitSave, currentCircuit } from '@src/App.svelte'
     import { refreshSideMenu } from '@AppComponents/SideMenu/SideMenu.svelte'
-
-    const primaryTabName = 'primary circuit';
+    import { MAIN_CIRCUIT_NAME as primaryTabName } from '@src/lib/circuitSave.ts'
 </script>
 
 <script lang="ts">
-    import { renameSubcomponent } from '@src/App.svelte'
-
     let {
-        clearDeviceData,
-        setDeviceData,
+        setCurrentCircuit,
     }: {
-        clearDeviceData: Function
-        setDeviceData: Function
+        setCurrentCircuit: Function
     } = $props();
 
-    let currentTabs: string[] = $derived(getSubcomponents());
-    let currentTab: string = $state(localStorage.getItem('currActiveTab') || primaryTabName);
+    let currentTabs: string[] = $state(circuitSave.getSubcomponents());
+    let currentTab: string = $state(''); // value will be set on subscribe
+    currentCircuit.subscribe(currentCircuit => {
+        currentTab = currentCircuit;
+    })
 
     function createTab(): void {
-        const nextTabId = getSubcomponents()
+        const nextTabId = circuitSave.getSubcomponents()
             .map((tab: string) => {
                 const match = tab.match(/^sub_(\d+)$/);
                 return match ? parseInt(match[1]) : null;
             })
             .filter((num: number | null) => num !== null)
             .reduce((a, b) => a > b ? a : b, 0) + 1;
-        createSubcomponent(`sub_${nextTabId}`);
+        circuitSave.createSubcomponent(`sub_${nextTabId}`);
+        currentTabs = circuitSave.getSubcomponents();
         refreshSideMenu();
     }
 
-    async function deleteTab(tabName: string): Promise<void> {
+    function deleteTab(tabName: string) {
         if (!currentTabs.includes(tabName)) {
             alert(`Subcomponent '${tabName}' not found!`);
             return;
@@ -41,45 +39,20 @@
 
         // if the deleted tab is the current tab, switch to the primary tab
         if (currentTab === tabName) {
-            // TODO need to await?
-            await setCurrentTab(primaryTabName);
+            setCurrentTab(primaryTabName);
         }
 
         // delete the subcomponent
-        deleteSubcomponent(tabName);
+        circuitSave.deleteSubcomponent(tabName);
+        currentTabs = circuitSave.getSubcomponents();
         refreshSideMenu();
     }
 
-    // TODO this function (or what it does) should be somewhere else
-    async function setCurrentTab(tabName: string): Promise<void> {
+    function setCurrentTab(tabName: string) {
         if (currentTab === tabName) { // no need to do anything
             return;
         }
-
-        // ensure new circuit exists
-        let loadedCircuit = localStorage.getItem(tabName);
-        if (loadedCircuit === null) {
-            alert(`Subcomponent '${tabName}' not found!`);
-            return;
-        }
-
-        // save the circuit
-        await saveCircuit();
-        const newSave = localStorage.getItem('circuitStoreSave');
-        if (!newSave) {
-            console.log("Empty after trying to save (this should not happen!)");
-            return;
-        }
-        localStorage.setItem(currentTab, newSave);
-
-        // load the new circuit
-        localStorage.setItem('circuitStoreSave', loadedCircuit)
-        loadCircuit();
-        setDeviceData($CircuitStore.devices);
-
-        // ready to go, update current tab
-        currentTab = tabName
-        localStorage.setItem('currActiveTab', tabName)
+        setCurrentCircuit(tabName);
     }
 
     // tab being edited
@@ -118,12 +91,13 @@
         }
 
         // update subcomponent
-        renameSubcomponent(editingTab, newTabName);
+        circuitSave.renameSubcomponent(editingTab, newTabName);
+        currentTabs = circuitSave.getSubcomponents();
         refreshSideMenu();
 
         // update current tab if necessary
         if (editingTab === currentTab) {
-            currentTab = newTabName;
+            currentCircuit.set(newTabName);
             localStorage.setItem('currActiveTab', newTabName);
         }
 
@@ -139,7 +113,7 @@
             <button
                 type="button"
                 class="tab-title {currentTab === primaryTabName ? 'tab-selected' : ''}"
-                onclick={async () => await setCurrentTab(primaryTabName)}
+                onclick={() => setCurrentTab(primaryTabName)}
             >
                 {primaryTabName}
             </button>
@@ -163,7 +137,7 @@
                     <button
                         type="button"
                         class="tab-title"
-                        onclick={async () => await setCurrentTab(tabName)}
+                        onclick={() => setCurrentTab(tabName)}
                         ondblclick={() => startEditing(tabName)}
                     >
                         {tabName}

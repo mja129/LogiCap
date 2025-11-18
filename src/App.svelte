@@ -1,5 +1,9 @@
 <!-- https://coolorgS.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script module lang="ts">
+    import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
+    import { type CircuitSave, createCircuitSave, MAIN_CIRCUIT_NAME } from '@src/lib/circuitSave.ts'
+    import { get, writable, type Writable } from 'svelte/store'
+
     export function onWireConnection(wireId: string) {
         console.log('Success new connection made id: ' + wireId)
         // saveCircuit() // we could auto-save on wire linking
@@ -7,44 +11,16 @@
         return null
     }
 
-    // TODO these might be better put elsewhere
-    // TODO stop using local storage for subcircuits once a better save format exists
-    let subcomponents : string[] = $state(JSON.parse((localStorage.getItem('subcircuits') || '')));
-    export function createSubcomponent(name: string) {
-        // update subcircuits json
-        if (subcomponents.indexOf(name) != -1) { // already exists
-            return;
-        }
-        subcomponents.push(name);
-        localStorage.setItem('subcircuits', JSON.stringify(subcomponents));
-        localStorage.setItem(name, '');
-    }
+    export const circuitSave: CircuitSave = createCircuitSave(localStorage.getItem('currentCircuitSave') || undefined);
+    export const currentCircuit: Writable<string> = writable(localStorage.getItem('currentActiveCircuit') || MAIN_CIRCUIT_NAME);
+    currentCircuit.subscribe(currentCircuit => { // track changes in local storage
+        localStorage.setItem('currentActiveCircuit', currentCircuit);
+    });
 
-    export function deleteSubcomponent(name: string) {
-        // update subcircuits json
-        const index = subcomponents.indexOf(name);
-        if (index == -1) { // nothing to remove
-            return;
-        }
-        subcomponents.splice(index, 1);
-        localStorage.setItem('subcircuits', JSON.stringify(subcomponents));
-        localStorage.removeItem(name);
-    }
-
-    export function renameSubcomponent(name: string, newName: string) {
-        const index = subcomponents.indexOf(name);
-        const tabContent = localStorage.getItem(name);
-        if (tabContent === null || index == -1) {
-            return;
-        }
-        subcomponents[index] = newName;
-        localStorage.setItem('subcircuits', JSON.stringify(subcomponents));
-        localStorage.removeItem(name);
-        localStorage.setItem(newName, tabContent);
-    }
-
-    export function getSubcomponents() : string[] {
-        return subcomponents;
+    function saveCircuitSave() {
+        saveCircuit();
+        circuitSave.setCircuit(get(currentCircuit), get(CircuitStore));
+        localStorage.setItem('currentCircuitSave', circuitSave.getSaveJson());
     }
 </script>
 
@@ -57,12 +33,6 @@
     // import { deviceFactoryMap } from '@Util/makeDigitalJsJson'
     import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
-
-    import {
-        CircuitStore,
-        loadCircuit,
-        saveCircuit,
-    } from '@CircuitStore'
 
     import type { logicGateTypes } from '@CircuitModel'
 
@@ -103,6 +73,21 @@
         localStorage.setItem('canvasTranslation', JSON.stringify({ x, y }))
     }
 
+    function setCurrentCircuit(name: string, save: boolean = true) {
+        if (save) {
+            saveCircuitSave();
+            console.log(get(CircuitStore));
+        }
+        const circuit = circuitSave.getCircuit(name);
+        if (circuit === null) {
+            console.log(`Attempted to load unknown circuit '${name}'!`);
+            return;
+        }
+        loadCircuit(circuit);
+        setDeviceData(circuit.devices);
+        currentCircuit.set(name);
+    }
+
     // const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
 
     // check if circuitStore is not null when the app starts up.
@@ -115,8 +100,8 @@
             localStorage.getItem('canvasTranslation') || '{"x":0,"y":0}'
         )
 
-        loadCircuit() // load circuit from LS into CircuitStore,
-        currentDevicesData = $CircuitStore.devices
+        // populate circuit
+        setCurrentCircuit(get(currentCircuit), false);
 
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
         //Needs to wait until the dom catches up
@@ -144,7 +129,7 @@
 
     // save circuit on page reload.
     window.addEventListener('beforeunload', () => {
-        saveCircuit()
+        saveCircuitSave();
     })
 
     // create new node in the global store for circuitStore digital js backend.
@@ -180,7 +165,7 @@
         currentDevicesData = newDeviceList
 
         // save on every addition of a new node.
-        saveCircuit()
+        saveCircuitSave();
     }
     // fitView={true}
 
@@ -210,7 +195,7 @@
         })
         currentDevicesData = newDeviceList
         // setDevices(newDeviceList);
-        saveCircuit()
+        saveCircuitSave();
     }
 
     async function copySelectedNodes() {
@@ -226,7 +211,7 @@
         )
 
         // TODO redo this
-        saveCircuit()
+        saveCircuitSave()
 
         let save = JSON.parse(localStorage.getItem('circuitStoreSave') ?? '')
 
@@ -327,7 +312,7 @@
                 }
             }
             console.log('rename',circuitRenaming);
-            saveCircuit();
+            saveCircuitSave();
 
         })
     }
@@ -347,7 +332,7 @@
         {copySelectedNodes}
         {pasteNodes}
     />
-    <TabMenu {clearDeviceData} {setDeviceData} />
+    <TabMenu {setCurrentCircuit} />
 
     <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->
     <Svelvet

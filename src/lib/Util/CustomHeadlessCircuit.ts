@@ -1,4 +1,5 @@
 import { HeadlessCircuit, type CircuitOptions } from 'custom_digitaljs'
+import { circuitSave } from '@src/App.svelte'
 
 function transformConnections(data: SvelvetConnectors): Connector[] {
     let connectorsDigital: Connector[] = new Array<Connector>()
@@ -60,11 +61,14 @@ function subcircuitParse(circuitJson: any): Subcircuit {
 function loadSubcircuits(subcircuits: string[], subjson?: Record<string, Subcircuit>): Record<string, Subcircuit> {
   let subcircuitsJson: Record<string, Subcircuit> = subjson || {}
   subcircuits.forEach((circuit: string) => {
-    var circ = localStorage.getItem(circuit)
-    if (circ) {
-      subcircuitsJson[circuit] = subcircuitParse(JSON.parse(circ))
+    // need to clone the json since it is modified. is there a more efficient way?
+    const subcircuit = circuitSave.getCircuit(circuit);
+    if (subcircuit) {
+      subcircuitsJson[circuit] = subcircuitParse(JSON.parse(JSON.stringify(subcircuit)));
       loadSubcircuits(subcircuitsJson[circuit]['subcircuits'], subcircuitsJson)
-    } else alert(`Subcircuit not found: ${circuit}`)
+    } else {
+      alert(`Subcircuit not found: ${circuit}`)
+    }
   })
   return subcircuitsJson
 }

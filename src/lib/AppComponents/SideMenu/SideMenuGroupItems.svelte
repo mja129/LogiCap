@@ -4,6 +4,7 @@
     import type { NodeMenuGroups } from '@CircuitModel'
     import type { menuJsonElement } from '@CircuitModel'
     import { getRunning } from '@CircuitEngine'
+    import { circuitSave } from '@src/App.svelte'
 
     // this will be a required prop but it is optional right now.
     let {
@@ -110,10 +111,9 @@
                 if (draggingItem.nodeType == 'Subcircuit') {
                   let inputs = 0;
                   let outputs = 0;
-                  let circuit = localStorage.getItem(draggingItem.name)
-                  if (circuit) {
-                    let circJSON = JSON.parse(circuit)
-                    let devices = circJSON['devices'] as Record<string, Device>
+                  let circuit = circuitSave.getCircuit(draggingItem.name);
+                  if (circuit != null) {
+                    let devices = circuit.devices;
                     Object.keys(devices).forEach((key) => {
                       if (devices[key].type == 'Button') {inputs += 1}
                     })
