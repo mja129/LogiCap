@@ -1,7 +1,7 @@
 <!-- https://coolorgS.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script module lang="ts">
     import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
-    import { type CircuitSave, createCircuitSave, MAIN_CIRCUIT_NAME } from '@src/lib/circuitSave.ts'
+    import { type CircuitSave, createCircuitSave } from '@src/lib/circuitSave.ts'
     import { get, writable, type Writable } from 'svelte/store'
 
     export function onWireConnection(wireId: string) {
@@ -18,7 +18,7 @@
         localStorage.setItem('currentCircuitSave', circuitSave.getSaveJson());
     }
 
-    export const currentCircuit: Writable<string> = writable(localStorage.getItem('currentActiveCircuit') || MAIN_CIRCUIT_NAME);
+    export const currentCircuit: Writable<string> = writable(localStorage.getItem('currentActiveCircuit') || circuitSave.getMainCircuitName());
     currentCircuit.subscribe(currentCircuit => { // track changes in local storage
         localStorage.setItem('currentActiveCircuit', currentCircuit);
     });
@@ -26,7 +26,6 @@
     export function setCurrentCircuit(name: string, save: boolean = true) {
         if (save) {
             saveCircuitSave();
-            console.log(get(CircuitStore));
         }
         const circuit = circuitSave.getCircuit(name);
         if (circuit === null) {
@@ -208,13 +207,17 @@
         let selected = domEls.filter((x) =>
             x === null ? false : x.classList.contains('selected')
         )
+        if (selected.length === 0) { // nothing to copy
+            return;
+        }
         let ids_to_copy = selected.map((x) =>
             x === null ? '' : x.id.substring(2)
         )
 
         // TODO redo this
         saveCircuitSave();
-        let save = circuitSave.getCircuit($currentCircuit);
+        // create a clone of the circuit
+        let save = JSON.parse(JSON.stringify(circuitSave.getCircuit($currentCircuit)));
         if (save === null) { // should be impossible
             console.log("if you are seeing this, very bad things have happened");
             return;

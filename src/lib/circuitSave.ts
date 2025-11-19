@@ -2,7 +2,7 @@ import { createEmptyCircuit } from '@CircuitStore'
 import { get, writable, type Writable } from 'svelte/store'
 
 type SaveDataFormat = {
-    main_circuit: SingleSaveDataFormat,
+    main_circuit: SingleSaveDataFormat & { display_name: string },
     subcircuits: { [key: string]: SingleSaveDataFormat },
 }
 type SingleSaveDataFormat = {
@@ -10,15 +10,10 @@ type SingleSaveDataFormat = {
     // add more data as needed
 }
 
-function createSingleSave(circuit: Circuit): SingleSaveDataFormat {
-    return {
-        circuit: circuit
-    };
-}
-
-export const MAIN_CIRCUIT_NAME = 'main circuit';
-
 export interface CircuitSave {
+
+    setMainCircuitName(name: string): void;
+    getMainCircuitName(): string;
 
     setCircuit(name: string, circuit: Circuit): void;
     getCircuit(name: string): Circuit | null;
@@ -39,15 +34,25 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
         saveData = JSON.parse(circuitSaveJson);
     } else {
         saveData = {
-            main_circuit: createSingleSave(createEmptyCircuit()),
+            main_circuit: {
+                circuit: createEmptyCircuit(),
+                display_name: 'Main Circuit'
+            },
             subcircuits: {},
         }
     }
     let subcomponents: Writable<string[]> = writable(Object.keys(saveData.subcircuits));
 
     return {
+        setMainCircuitName(name: string) {
+            saveData.main_circuit.display_name = name;
+        },
+        getMainCircuitName():string {
+            return saveData.main_circuit.display_name;
+        },
+
         setCircuit(name: string, circuit: Circuit) {
-            if (name === MAIN_CIRCUIT_NAME) {
+            if (name === saveData.main_circuit.display_name) {
                 saveData.main_circuit.circuit = circuit;
             } else {
                 const subcircuit = saveData.subcircuits[name];
@@ -57,18 +62,21 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
             }
         },
         getCircuit(name: string): Circuit | null {
-            if (name === MAIN_CIRCUIT_NAME) {
+            if (name === saveData.main_circuit.display_name) {
                 return saveData.main_circuit.circuit;
             }
             const subcircuit = saveData.subcircuits[name];
             return subcircuit == null ? null : subcircuit.circuit;
         },
+
         createSubcomponent(name: string) {
             // update subcircuits json
             if (get(subcomponents).indexOf(name) != -1) { // already exists
                 return;
             }
-            saveData.subcircuits[name] = createSingleSave(createEmptyCircuit());
+            saveData.subcircuits[name] = {
+                circuit: createEmptyCircuit()
+            };
             subcomponents.update((current) => {
                 current.push(name);
                 return current;

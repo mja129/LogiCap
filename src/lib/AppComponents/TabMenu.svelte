@@ -1,13 +1,12 @@
 <script lang="ts" module>
     import AddTab from '~icons/material-symbols/tab-new-right-outline-rounded'
     import { circuitSave, currentCircuit, setCurrentCircuit } from '@src/App.svelte'
-    import { MAIN_CIRCUIT_NAME as primaryTabName } from '@src/lib/circuitSave.ts'
 </script>
 
 <script lang="ts">
     let currentTabs: string[] = $state([]);
     circuitSave.getSubcomponents().subscribe((subcomponents) => {
-        currentTabs = subcomponents;
+        currentTabs = [circuitSave.getMainCircuitName(), ...subcomponents];
     });
     let currentTab: string = $state(''); // value will be set on subscribe
     currentCircuit.subscribe(currentCircuit => {
@@ -33,7 +32,7 @@
 
         // if the deleted tab is the current tab, switch to the primary tab
         if (currentTab === tabName) {
-            setCurrentTab(primaryTabName);
+            setCurrentTab(circuitSave.getMainCircuitName());
         }
 
         // delete the subcomponent
@@ -82,8 +81,14 @@
             return;
         }
 
-        // update subcomponent
-        circuitSave.renameSubcomponent(editingTab, newTabName);
+        // perform rename
+        if (editingTab === circuitSave.getMainCircuitName()) {
+            circuitSave.setMainCircuitName(newTabName);
+            // need to manually update as automatic updates are only on subcomponent changes
+            currentTabs[0] = newTabName;
+        } else {
+            circuitSave.renameSubcomponent(editingTab, newTabName);
+        }
 
         // update current tab if necessary
         if (editingTab === currentTab) {
@@ -98,15 +103,6 @@
 
 <div class="tabs">
     <div class="scrollable-tabs">
-        <div class="tab-item">
-            <button
-                type="button"
-                class="tab-title {currentTab === primaryTabName ? 'tab-selected' : ''}"
-                onclick={() => setCurrentTab(primaryTabName)}
-            >
-                {primaryTabName}
-            </button>
-        </div>
         {#each currentTabs as tabName, index (tabName + index)}
             <div class="tab-item {currentTab === tabName ? 'tab-selected' : ''}">
                 {#if editingTab === tabName}
@@ -132,14 +128,16 @@
                         {tabName}
                     </button>
                 {/if}
-                <button
-                    type="button"
-                    class="delete-btn"
-                    onclick={() => deleteTab(tabName)}
-                    title="Delete Tab"
-                >
-                    ×
-                </button>
+                {#if circuitSave.getMainCircuitName() !== tabName}
+                    <button
+                        type="button"
+                        class="delete-btn"
+                        onclick={() => deleteTab(tabName)}
+                        title="Delete Tab"
+                    >
+                        ×
+                    </button>
+                {/if}
             </div>
         {/each}
     </div>

@@ -23,7 +23,6 @@
     import LoadIcon from '~icons/lucide/upload'
     import { circuitSave, saveCircuitSave, setCurrentCircuit } from '@src/App.svelte'
     import { downloadJson, receiveJson } from '@Util/fileUtils.ts'
-    import { MAIN_CIRCUIT_NAME } from '@src/lib/circuitSave.ts'
 
     type Icon = { Component: Component<any>; width: number }
     type IconName = string
@@ -113,7 +112,7 @@
         const circuitJsonString = JSON.stringify(circuitJson, null, 2);
 
         // download circuit representation
-        downloadJson("my_circuit", circuitJsonString);
+        downloadJson(circuitSave.getMainCircuitName(), circuitJsonString);
     }
 
     function circuitUpload(
@@ -126,7 +125,7 @@
             .then((jsonString) => {
                 circuitSave.setSaveJson(jsonString);
                 // switch to main circuit
-                setCurrentCircuit(MAIN_CIRCUIT_NAME, false);
+                setCurrentCircuit(circuitSave.getMainCircuitName(), false);
             })
             .catch((err) => {
                 console.log('circuit upload failed:', err);
