@@ -12,15 +12,30 @@
     }
 
     export const circuitSave: CircuitSave = createCircuitSave(localStorage.getItem('currentCircuitSave') || undefined);
+    export function saveCircuitSave() {
+        saveCircuit();
+        circuitSave.setCircuit(get(currentCircuit), get(CircuitStore));
+        localStorage.setItem('currentCircuitSave', circuitSave.getSaveJson());
+    }
+
     export const currentCircuit: Writable<string> = writable(localStorage.getItem('currentActiveCircuit') || MAIN_CIRCUIT_NAME);
     currentCircuit.subscribe(currentCircuit => { // track changes in local storage
         localStorage.setItem('currentActiveCircuit', currentCircuit);
     });
-
-    function saveCircuitSave() {
-        saveCircuit();
-        circuitSave.setCircuit(get(currentCircuit), get(CircuitStore));
-        localStorage.setItem('currentCircuitSave', circuitSave.getSaveJson());
+    const rerenderTrigger: Writable<boolean> = writable(false);
+    export function setCurrentCircuit(name: string, save: boolean = true) {
+        if (save) {
+            saveCircuitSave();
+            console.log(get(CircuitStore));
+        }
+        const circuit = circuitSave.getCircuit(name);
+        if (circuit === null) {
+            console.log(`Attempted to load unknown circuit '${name}'!`);
+            return;
+        }
+        loadCircuit(circuit);
+        currentCircuit.set(name);
+        rerenderTrigger.update((rerender: boolean) => !rerender);
     }
 </script>
 
@@ -73,21 +88,6 @@
         localStorage.setItem('canvasTranslation', JSON.stringify({ x, y }))
     }
 
-    function setCurrentCircuit(name: string, save: boolean = true) {
-        if (save) {
-            saveCircuitSave();
-            console.log(get(CircuitStore));
-        }
-        const circuit = circuitSave.getCircuit(name);
-        if (circuit === null) {
-            console.log(`Attempted to load unknown circuit '${name}'!`);
-            return;
-        }
-        loadCircuit(circuit);
-        setDeviceData(circuit.devices);
-        currentCircuit.set(name);
-    }
-
     // const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
 
     // check if circuitStore is not null when the app starts up.
@@ -102,6 +102,9 @@
 
         // populate circuit
         setCurrentCircuit(get(currentCircuit), false);
+        rerenderTrigger.subscribe(() => {
+            setDeviceData($CircuitStore.devices);
+        })
 
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
         //Needs to wait until the dom catches up
@@ -170,7 +173,6 @@
     // fitView={true}
 
     let setDevices = (d: Devices) => (currentDevicesData = d)
-    let currCircuitName = $state('')
 
     function deletedSelectedNodes(){
         let domEls = Object.keys(currentDevicesData)
@@ -323,8 +325,6 @@
     <SideMenu {createCanvasDevice} />
     <SimMenu
         clearCanvas={clearDeviceData}
-        {currCircuitName}
-        setCanvas={setDevices}
     />
     <CommandMenu
         {createCanvasDevice}
@@ -332,7 +332,7 @@
         {copySelectedNodes}
         {pasteNodes}
     />
-    <TabMenu {setCurrentCircuit} />
+    <TabMenu />
 
     <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->
     <Svelvet

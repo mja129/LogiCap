@@ -1,25 +1,21 @@
 <script lang="ts" module>
     import AddTab from '~icons/material-symbols/tab-new-right-outline-rounded'
-    import { circuitSave, currentCircuit } from '@src/App.svelte'
-    import { refreshSideMenu } from '@AppComponents/SideMenu/SideMenu.svelte'
+    import { circuitSave, currentCircuit, setCurrentCircuit } from '@src/App.svelte'
     import { MAIN_CIRCUIT_NAME as primaryTabName } from '@src/lib/circuitSave.ts'
 </script>
 
 <script lang="ts">
-    let {
-        setCurrentCircuit,
-    }: {
-        setCurrentCircuit: Function
-    } = $props();
-
-    let currentTabs: string[] = $state(circuitSave.getSubcomponents());
+    let currentTabs: string[] = $state([]);
+    circuitSave.getSubcomponents().subscribe((subcomponents) => {
+        currentTabs = subcomponents;
+    });
     let currentTab: string = $state(''); // value will be set on subscribe
     currentCircuit.subscribe(currentCircuit => {
         currentTab = currentCircuit;
-    })
+    });
 
     function createTab(): void {
-        const nextTabId = circuitSave.getSubcomponents()
+        const nextTabId = currentTabs
             .map((tab: string) => {
                 const match = tab.match(/^sub_(\d+)$/);
                 return match ? parseInt(match[1]) : null;
@@ -27,8 +23,6 @@
             .filter((num: number | null) => num !== null)
             .reduce((a, b) => a > b ? a : b, 0) + 1;
         circuitSave.createSubcomponent(`sub_${nextTabId}`);
-        currentTabs = circuitSave.getSubcomponents();
-        refreshSideMenu();
     }
 
     function deleteTab(tabName: string) {
@@ -44,8 +38,6 @@
 
         // delete the subcomponent
         circuitSave.deleteSubcomponent(tabName);
-        currentTabs = circuitSave.getSubcomponents();
-        refreshSideMenu();
     }
 
     function setCurrentTab(tabName: string) {
@@ -92,8 +84,6 @@
 
         // update subcomponent
         circuitSave.renameSubcomponent(editingTab, newTabName);
-        currentTabs = circuitSave.getSubcomponents();
-        refreshSideMenu();
 
         // update current tab if necessary
         if (editingTab === currentTab) {

@@ -1,4 +1,5 @@
 import { createEmptyCircuit } from '@CircuitStore'
+import { get, writable, type Writable } from 'svelte/store'
 
 type SaveDataFormat = {
     main_circuit: SingleSaveDataFormat,
@@ -25,9 +26,10 @@ export interface CircuitSave {
     createSubcomponent(name: string): void;
     deleteSubcomponent(name: string): void;
     renameSubcomponent(name: string, newName: string): void;
-    getSubcomponents(): string[];
+    getSubcomponents(): Writable<string[]>;
 
-    getSaveJson() : string;
+    setSaveJson(saveJson: string): void;
+    getSaveJson(): string;
 
 }
 
@@ -41,7 +43,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
             subcircuits: {},
         }
     }
-    let subcomponents: string[] = Object.keys(saveData.subcircuits);
+    let subcomponents: Writable<string[]> = writable(Object.keys(saveData.subcircuits));
 
     return {
         setCircuit(name: string, circuit: Circuit) {
@@ -63,35 +65,49 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
         },
         createSubcomponent(name: string) {
             // update subcircuits json
-            if (subcomponents.indexOf(name) != -1) { // already exists
+            if (get(subcomponents).indexOf(name) != -1) { // already exists
                 return;
             }
-            subcomponents.push(name);
             saveData.subcircuits[name] = createSingleSave(createEmptyCircuit());
+            subcomponents.update((current) => {
+                current.push(name);
+                return current;
+            });
         },
         deleteSubcomponent(name: string) {
             // update subcircuits json
-            const index = subcomponents.indexOf(name);
+            const index = get(subcomponents).indexOf(name);
             if (index == -1) { // nothing to remove
                 return;
             }
-            subcomponents.splice(index, 1);
             delete saveData.subcircuits[name];
+            subcomponents.update((current) => {
+                current.splice(index, 1);
+                return current;
+            });
         },
         renameSubcomponent(name: string, newName: string) {
-            const index = subcomponents.indexOf(name);
+            const index = get(subcomponents).indexOf(name);
             if (index == -1) {
                 return;
             }
-            subcomponents[index] = newName;
             saveData.subcircuits[newName] = saveData.subcircuits[name];
             delete saveData.subcircuits[name];
             // TODO need to convert data of existing circuits
+            subcomponents.update((current) => {
+               current[index] = newName;
+               return current;
+            });
         },
-        getSubcomponents(): string[] {
+        getSubcomponents(): Writable<string[]> {
             return subcomponents;
         },
 
+        setSaveJson(saveJson: string) {
+            // TODO validation
+            saveData = JSON.parse(saveJson);
+            subcomponents.set(Object.keys(saveData.subcircuits));
+        },
         getSaveJson(): string {
             return JSON.stringify(saveData);
         }

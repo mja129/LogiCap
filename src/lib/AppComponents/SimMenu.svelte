@@ -3,10 +3,7 @@
 
     import {
         CircuitStore,
-        saveCircuit,
         backupDelete,
-        downloadCircuit,
-        uploadCircuit,
     } from '@CircuitStore'
     import {
         toggleSimulation,
@@ -25,6 +22,9 @@
     import TrashIcon from '~icons/material-symbols/delete-outline'
     import ButtonNode from '../Circuits/InputOutputNodes/ButtonNode.svelte'
     import LoadIcon from '~icons/lucide/upload'
+    import { circuitSave, saveCircuitSave, setCurrentCircuit } from '@src/App.svelte'
+    import { downloadJson, receiveJson } from '@Util/fileUtils.ts'
+    import { MAIN_CIRCUIT_NAME } from '@src/lib/circuitSave.ts'
 
     type Icon = { Component: Component<any>; width: number }
     type IconName = string
@@ -33,9 +33,9 @@
 
     let {
         clearCanvas,
-        setCanvas,
-    }: { clearCanvas: Function; currCircuitName: string; setCanvas: Function } =
-        $props()
+    }: {
+        clearCanvas: Function;
+    } = $props()
 
     const simMenuModel: SimMenuModel = {
         playTick: {
@@ -101,25 +101,37 @@
     function circuitDownload(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
-        const currCircuitName = localStorage.getItem('currActiveTab')
-        if (!currCircuitName)
-            return (
-                console.log(
-                    'could not download because current active tab name is null'
-                ),
-                null
-            )
-        downloadCircuit(currCircuitName)
+        // ensure save file is up to date
+        saveCircuitSave();
+
+        // build save JSON
+        const circuitJson = JSON.parse(circuitSave.getSaveJson());
+        // insert some settings
+        const zoom = parseFloat(localStorage.getItem('canvasZoom') || '1');
+        const translation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0}');
+        circuitJson.zoom = zoom;
+        circuitJson.translation = translation;
+        const circuitJsonString = JSON.stringify(circuitJson, null, 2);
+
+        // download circuit representation
+        downloadJson("my_circuit", circuitJsonString);
     }
 
-    async function circuitUpload(
+    function circuitUpload(
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
-        // if (getRunning()) {
-        //     toggleRunSim()
-        // }
-        await uploadCircuit()
-        setCanvas($CircuitStore.devices)
+        if (getRunning()) { // stop simulation if it is running
+            toggleRunSim(event);
+        }
+        receiveJson()
+            .then((jsonString) => {
+                circuitSave.setSaveJson(jsonString);
+                // switch to main circuit
+                setCurrentCircuit(MAIN_CIRCUIT_NAME, false);
+            })
+            .catch((err) => {
+                console.log('circuit upload failed:', err);
+            });
     }
 
     function onTrash() {

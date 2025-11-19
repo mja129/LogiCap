@@ -3,7 +3,7 @@
     import type { menuJsonElement, menuJsonType } from '@CircuitModel'
     import { circuitSave } from '@src/App.svelte'
 
-    export function refreshSideMenu(): void {
+    function refreshSideMenu(subcomponents: string[]): void {
         menuJsonData.update(old => {
             return {
                 'Logic Gates': { ...old['Logic Gates'] },
@@ -11,7 +11,7 @@
                 'Subcomponents': {
                     svg: old.Subcomponents.svg,
                     groupElements: [
-                        ...(circuitSave.getSubcomponents().map((subcircuit: string) => {
+                        ...(subcomponents.map((subcircuit: string) => {
                             return { name: subcircuit, nodeType: 'Subcircuit', icon: subcomponentIcon} as menuJsonElement;
                         })),
                     ]
@@ -132,11 +132,9 @@
         }
     }
 
-    onMount(() => {
-        // TODO ideally we do not have to do this
-        // this is mainly done to pull subcomponents
-        refreshSideMenu();
-    })
+    circuitSave.getSubcomponents().subscribe((subcomponents) => {
+        refreshSideMenu(subcomponents);
+    });
 </script>
 
 <nav class="side_menu noselect" aria-label="Side Menu">
