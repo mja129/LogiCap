@@ -213,9 +213,12 @@
         )
 
         // TODO redo this
-        saveCircuitSave()
-
-        let save = JSON.parse(localStorage.getItem('circuitStoreSave') ?? '')
+        saveCircuitSave();
+        let save = circuitSave.getCircuit($currentCircuit);
+        if (save === null) { // should be impossible
+            console.log("if you are seeing this, very bad things have happened");
+            return;
+        }
 
         let copiedCircuits: any = {
             devices: {},

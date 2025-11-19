@@ -88,7 +88,6 @@
         // update current tab if necessary
         if (editingTab === currentTab) {
             currentCircuit.set(newTabName);
-            localStorage.setItem('currActiveTab', newTabName);
         }
 
         // reset for next rename

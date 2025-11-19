@@ -215,17 +215,6 @@ function savePositionsToCircuitStore() {
     })
 }
 
-// save the current circuit store to localStorage
-export function saveCircuitStoreToLS() {
-    const CircuitStoreSave: string | null = getLsItem('circuitStoreSave')
-
-    // getLsItem might warn that circuitStoreSave does not exist, in this case
-    // we are creating it for the first time, thats okay
-    // const currCircuitStore = get(CircuitStore)
-
-    localStorage.setItem('circuitStoreSave', JSON.stringify(get(CircuitStore)))
-}
-
 export function clickSvelvetSave() {
     const svelvetSaveButton = document.querySelector('.save-button')
     const mouseEvent = new MouseEvent('click', {
@@ -247,8 +236,6 @@ export function saveCircuit() {
     clickSvelvetSave()
 
     savePositionsToCircuitStore()
-
-    saveCircuitStoreToLS()
 }
 
 // on reload the saved connections are sent implicitly through the Circuit components
@@ -289,29 +276,4 @@ export function loadCircuit(circuit: Circuit) {
         console.log((circuit as any).zoom);
         setScale((circuit as any).zoom);
     }
-
-    // just in case
-    saveCircuitStoreToLS();
-}
-
-// remove circuitStore save and backup to prevCircuitStore, iff you aren't deleting an empty circuit.
-// backup to LS and delete circuitStoreSave from LS
-export function backupDelete() {
-    // what if they clear an empty canvas.
-    saveCircuit()
-
-    const saveDeleted = localStorage.getItem('circuitStoreSave')
-    if (!saveDeleted) {
-        console.warn('we saved before deleting so this should not be possible')
-    } else if (
-        // only save non empty circuits to previousCircuitStore.
-        saveDeleted === '{"devices":{},"connectors":[],"subcircuits":{}}'
-    ) {
-        console.warn(
-            'EMPTY on delete, do not set prevCircuitStore just empty stores.'
-        )
-    } else {
-        localStorage.setItem('prevCircuitStore', saveDeleted)
-    }
-    localStorage.removeItem('circuitStoreSave')
 }

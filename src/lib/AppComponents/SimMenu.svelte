@@ -3,7 +3,6 @@
 
     import {
         CircuitStore,
-        backupDelete,
     } from '@CircuitStore'
     import {
         toggleSimulation,
@@ -135,8 +134,6 @@
     }
 
     function onTrash() {
-        backupDelete()
-
         CircuitStore.reset()
 
         // clears the currentDevicesData variable in app.svelte
