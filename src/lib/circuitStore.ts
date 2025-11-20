@@ -1,6 +1,7 @@
 import { writable, get, type Writable } from 'svelte/store'
 import { deviceJsonFactoryMap } from './Util/makeDigitalJsJson'
 import { setScale, setTranslation} from '@Util/graphUtils'
+import { circuitSave, currentCircuit } from '@src/App.svelte'
 
 // Explains the json representation
 // https://github.com/tilk/digitaljs
@@ -87,23 +88,32 @@ const createCircuitStore = (): CircuitStoreType => {
             const nodeName: string = `${gateType}_${uuid}`
             let newDevices: Devices | null = null;
             let celltype = options?.celltype;
-            // if (celltype) {
-            //   if (options) {
-            //     options.celltype = celltype
-            //     options.inputs = inputs
-            //     options.outputs = outputs
-            //   } else {
-            //     options = {'celltype': celltype, 'inputs': inputs}
-            //   }
-            // }
             update((currCircuit) => {
                 const newDevice: Device =
                     options === undefined
                         ? deviceJsonFactoryMap[gateType](nodeName)
                         : deviceJsonFactoryMap[gateType](nodeName, options)
 
+                if (gateType == 'Subcircuit') {
+                    if (currCircuit.subcircuits.indexOf(celltype) == -1) currCircuit.subcircuits.push(celltype)
+                    // detect recursive subcircuitry
+                    let queue: string[][] = [[get(currentCircuit)]]
+                    while (queue.length > 0) {
+                        let item = queue.pop()
+                        if (!item) {continue}
+                        let lastCircJson = circuitSave.getCircuit(item[item.length - 1])
+                        lastCircJson.subcircuits.forEach((newCirc: string) => {
+                            if (item.indexOf(newCirc) != -1) {
+                                item.push(newCirc)
+                                alert('Recursive subcircuitry!\n' + item.join(' -> '))
+                                throw Error
+                            }
+                            item.push(newCirc)
+                            queue.push(item)
+                        })
+                    }
+                }
                 currCircuit.devices[nodeName] = newDevice
-                if (gateType == 'Subcircuit' && currCircuit.subcircuits.indexOf(celltype) == -1) currCircuit.subcircuits.push(celltype)
                 newDevices = currCircuit.devices
 
                 return currCircuit

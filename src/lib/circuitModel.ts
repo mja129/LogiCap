@@ -29,8 +29,8 @@ export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Tunnels' | 'Subco
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
-export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes
 export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
+export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes
 
 export type ioNodeTypes = 'Button' | 'Lamp'
 export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit'
@@ -98,8 +98,9 @@ export const menuJsonData: Writable<menuJsonType> = writable({
     'Tunnels': {
         svg: undefined,
         groupElements: [
+            // TODO give these their own icons
             { name: 'Tunnel Input', nodeType: 'TunnelInput', icon: outputIcon },
-            { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: inputIcon },
+            { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: outputIcon },
         ],
     },
     'Subcomponents': {
@@ -120,7 +121,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
 // 3. create the component
 // 4. add the component prop type to AllNodeProps
 // 5. add it to the switch statement below.
-// If your component has specific required props: this may be an issue, lmk.
+// If your component has specific required props: this may be an issue, lmk. 
 // this function is used to getComponent when dropping and create the correct component.
 export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
     switch (type) {

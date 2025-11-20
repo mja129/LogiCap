@@ -23,6 +23,14 @@ function transformConnections(data: SvelvetConnectors): Connector[] {
     // return data
 }
 
+/*  Modify given circuitJson into format DigitalJS will understand
+  * This entails:
+  * - Changing all Buttons to be type 'Input' and Lamps to 'Output'
+  * - Sorting the ins/outs by y position and giving them port ids in sorted order.
+  *   This ensures they show up on the subcomponent node as they show in the subcircuit,
+  *   assuming that all inputs are on the left and all outputs are on the right.
+  * TODO: more in depth anchor placement. Will involve some serious refactoring of Subcomponent.svelte
+  */
 function subcircuitParse(circuitJson: any): Subcircuit {
   circuitJson['devices'] = circuitJson['devices'] as Record<string, Device>
   var inputs: IODevice[] = []
@@ -55,9 +63,11 @@ function subcircuitParse(circuitJson: any): Subcircuit {
   outputs.forEach((device: IODevice, i: number) => {
     device['net'] = `out${i+1}`;
   })
-  return {'devices': circuitJson['devices'], 'connectors': transformConnections(circuitJson['connectors']), 'subcircuits': circuitJson['subcircuits']}
+  let { devices, connections } = resolveTunnels(circuitJson['devices'], circuitJson['connectors'])
+  return {'devices': devices, 'connectors': transformConnections(connections), 'subcircuits': circuitJson['subcircuits']}
 }
 
+// Load a set of subcircuits, and all of their subcircuits recursively
 function loadSubcircuits(subcircuits: string[], subjson?: Record<string, Subcircuit>): Record<string, Subcircuit> {
   let subcircuitsJson: Record<string, Subcircuit> = subjson || {}
   subcircuits.forEach((circuit: string) => {
@@ -73,6 +83,15 @@ function loadSubcircuits(subcircuits: string[], subjson?: Record<string, Subcirc
   return subcircuitsJson
 }
 
+/*  Funky bit of BS-ery to hook up tunnel inputs to their outputs.
+  * Jank as HELL!
+  * Essentially, replaces all tunnels with repeaters on the backend and adds an invisible wire from
+  * every input to all its outputs.
+  *
+  * Worth noting that while celltype is an actual digitalJS property of subcircuits,
+  * it is completely useless to the backend on a repeater. It's only used for tunnels
+  * because it was an extraneous property that was already hooked into the frontend.
+  */
 function resolveTunnels(devices: Devices, connections: SvelvetConnectors) {
   let ins: Record<string, LogicGate> = {}
   let outs: Record<string, LogicGate[]> = {}
@@ -81,7 +100,9 @@ function resolveTunnels(devices: Devices, connections: SvelvetConnectors) {
       let celltype = (devices[key] as TunnelInput).celltype
       devices[key].type = 'Repeater'
       let input = devices[key] as LogicGate
-      if (celltype in ins) {
+      // celltype already being a key means there are duped inputs.
+      // Can't imagine an elegant way to handle this, so yell at the user it is
+      if (celltype in ins) { 
         alert('Multiple tunnel inputs with same name')
       }
       ins[celltype] = input
@@ -99,16 +120,8 @@ function resolveTunnels(devices: Devices, connections: SvelvetConnectors) {
       }
     }
   })
+  // Add connection from every input to all outputs with same celltype
   Object.keys(ins).forEach((key: string) => {
-    let sourceAnchor: outputAnchorName = 'out__' 
-    Object.keys(connections).forEach((connKey: string) => {
-      let anchor = connKey as outputAnchorName
-      connections[anchor].forEach((conn: ConnectionTuple, index: number) => {
-        if (conn[0] == ins[key].label as inputGateName) {
-          sourceAnchor = anchor
-        }
-      })
-    })
     connections[`out_${ins[key].label}` as outputAnchorName] = []
     outs[key].forEach((out: LogicGate) => {
       connections[`out_${ins[key].label}` as outputAnchorName].push([out.label, `in_${out.label}`] as ConnectionTuple)
@@ -124,7 +137,7 @@ export class CustomHeadlessCircuit extends HeadlessCircuit {
         const standardDigitalJsJson = transformConnections(connections)
         const subcircuitsJson = loadSubcircuits(data.subcircuits)
         const digitalCircuit: DefaultCircuit = { devices: devices, connectors: standardDigitalJsJson, subcircuits: subcircuitsJson }
-        console.log(digitalCircuit)
+        console.log('COMPILED CIRCUIT:', digitalCircuit)
         super(digitalCircuit, options)
 
         // Additional custom logic can go here

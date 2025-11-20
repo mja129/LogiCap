@@ -92,9 +92,9 @@ function makeSubcomponentNode(
     return {
         type: 'Subcircuit',
         label: nodeName,
-        inputs: inputs,
-        outputs: outputs,
-        celltype: celltype,
+        inputs,
+        outputs,
+        celltype,
         ...(options?.position && {
             position: {
                 x: options.position.x,
@@ -115,8 +115,7 @@ function makeTunnelInput(
     return {
         type: 'TunnelInput',
         label: nodeName,
-        // celltype: celltype,
-        celltype: 'tunnel',
+        celltype,
         ...(options?.position && {
             position: {
                 x: options.position.x,
@@ -137,8 +136,7 @@ function makeTunnelOutput(
     return {
         type: 'TunnelOutput',
         label: nodeName,
-        // celltype: celltype,
-        celltype: 'tunnel',
+        celltype,
         ...(options?.position && {
             position: {
                 x: options.position.x,

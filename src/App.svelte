@@ -148,16 +148,31 @@
 
         // create new gate on global circuit store on drop
         var newDeviceList
-        if (e.celltype) {  
+        if (gateType == 'TunnelInput' || gateType == 'TunnelOutput') {
+          let tunnelName = prompt('Enter tunnel name:')
+          if (!tunnelName) return
           newDeviceList = CircuitStore.addCircuitDevice(
               gateType,
               uuid,
               {
-                celltype: e.celltype,
-                inputs: e.inputs,
-                outputs: e.outputs
+                celltype: tunnelName.toLowerCase(), // make tunnels case insensitive bc everything is capitalized in this font lol
               }
           ) as Devices
+        } else if (e.celltype) {
+          try {
+            newDeviceList = CircuitStore.addCircuitDevice(
+                gateType,
+                uuid,
+                {
+                  celltype: e.celltype,
+                  inputs: e.inputs,
+                  outputs: e.outputs
+                }
+            ) as Devices
+          } catch {
+            console.log('circuit add aborted')
+            return
+          }
         } else {
           newDeviceList = CircuitStore.addCircuitDevice(
               gateType,
