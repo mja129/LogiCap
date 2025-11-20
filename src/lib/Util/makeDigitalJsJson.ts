@@ -107,6 +107,50 @@ function makeSubcomponentNode(
     }
 }
 
+function makeTunnelInput(
+    nodeName: string,
+    celltype: string,
+    options?: { position?: { x: number; y: number }, rotation?: number }
+): TunnelInput {
+    return {
+        type: 'TunnelInput',
+        label: nodeName,
+        // celltype: celltype,
+        celltype: 'tunnel',
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
+        }),
+    }
+}
+
+function makeTunnelOutput(
+    nodeName: string,
+    celltype: string,
+    options?: { position?: { x: number; y: number }, rotation?: number }
+): TunnelOutput {
+    return {
+        type: 'TunnelOutput',
+        label: nodeName,
+        // celltype: celltype,
+        celltype: 'tunnel',
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
+        }),
+    }
+}
+
 export const deviceJsonFactoryMap: Record<
     string,
     (nodeName: string, options?: any) => Device
@@ -131,6 +175,10 @@ export const deviceJsonFactoryMap: Record<
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
     Subcircuit: (nodeName, options?) => 
         makeSubcomponentNode(nodeName, options.celltype as string, options.inputs as number, options.outputs as number, ...(options ? [options] : [])), 
+    TunnelInput: (nodeName, options?) =>
+        makeTunnelInput(nodeName, options.celltype as string, ...(options ? [options] : [])),
+    TunnelOutput: (nodeName, options?) =>
+        makeTunnelOutput(nodeName, options.celltype as string, ...(options ? [options] : [])),
 }
 
 // // Example usage

@@ -131,6 +131,12 @@
                       inputs,
                       outputs
                   }
+                } else if (draggingItem.nodeType == 'TunnelInput' || draggingItem.nodeType == 'TunnelOutput') {
+                  e = {
+                      ...event,
+                      gateType: draggingItem.nodeType,
+                      celltype: draggingItem.name,
+                  }
                 } else {
                   e = {
                       ...event,

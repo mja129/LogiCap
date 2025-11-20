@@ -8,6 +8,7 @@
             return {
                 'Logic Gates': { ...old['Logic Gates'] },
                 'Input/Output': { ...old['Input/Output'] },
+                'Tunnels': { ...old['Tunnels'] },
                 'Subcomponents': {
                     svg: old.Subcomponents.svg,
                     groupElements: [

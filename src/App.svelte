@@ -9,7 +9,7 @@
 
     // TODO these might be better put elsewhere
     // TODO stop using local storage for subcircuits once a better save format exists
-    let subcomponents : string[] = $state(JSON.parse((localStorage.getItem('subcircuits') || '')));
+    let subcomponents : string[] = $state(JSON.parse((localStorage.getItem('subcircuits') || '[]')));
     export function createSubcomponent(name: string) {
         // update subcircuits json
         if (subcomponents.indexOf(name) != -1) { // already exists
