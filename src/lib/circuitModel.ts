@@ -19,18 +19,21 @@ import SingleIoLogic from '@Circuits/LogicGates/SingleIoLogic.svelte'
 import Lamp from '@Circuits/InputOutputNodes/Lamp.svelte'
 import ButtonNode from '@Circuits/InputOutputNodes/ButtonNode.svelte'
 import Subcomponent from '@Circuits/Subcomponent.svelte'
+import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
+import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
 // or their grouping in the menu
-export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Subcomponents' | 'GhostElement'
+export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Tunnels' | 'Subcomponents' | 'GhostElement'
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes
+export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
 
 export type ioNodeTypes = 'Button' | 'Lamp'
-export type allNodeTypes = logicGateTypes | ioNodeTypes | 'Subcircuit'
+export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit'
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte
@@ -49,6 +52,8 @@ type LogicGateProps = ComponentProps<typeof LogicGate>
 type OutputResultNodeProps = ComponentProps<typeof Lamp>
 type ButtonInputNodeProps = ComponentProps<typeof ButtonNode>
 type SubcomponentProps = ComponentProps<typeof Subcomponent>
+type TunnelInputProps = ComponentProps<typeof TunnelInput>
+type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -62,6 +67,8 @@ export type AllNodePropsWithoutId =
     | Omit<OutputResultNodeProps, 'nodeId'>
     | Omit<ButtonInputNodeProps, 'nodeId'>
     | Omit<SubcomponentProps, 'nodeId'>
+    | Omit<TunnelInputProps, 'nodeId'>
+    | Omit<TunnelOutputProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -86,6 +93,13 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         groupElements: [
             { name: 'Lamp', nodeType: 'Lamp', icon: outputIcon },
             { name: 'Button', nodeType: 'Button', icon: inputIcon },
+        ],
+    },
+    'Tunnels': {
+        svg: undefined,
+        groupElements: [
+            { name: 'Tunnel Input', nodeType: 'TunnelInput', icon: outputIcon },
+            { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: inputIcon },
         ],
     },
     'Subcomponents': {
@@ -126,5 +140,9 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return Lamp
         case 'Subcircuit':
             return Subcomponent
+        case 'TunnelInput':
+            return TunnelInput
+        case 'TunnelOutput':
+            return TunnelOutput
     }
 }

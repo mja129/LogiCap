@@ -103,7 +103,7 @@ const createCircuitStore = (): CircuitStoreType => {
                         : deviceJsonFactoryMap[gateType](nodeName, options)
 
                 currCircuit.devices[nodeName] = newDevice
-                if (celltype && currCircuit.subcircuits.indexOf(celltype) == -1) currCircuit.subcircuits.push(celltype)
+                if (gateType == 'Subcircuit' && currCircuit.subcircuits.indexOf(celltype) == -1) currCircuit.subcircuits.push(celltype)
                 newDevices = currCircuit.devices
 
                 return currCircuit
