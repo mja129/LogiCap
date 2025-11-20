@@ -1,5 +1,6 @@
 <script module lang="ts">
     import { writable, type Writable } from 'svelte/store'
+    import { CircuitStore } from '@CircuitStore'
     // out_Or_qBoVfe501f-in2_Xnor_OhSTyJtjsm
     type WireId = string
     type WireType = string
@@ -7,7 +8,6 @@
     // probably with the inverted mapping I keep talking about.
     type WireSaveData = Record<WireId, WireType>
 
-    let wireSaveData: Writable<WireSaveData> = writable({})
     let lastDel: Writable<{ type: string; id: string }> = writable({
         type: '',
         id: '',
@@ -28,7 +28,6 @@
         onWireChange,
         findWireInEngine,
     } from '@CircuitEngine'
-    import { CircuitStore } from '@CircuitStore'
 
     import { setAnchor, getWireIdFromDOM } from './wireUtils.ts'
     import { createDragWire } from './manipulateWire.ts'
@@ -51,15 +50,6 @@
         wireType?: string
     } = $props()
 
-    // keep track of length, this is more computation than necessary
-    // map works too map has .size
-    // set to save data on mount.
-    // this is what links to local storage
-    if (Object.keys($wireSaveData).length === 0) {
-        $wireSaveData = $CircuitStore.wireManipulations
-        $wireSaveData = $wireSaveData
-    }
-
     // $inspect($wireSaveData).with(console.log)
     // Cache the wire type.
     // once a wire type is created once it will always be that type of wire unless edited with the cursor tool
@@ -80,10 +70,7 @@
             $lastDel.id = ''
             $lastDel = $lastDel
             if (disableTapUpdate) {
-                wireSaveData.update((currData) => {
-                    delete currData[wireId]
-                    return currData
-                })
+                delete $CircuitStore.wireManipulations[wireId];
             }
         }
         // remove yourself
@@ -105,7 +92,7 @@
             $handleDisconnect &&
             wireId !== '' &&
             !wireId.includes('cursor') &&
-            wireId in $wireSaveData
+            wireId in $CircuitStore.wireManipulations
         ) {
             lastDel.update(() => {
                 return { type: wireType, id: wireId }
@@ -114,10 +101,7 @@
             window.addEventListener('mouseup', handleMouseUp, { capture: true })
 
             if (!disableTapUpdate) {
-                wireSaveData.update((currData) => {
-                    delete currData[wireId]
-                    return currData
-                })
+                delete $CircuitStore.wireManipulations[wireId];
             }
 
             $handleDisconnect = false
@@ -127,26 +111,23 @@
         if (wireId !== '' && !wireId.includes('cursor')) {
             // console.warn('WIREIDNOTNULL: ' + wireId)
 
-            if (!(wireId in $wireSaveData)) {
+            if (!(wireId in $CircuitStore.wireManipulations)) {
                 if ($lastDel.type !== '' && $handleDisconnect === false) {
-                    $wireSaveData[wireId] = disableCarryType
+                    $CircuitStore.wireManipulations[wireId] = disableCarryType
                         ? $settingsStore.wireType
                         : $lastDel.type
-                    wireType = $wireSaveData[wireId]
+                    wireType = $CircuitStore.wireManipulations[wireId]
 
-                    wireSaveData.update((currData) => {
-                        delete currData[$lastDel.id]
-                        return currData
-                    })
+                    delete $CircuitStore.wireManipulations[$lastDel.id];
                     $lastDel.type = ''
                     $lastDel.id = ''
                     $lastDel = $lastDel
                     return
                 }
-                $wireSaveData[wireId] = $settingsStore.wireType
+                $CircuitStore.wireManipulations[wireId] = $settingsStore.wireType
             }
             // check map on every rerender, where the wire is linked
-            wireType = $wireSaveData[wireId]
+            wireType = $CircuitStore.wireManipulations[wireId]
         }
     })
 
@@ -229,13 +210,6 @@
             (digitalJsCircuit !== null && getMonitor(digitalJsCircuit)) ||
             (() => null)
         monitorFn()
-    })
-
-    // TODO, refactor this so that it happens when save/sync/tabswitch happen.
-    // it doesn't need to be this often.
-    wireSaveData.subscribe((newSaveData) => {
-        $CircuitStore.wireManipulations = newSaveData
-        $CircuitStore = $CircuitStore
     })
 
     // used for finding the html element with the connectionID
