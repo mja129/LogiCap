@@ -49,7 +49,7 @@
         y="50%"
         text-anchor="middle"
         alignment-baseline="middle"
-        textLength="80%"
+        textLength="{width * 0.8}px"
         lengthAdjust="spacingAndGlyphs"
         font-size="200%"
         fill="white"

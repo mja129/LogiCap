@@ -51,7 +51,7 @@ const createCircuitStore = (): CircuitStoreType => {
             ) as inputGateName
             update((currCircuit) => {
                 if (!(fromId in currCircuit.connectors)) {
-                    currCircuit.connectors[fromId] = new Array()
+                    currCircuit.connectors[fromId] = []
                 }
                 // I wanna check if the full array copy is needed here, I think it is tbh
                 currCircuit.connectors[fromId] = [
@@ -101,10 +101,10 @@ const createCircuitStore = (): CircuitStoreType => {
                     while (queue.length > 0) {
                         let item = queue.pop()
                         if (!item) {continue}
-                        let lastCircJson = circuitSave.getCircuit(item[item.length - 1])
+                        let lastCircJson = circuitSave.getCircuit(item[item.length - 1]) as Circuit
                         lastCircJson.subcircuits.forEach((newCirc: string) => {
                             if (item.indexOf(newCirc) != -1) {
-                                item.push(newCirc)
+                                currCircuit.subcircuits.pop(); // remove subcircuit we just pushed since it causes recursion
                                 alert('Recursive subcircuitry!\n' + item.join(' -> '))
                                 throw Error
                             }
@@ -126,14 +126,53 @@ const createCircuitStore = (): CircuitStoreType => {
         removeCircuitDevice(gateTypePlus_uuid:string) {
             let newDevices: Devices | null = null
             update((currCircuit) => {
+                // if this is the last of a subcircuit, remove it from subcircuits
+                if (currCircuit.devices[gateTypePlus_uuid].type === 'Subcircuit') {
+                    const sub: Subcomponent = currCircuit.devices[gateTypePlus_uuid] as Subcomponent;
+                    let found = false;
+                    for (const deviceId in currCircuit.devices) {
+                        if (deviceId === gateTypePlus_uuid) {
+                            continue;
+                        }
+                        let device = currCircuit.devices[deviceId];
+                        if (device.type === 'Subcircuit' && (device as Subcomponent).celltype === sub.celltype) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        currCircuit.subcircuits.splice(currCircuit.subcircuits.indexOf(sub.celltype), 1);
+                    }
+                }
+
+                // remove orphaned wires
+                for (const connectionId in currCircuit.connectors) {
+                    if (connectionId.endsWith(gateTypePlus_uuid)) { // one of the outputs
+                        delete currCircuit.connectors[connectionId as outputAnchorName];
+                    } else { // check the inputs for any to remove
+                        currCircuit.connectors[connectionId as outputAnchorName] = currCircuit.connectors[connectionId as outputAnchorName]
+                            .filter(([gateId, _]) => {
+                                return gateId !== gateTypePlus_uuid;
+                            })
+                    }
+                }
+
+                // remove unnecessary wire manipulations
+                for (const manipulationId in currCircuit.wireManipulations) {
+                    if (manipulationId.indexOf(gateTypePlus_uuid) != -1) {
+                        delete currCircuit.wireManipulations[manipulationId];
+                    }
+                }
+
+                // remove the device
                 delete currCircuit.devices[gateTypePlus_uuid];
-                newDevices = currCircuit.devices
-                return currCircuit
+                newDevices = currCircuit.devices;
+                return currCircuit;
             })
             if (newDevices === null) {
                 throw new Error('devices null after setting devices')
             }
-            // todo remove orphaned wire connection
+
             return newDevices;
         },
     }
