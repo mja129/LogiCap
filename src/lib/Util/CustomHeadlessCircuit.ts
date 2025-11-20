@@ -123,9 +123,11 @@ function resolveTunnels(devices: Devices, connections: SvelvetConnectors) {
   // Add connection from every input to all outputs with same celltype
   Object.keys(ins).forEach((key: string) => {
     connections[`out_${ins[key].label}` as outputAnchorName] = []
-    outs[key].forEach((out: LogicGate) => {
-      connections[`out_${ins[key].label}` as outputAnchorName].push([out.label, `in_${out.label}`] as ConnectionTuple)
-    })
+    if (key in outs) {
+      outs[key].forEach((out: LogicGate) => {
+        connections[`out_${ins[key].label}` as outputAnchorName].push([out.label, `in_${out.label}`] as ConnectionTuple)
+      })
+    }
   })
   return { devices, connections }
 }
