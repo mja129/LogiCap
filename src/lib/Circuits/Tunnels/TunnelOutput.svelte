@@ -55,6 +55,9 @@
     io="output"
     ioId=""
     id={nodeId}
+    connections={get(CircuitStore).connectors[
+        ('out_' + nodeId) as outputAnchorName
+    ]}
     side="east"
     offset={[75, 20]}
     usePixelOffset={true}
