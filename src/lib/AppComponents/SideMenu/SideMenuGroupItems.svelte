@@ -179,7 +179,7 @@
             >
                 <img src={item.icon} alt="{item.name} logic gate, hand-drawn" />
             </button>
-            {item.name}
+            <p>{item.name}</p>
         </li>
     {/each}
 </ol>
@@ -253,14 +253,12 @@
         display: flex;
         align-items: center;
         flex-direction: column;
-        justify-content: space-around;
         min-height: 65px;
 
         border-radius: 20px;
         border: 2px solid black;
         box-shadow: 4px 4px 0 0 black;
     }
-
     .side_menu_group li:hover {
         cursor: pointer;
         scale: 1.1;
@@ -274,5 +272,15 @@
     }
     :global(.running .side_menu_group li:hover) {
         cursor: not-allowed;
+    }
+
+    .gate-button {
+        min-height: 40px;
+        max-height: 40px;
+    }
+    .side_menu_group li p {
+        max-width: 80%;
+        line-height: normal;
+        padding-bottom: 5px;
     }
 </style>
