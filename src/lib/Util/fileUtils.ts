@@ -33,14 +33,9 @@ export async function receiveJson(): Promise<string> {
         input.setAttribute("type", "file");
         input.setAttribute("accept", "application/JSON");
         input.onchange = () => {
-            const reader = new FileReader();
-            reader.onload = (e: ProgressEvent<FileReader>) => {
-                resolve(e.target?.result as string);
-            };
-            reader.onerror = () => {
-                reject("Error while reading uploaded file");
-            };
-            reader.readAsText(input.files?.[0] as File);
+            (input.files?.[0] as File).text()
+                .then((content) => resolve(content))
+                .catch((err) => reject(err));
         };
 
         // trigger upload prompt
