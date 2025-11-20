@@ -1,5 +1,5 @@
 import { createEmptyCircuit } from '@CircuitStore'
-import { get, writable, type Writable } from 'svelte/store'
+import { get, type Readable, writable, type Writable } from 'svelte/store'
 
 type SaveDataFormat = {
     main_circuit: SingleSaveDataFormat & { display_name: string },
@@ -21,7 +21,7 @@ export interface CircuitSave {
     createSubcomponent(name: string): void;
     deleteSubcomponent(name: string): void;
     renameSubcomponent(name: string, newName: string): void;
-    getSubcomponents(): Writable<string[]>;
+    getSubcomponents(): Readable<string[]>;
 
     setSaveJson(saveJson: string): void;
     getSaveJson(): string;
@@ -107,7 +107,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
                return current;
             });
         },
-        getSubcomponents(): Writable<string[]> {
+        getSubcomponents(): Readable<string[]> {
             return subcomponents;
         },
 

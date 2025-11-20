@@ -2,7 +2,7 @@
 <script module lang="ts">
     import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
     import { type CircuitSave, createCircuitSave } from '@src/lib/circuitSave.ts'
-    import { get, writable, type Writable } from 'svelte/store'
+    import { get, type Readable, writable, type Writable } from 'svelte/store'
 
     export function onWireConnection(wireId: string) {
         console.log('Success new connection made id: ' + wireId)
@@ -11,18 +11,37 @@
         return null
     }
 
+    /**
+     * The save file representing the current open project.
+     */
     export const circuitSave: CircuitSave = createCircuitSave(localStorage.getItem('currentCircuitSave') || undefined);
+    /**
+     * Forces a save that syncs the CircuitStore with the save file.
+     */
     export function saveCircuitSave() {
         saveCircuit();
         circuitSave.setCircuit(get(currentCircuit), get(CircuitStore));
         localStorage.setItem('currentCircuitSave', circuitSave.getSaveJson());
     }
 
+    /**
+     * Writable representing the name of the current displayed circuit.
+     */
     export const currentCircuit: Writable<string> = writable(localStorage.getItem('currentActiveCircuit') || circuitSave.getMainCircuitName());
     currentCircuit.subscribe(currentCircuit => { // track changes in local storage
         localStorage.setItem('currentActiveCircuit', currentCircuit);
     });
-    const rerenderTrigger: Writable<boolean> = writable(false);
+    const circuitLoadTrigger_i: Writable<boolean> = writable(false);
+    /**
+     * Trigger to listen for when the loaded circuit changes.
+     */
+    export const circuitLoadTrigger: Readable<boolean> = circuitLoadTrigger_i;
+
+    /**
+     * Changes the circuit currently being displayed (and housed by the CircuitStore).
+     * @param name The name of the circuit to load and display.
+     * @param save Whether the currently displayed circuit should be saved before being closed.
+     */
     export function setCurrentCircuit(name: string, save: boolean = true) {
         if (save) {
             saveCircuitSave();
@@ -34,7 +53,7 @@
         }
         loadCircuit(circuit);
         currentCircuit.set(name);
-        rerenderTrigger.update((rerender: boolean) => !rerender);
+        circuitLoadTrigger_i.update((rerender: boolean) => !rerender);
     }
 </script>
 
@@ -64,7 +83,10 @@
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
-    const clearDeviceData = () => (currentDevicesData = {})
+    const clearDeviceData = () => {
+        currentDevicesData = {};
+        $CircuitStore.wireManipulations = {};
+    }
     const setDeviceData = (devs: Devices) => (currentDevicesData = devs)
 
     let initialScale: number = $state(1)
@@ -101,7 +123,7 @@
 
         // populate circuit
         setCurrentCircuit(get(currentCircuit), false);
-        rerenderTrigger.subscribe(() => {
+        circuitLoadTrigger.subscribe(() => {
             setDeviceData($CircuitStore.devices);
         })
 
