@@ -102,13 +102,8 @@
         // ensure save file is up to date
         saveCircuitSave();
 
-        // build save JSON
+        // build save JSON and reformat
         const circuitJson = JSON.parse(circuitSave.getSaveJson());
-        // insert some settings
-        const zoom = parseFloat(localStorage.getItem('canvasZoom') || '1');
-        const translation = JSON.parse(localStorage.getItem('canvasTranslation') || '{"x":0,"y":0}');
-        circuitJson.zoom = zoom;
-        circuitJson.translation = translation;
         const circuitJsonString = JSON.stringify(circuitJson, null, 2);
 
         // download circuit representation

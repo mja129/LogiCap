@@ -72,7 +72,7 @@ function loadSubcircuits(subcircuits: string[], subjson?: Record<string, Subcirc
   let subcircuitsJson: Record<string, Subcircuit> = subjson || {}
   subcircuits.forEach((circuit: string) => {
     // need to clone the json since it is modified. is there a more efficient way?
-    const subcircuit = circuitSave.getCircuit(circuit);
+    const subcircuit = circuitSave.getCircuit(circuit)?.circuit;
     if (subcircuit) {
       subcircuitsJson[circuit] = subcircuitParse(JSON.parse(JSON.stringify(subcircuit)));
       loadSubcircuits(subcircuitsJson[circuit]['subcircuits'], subcircuitsJson)

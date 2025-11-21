@@ -1,13 +1,15 @@
 import { createEmptyCircuit } from '@CircuitStore'
 import { get, type Readable, writable, type Writable } from 'svelte/store'
+import type { XYPair } from 'svelvet'
 
 type SaveDataFormat = {
     main_circuit: SingleSaveDataFormat & { display_name: string },
     subcircuits: { [key: string]: SingleSaveDataFormat },
 }
-type SingleSaveDataFormat = {
-    circuit: Circuit
-    // add more data as needed
+export type SingleSaveDataFormat = {
+    circuit: Circuit,
+    zoom: number,
+    translation: XYPair,
 }
 
 export interface CircuitSave {
@@ -15,8 +17,8 @@ export interface CircuitSave {
     setMainCircuitName(name: string): void;
     getMainCircuitName(): string;
 
-    setCircuit(name: string, circuit: Circuit): void;
-    getCircuit(name: string): Circuit | null;
+    setCircuit(name: string, save: SingleSaveDataFormat): void;
+    getCircuit(name: string): SingleSaveDataFormat | null;
 
     createSubcomponent(name: string): void;
     deleteSubcomponent(name: string): void;
@@ -28,6 +30,14 @@ export interface CircuitSave {
 
 }
 
+function createEmptySingleSave() : SingleSaveDataFormat {
+    return {
+        circuit: createEmptyCircuit(),
+        zoom: 1,
+        translation: { x: 0, y: 0 }
+    }
+}
+
 export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
     let saveData: SaveDataFormat;
     if (circuitSaveJson != null) {
@@ -35,7 +45,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
     } else {
         saveData = {
             main_circuit: {
-                circuit: createEmptyCircuit(),
+                ...createEmptySingleSave(),
                 display_name: 'Main Circuit'
             },
             subcircuits: {},
@@ -51,22 +61,22 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
             return saveData.main_circuit.display_name;
         },
 
-        setCircuit(name: string, circuit: Circuit) {
+        setCircuit(name: string, save: SingleSaveDataFormat) {
             if (name === saveData.main_circuit.display_name) {
-                saveData.main_circuit.circuit = circuit;
-            } else {
-                const subcircuit = saveData.subcircuits[name];
-                if (subcircuit != null) {
-                    subcircuit.circuit = circuit;
-                }
+                saveData.main_circuit = {
+                    ...save,
+                    display_name: saveData.main_circuit.display_name
+                };
+            } else if (name in saveData.subcircuits) {
+                saveData.subcircuits[name] = save;
             }
         },
-        getCircuit(name: string): Circuit | null {
+        getCircuit(name: string): SingleSaveDataFormat | null {
             if (name === saveData.main_circuit.display_name) {
-                return saveData.main_circuit.circuit;
+                return saveData.main_circuit;
             }
             const subcircuit = saveData.subcircuits[name];
-            return subcircuit == null ? null : subcircuit.circuit;
+            return subcircuit == null ? null : subcircuit;
         },
 
         createSubcomponent(name: string) {
@@ -74,9 +84,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
             if (get(subcomponents).indexOf(name) != -1) { // already exists
                 return;
             }
-            saveData.subcircuits[name] = {
-                circuit: createEmptyCircuit()
-            };
+            saveData.subcircuits[name] = createEmptySingleSave();
             subcomponents.update((current) => {
                 current.push(name);
                 return current;

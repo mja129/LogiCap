@@ -1,6 +1,5 @@
 import { writable, get, type Writable } from 'svelte/store'
 import { deviceJsonFactoryMap } from './Util/makeDigitalJsJson'
-import { setScale, setTranslation} from '@Util/graphUtils'
 import { circuitSave, currentCircuit } from '@src/App.svelte'
 
 // Explains the json representation
@@ -101,7 +100,7 @@ const createCircuitStore = (): CircuitStoreType => {
                     while (queue.length > 0) {
                         let item = queue.pop()
                         if (!item) {continue}
-                        let lastCircJson = circuitSave.getCircuit(item[item.length - 1]) as Circuit
+                        let lastCircJson = circuitSave.getCircuit(item[item.length - 1])?.circuit as Circuit
                         lastCircJson.subcircuits.forEach((newCirc: string) => {
                             if (item.indexOf(newCirc) != -1) {
                                 currCircuit.subcircuits.pop(); // remove subcircuit we just pushed since it causes recursion
@@ -309,20 +308,10 @@ function validateSavedCircuit(savedCircuit: any) {
 
 export function loadCircuit(circuit: Circuit) {
     validateSavedCircuit(circuit);
-
     CircuitStore.set({
         devices: circuit.devices,
         connectors: circuit.connectors,
         subcircuits: circuit.subcircuits,
         wireManipulations: circuit.wireManipulations
     });
-
-    // TODO improve this...
-    if ((circuit as any).translation) {
-        setTranslation((circuit as any).translation);
-    }
-    if ((circuit as any).zoom) {
-        console.log((circuit as any).zoom);
-        setScale((circuit as any).zoom);
-    }
 }

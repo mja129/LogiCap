@@ -111,7 +111,7 @@
                 if (draggingItem.nodeType == 'Subcircuit') {
                   let inputs = 0;
                   let outputs = 0;
-                  let circuit = circuitSave.getCircuit(draggingItem.name);
+                  let circuit = circuitSave.getCircuit(draggingItem.name)?.circuit;
                   if (circuit != null) {
                     let devices = circuit.devices;
                     Object.keys(devices).forEach((key) => {

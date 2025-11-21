@@ -1,7 +1,7 @@
 <!-- https://coolorgS.co/palette/9b5de5-f15bb5-fee440-00bbf9-00f5d4 -->
 <script module lang="ts">
     import { CircuitStore, loadCircuit, saveCircuit } from '@CircuitStore'
-    import { type CircuitSave, createCircuitSave } from '@src/lib/circuitSave.ts'
+    import { type CircuitSave, createCircuitSave, type SingleSaveDataFormat } from '@src/lib/circuitSave.ts'
     import { get, type Readable, writable, type Writable } from 'svelte/store'
 
     export function onWireConnection(wireId: string) {
@@ -20,7 +20,7 @@
      */
     export function saveCircuitSave() {
         saveCircuit();
-        circuitSave.setCircuit(get(currentCircuit), get(CircuitStore));
+        (circuitSave.getCircuit(get(currentCircuit)) as SingleSaveDataFormat).circuit = get(CircuitStore);
         localStorage.setItem('currentCircuitSave', circuitSave.getSaveJson());
     }
 
@@ -51,7 +51,7 @@
             console.log(`Attempted to load unknown circuit '${name}'!`);
             return;
         }
-        loadCircuit(circuit);
+        loadCircuit(circuit.circuit);
         currentCircuit.set(name);
         circuitLoadTrigger_i.update((rerender: boolean) => !rerender);
     }
@@ -105,8 +105,11 @@
         if (!match) return
 
         const [, x, y, scale] = match.map(Number)
-        localStorage.setItem('canvasZoom', scale.toString())
-        localStorage.setItem('canvasTranslation', JSON.stringify({ x, y }))
+        let saveData = circuitSave.getCircuit(get(currentCircuit));
+        if (saveData !== null) {
+            saveData.zoom = scale;
+            saveData.translation = { x: x, y: y };
+        }
     }
 
     // const setDeviceData = (newData: Devices) => (currentDevicesData = newData)
@@ -116,15 +119,19 @@
         // All three of these ways work
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
-        initialScale = parseFloat(localStorage.getItem('canvasZoom') || '1')
-        initialTranslation = JSON.parse(
-            localStorage.getItem('canvasTranslation') || '{"x":0,"y":0}'
-        )
+
+        // zoom and translation data is checked here as it may not exist in older saves
+        const saveData = circuitSave.getCircuit(get(currentCircuit)) as SingleSaveDataFormat;
+        initialScale = saveData?.zoom || 1;
+        initialTranslation = saveData?.translation || {x: 0, y: 0};
 
         // populate circuit
         setCurrentCircuit(get(currentCircuit), false);
         circuitLoadTrigger.subscribe(() => {
             setDeviceData($CircuitStore.devices);
+            const saveData = circuitSave.getCircuit(get(currentCircuit));
+            setScale(saveData?.zoom || 1);
+            setTranslation(saveData?.translation || {x: 0, y: 0});
         })
 
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.
@@ -254,7 +261,7 @@
         // TODO redo this
         saveCircuitSave();
         // create a clone of the circuit
-        let save = JSON.parse(JSON.stringify(circuitSave.getCircuit($currentCircuit)));
+        let save = JSON.parse(JSON.stringify(circuitSave.getCircuit($currentCircuit)?.circuit));
         if (save === null) { // should be impossible
             console.log("if you are seeing this, very bad things have happened");
             return;
