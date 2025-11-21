@@ -111,12 +111,12 @@ const createCircuitStore = (): CircuitStoreType => {
                         }
                         lastCircJson.subcircuits.forEach((newCirc: string) => {
                             if (item.indexOf(newCirc) != -1) {
+                                console.error("recursive subcir");
                                 currCircuit.subcircuits.pop(); // remove subcircuit we just pushed since it causes recursion
                                 alert('Recursive subcircuitry!\n' + item.join(' -> '))
                                 throw Error
                             }
-                            item.push(newCirc)
-                            queue.push(item)
+                            queue.push( item.concat([newCirc]) );
                         })
                     }
                 }
