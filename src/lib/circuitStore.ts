@@ -96,11 +96,19 @@ const createCircuitStore = (): CircuitStoreType => {
                 if (gateType == 'Subcircuit') {
                     if (currCircuit.subcircuits.indexOf(celltype) == -1) currCircuit.subcircuits.push(celltype)
                     // detect recursive subcircuitry
-                    let queue: string[][] = [[get(currentCircuit)]]
+                    let queue: string[][] = [[get(currentCircuit)]];
                     while (queue.length > 0) {
                         let item = queue.pop()
                         if (!item) {continue}
-                        let lastCircJson = circuitSave.getCircuit(item[item.length - 1])?.circuit as Circuit
+
+                        let subcircuitName = item[item.length - 1];
+
+                        let lastCircJson = circuitSave.getCircuit(subcircuitName)?.circuit as Circuit
+                        if (!lastCircJson){
+                            console.warn("subcircut not defined!");
+                            circuitSave.createSubcomponent(subcircuitName);
+                            continue;
+                        }
                         lastCircJson.subcircuits.forEach((newCirc: string) => {
                             if (item.indexOf(newCirc) != -1) {
                                 currCircuit.subcircuits.pop(); // remove subcircuit we just pushed since it causes recursion
