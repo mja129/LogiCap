@@ -1,6 +1,7 @@
 <script lang="ts" module>
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
     import { CircuitEngine, inputSetter, getRunning } from '@CircuitEngine'
+    import { onDestroy } from 'svelte'
     import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
 
@@ -32,13 +33,14 @@
         }
     }
 
-    CircuitEngine.subscribe((circuit) => {
+   const unsubscriber = CircuitEngine.subscribe((circuit) => {
         // Turn off buttons on simulation stop
         if (circuit === null) {
             signalOn = false;
             return;
         }
-    })
+    });
+    onDestroy(unsubscriber);
 </script>
 
 <svg

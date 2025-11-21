@@ -1,4 +1,6 @@
 <script lang="ts" module>
+    import { CircuitEngine, getRunning } from '@CircuitEngine'
+    import { onDestroy, onMount } from 'svelte'
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
 
     const anchorOffset: [number, number] = [-5, 35.43];
@@ -17,9 +19,6 @@
 </script>
 
 <script lang="ts">
-    import { CircuitEngine, getRunning } from '@CircuitEngine'
-    import { onMount } from 'svelte'
-
     let {
         width = 80,
         height = 50,
@@ -46,13 +45,14 @@
         Object.assign(lampSVGElement, { setLampState });
     })
 
-    CircuitEngine.subscribe((circuit) => {
+    const unsubscriber = CircuitEngine.subscribe((circuit) => {
         // Turn off lamps on simulation stop
         if (circuit === null) {
             signalOn = false;
             return;
         }
-    })
+    });
+    onDestroy(unsubscriber);
 </script>
 
 <div style="min-width: 85px !important;">

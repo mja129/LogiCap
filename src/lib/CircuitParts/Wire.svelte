@@ -41,6 +41,7 @@
     import { onDestroy, onMount } from 'svelte'
 
     import { setLampState } from '@Circuits/InputOutputNodes/Lamp.svelte'
+    import type { Unsubscriber } from 'svelte/store'
 
     let {
         initAncId,
@@ -85,6 +86,8 @@
     const disableTapUpdate = !$settingsStore.useTapUpdate
     const disableCarryType = !$settingsStore.useCarry
 
+    let circuitEngineUnsubcriber: Unsubscriber | null = null;
+
     onDestroy(async () => {
         // make sure that wire types persist correctly
         // remove when input linking is removed.
@@ -105,6 +108,10 @@
             }
 
             $handleDisconnect = false
+        }
+
+        if (circuitEngineUnsubcriber !== null) {
+            circuitEngineUnsubcriber();
         }
     })
     $effect(() => {
@@ -197,7 +204,7 @@
     }
 
     // decent amount of overhead here, new listeners for every wire on circuit update
-    CircuitEngine.subscribe((digitalJsCircuit) => {
+    circuitEngineUnsubcriber = CircuitEngine.subscribe((digitalJsCircuit) => {
         // reset on play/pause
         // console.log('ENGINE UPDATE')
         if (digitalJsCircuit === null) {

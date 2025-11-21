@@ -3,8 +3,9 @@
     import CustomAnchor from './CustomAnchor.svelte'
     import Wire from './Wire.svelte'
     import { getRunning } from '@CircuitEngine'
-    import { getContext, onMount } from 'svelte'
+    import { getContext, onDestroy, onMount } from 'svelte'
     import { writable, type Writable } from 'svelte/store'
+    import { findOutputAnchor } from '@CircuitStore'
 
     let anchorRendererQ: Writable<Array<string>> = writable([]);
 
@@ -38,8 +39,6 @@
 </script>
 
 <script lang="ts">
-    import { findOutputAnchor } from '@CircuitStore'
-
     let {
         io,
         ioId,
@@ -76,7 +75,7 @@
     let updateTrigger = $state(false)
     let isProcessing = false
     onMount(() => {
-        anchorRendererQ.subscribe((value) => {
+        const unsubscriber = anchorRendererQ.subscribe((value) => {
             if (value.includes(anchorId) && !isProcessing) {
                 isProcessing = true;
                 // so this timeout is basically black magic
@@ -89,6 +88,7 @@
                 });
             }
         });
+        onDestroy(unsubscriber);
     });
 </script>
 
