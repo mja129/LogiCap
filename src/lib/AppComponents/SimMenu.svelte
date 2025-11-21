@@ -118,9 +118,13 @@
         }
         receiveJson()
             .then((jsonString) => {
-                circuitSave.setSaveJson(jsonString);
-                // switch to main circuit
-                setCurrentCircuit(circuitSave.getMainCircuitName(), false);
+                try {
+                    circuitSave.setSaveJson(jsonString);
+                    // switch to main circuit
+                    setCurrentCircuit(circuitSave.getMainCircuitName(), false);
+                } catch (error) {
+                    alert(error);
+                }
             })
             .catch((err) => {
                 console.log('circuit upload failed:', err);

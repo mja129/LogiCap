@@ -120,18 +120,18 @@
         // loadCircuit((newData: Devices) => setDeviceData(newData))
         // loadCircuit((newData: Devices) => (currentDevicesData = newData))
 
-        // zoom and translation data is checked here as it may not exist in older saves
+        // prepare initial view
         const saveData = circuitSave.getCircuit(get(currentCircuit)) as SingleSaveDataFormat;
-        initialScale = saveData?.zoom || 1;
-        initialTranslation = saveData?.translation || {x: 0, y: 0};
+        initialScale = saveData.zoom;
+        initialTranslation = saveData.translation;
 
         // populate circuit
         setCurrentCircuit(get(currentCircuit), false);
         circuitLoadTrigger.subscribe(() => {
             setDeviceData($CircuitStore.devices);
-            const saveData = circuitSave.getCircuit(get(currentCircuit));
-            setScale(saveData?.zoom || 1);
-            setTranslation(saveData?.translation || {x: 0, y: 0});
+            const saveData = circuitSave.getCircuit(get(currentCircuit)) as SingleSaveDataFormat;
+            setScale(saveData.zoom);
+            setTranslation(saveData.translation);
         })
 
         fixSvelvetBugs() // doesn't have to be on mount could just be in the component scope its the same.

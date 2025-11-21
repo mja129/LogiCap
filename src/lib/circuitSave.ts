@@ -38,10 +38,31 @@ function createEmptySingleSave() : SingleSaveDataFormat {
     }
 }
 
+function parseSaveData(data: string) : SaveDataFormat {
+    let saveData: SaveDataFormat = JSON.parse(data);
+    // handle missing entries
+    const allSingleSaves = [
+        ...Object.keys(saveData.subcircuits).map((key) => saveData.subcircuits[key]),
+        saveData.main_circuit
+    ];
+    for (const singleSave of allSingleSaves) {
+        if (singleSave.circuit === undefined) {
+            throw Error("Save missing circuit entry!");
+        }
+        if (singleSave.zoom === undefined) {
+            singleSave.zoom = 1;
+        }
+        if (singleSave.translation === undefined) {
+            singleSave.translation = { x: 0, y: 0 };
+        }
+    }
+    return saveData;
+}
+
 export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
     let saveData: SaveDataFormat;
     if (circuitSaveJson != null) {
-        saveData = JSON.parse(circuitSaveJson);
+        saveData = parseSaveData(circuitSaveJson);
     } else {
         saveData = {
             main_circuit: {
@@ -120,8 +141,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
         },
 
         setSaveJson(saveJson: string) {
-            // TODO validation
-            saveData = JSON.parse(saveJson);
+            saveData = parseSaveData(saveJson);
             subcomponents.set(Object.keys(saveData.subcircuits));
         },
         getSaveJson(): string {
