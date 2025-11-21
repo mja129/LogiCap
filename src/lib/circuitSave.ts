@@ -24,7 +24,7 @@ export interface CircuitSave {
     deleteSubcomponent(name: string): void;
     renameSubcomponent(name: string, newName: string): void;
     getSubcomponents(): Readable<string[]>;
-    fixSubcomponentAnchors(name: string): void;
+    updateSubcomponenUsages(name: string, newName?: string): void;
 
     setSaveJson(saveJson: string): void;
     getSaveJson(): string;
@@ -129,9 +129,9 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
             if (index == -1) {
                 return;
             }
+            this.updateSubcomponenUsages(name, newName);
             saveData.subcircuits[newName] = saveData.subcircuits[name];
             delete saveData.subcircuits[name];
-            // TODO need to convert data of existing circuits
             subcomponents.update((current) => {
                current[index] = newName;
                return current;
@@ -140,7 +140,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
         getSubcomponents(): Readable<string[]> {
             return subcomponents;
         },
-        fixSubcomponentAnchors(name: string): void {
+        updateSubcomponenUsages(name: string, newName?: string): void {
             if (name === saveData.main_circuit.display_name) {
                 return
             }
@@ -166,14 +166,21 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
                 let otherSave = this.getCircuit(circName)
                 if (!otherSave) { continue }
                 let circ = otherSave.circuit
-                if (circ.subcircuits.indexOf(name) == -1) { continue }
+                const circIndex = circ.subcircuits.indexOf(name);
+                if (circIndex == -1) {
+                    continue;
+                }
+                if (newName) {
+                    circ.subcircuits[circIndex] = newName;
+                }
                 for (const deviceKey in circ.devices) {
-                    console.log('FUCK')
                     if (deviceKey in circ.devices && circ.devices[deviceKey].type == 'Subcircuit' && (circ.devices[deviceKey] as Subcomponent).celltype == name) {
-                        console.log('FOUND DEVICE')
                         let subcomp = circ.devices[deviceKey] as Subcomponent
                         subcomp.inputs = inputs
                         subcomp.outputs = outputs
+                        if (newName) {
+                            subcomp.celltype = newName;
+                        }
                         circ.devices[deviceKey] = subcomp
                         for (let connKey in circ.connectors) {
                             if (connKey.split('_')[2] == subcomp.label.split('_')[1] && parseInt(connKey.split('_')[0][3]) > outputs) {
@@ -186,7 +193,6 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
                               for (const [index, connTup] of circ.connectors[connKey as outputAnchorName].entries()) {
                                   if (connTup[0] == subcomp.label && parseInt(connTup[1].split('_')[0][2]) > inputs) { toDel.push(index) }
                               }
-                              console.log(connKey, toDel)
                               toDel.sort((a, b) => b - a)
                               for (let i of toDel) { circ.connectors[connKey as outputAnchorName].splice(i, 1) }
                             }
