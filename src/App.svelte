@@ -279,9 +279,25 @@
             )
         )
 
-        let all_subcircuit_names_used = Object.values(save.devices)
+        let all_subcircuit_names_used = Object.values(copiedCircuits.devices)
             .filter( (d: any) => d.type === "Subcircuit")
             .map( (d : any) => d.celltype);
+        let subcircuit_q = [...all_subcircuit_names_used];
+
+        while (subcircuit_q.length > 0){
+            let subcircuitName = subcircuit_q.pop();
+            if (!all_subcircuit_names_used.includes(subcircuitName)){
+                all_subcircuit_names_used.push(subcircuitName);
+            }
+
+            let subcircuit_to_explore = circuitSave.getCircuit(subcircuitName)?.circuit;
+
+            for (let device of Object.values(subcircuit_to_explore?.devices ?? {})){
+                if(device.type === "Subcircuit"){
+                    subcircuit_q.push((device as any ).celltype);
+                }
+            }
+        }
 
          all_subcircuit_names_used.forEach( subCircuitName=>{
             copiedCircuits.subcircuits[subCircuitName] = circuitSave.getCircuit(subCircuitName)
@@ -373,6 +389,7 @@
             }
 
             for(let subCircuitName of Object.keys(circuitToPaste.subcircuits)){
+                circuitSave.createSubcomponent(subCircuitName); 
                 circuitSave.setCircuit(subCircuitName, circuitToPaste.subcircuits[subCircuitName]);
             }
 
