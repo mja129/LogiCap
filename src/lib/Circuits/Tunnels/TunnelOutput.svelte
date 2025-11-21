@@ -30,17 +30,14 @@
     xmlns="http://www.w3.org/2000/svg"
     style="max-width:unset;"
 >
-    <rect
-        x="0"
-        y="0"
-        width={width}
-        height={height}
+    <polygon
+        points="0,0 {width * 0.75},0 {width},{height / 2} {width * 0.75},{height} 0,{height}"
         fill="black"
     />
     <text
-        x="50%"
+        x="5%"
         y="50%"
-        text-anchor="middle"
+        text-anchor="start"
         alignment-baseline="middle"
         textLength="{width * 0.8}px"
         lengthAdjust="spacingAndGlyphs"
