@@ -285,6 +285,7 @@ export function clickSvelvetSave() {
 // this is essentially a sync with localStorage.
 // Sync svelvet by clicking its button through clickListener, (I could probably find the function they use on this button lol, sounds like a good idea)
 export function saveCircuit() {
+    circuitSave.fixSubcomponentAnchors(get(currentCircuit))
     // click on the hidden svelvet button, the button is in "theme toggle" but I set it to display: none,
     // and now we trigger it with css, after it triggers we use the svelvet json positions to set our digitial js positions
     // the digitalJS save is the main save and we are just piggybacking off the svelvet save a bit

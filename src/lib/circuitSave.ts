@@ -24,6 +24,7 @@ export interface CircuitSave {
     deleteSubcomponent(name: string): void;
     renameSubcomponent(name: string, newName: string): void;
     getSubcomponents(): Readable<string[]>;
+    fixSubcomponentAnchors(name: string): void;
 
     setSaveJson(saveJson: string): void;
     getSaveJson(): string;
@@ -138,6 +139,61 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
         },
         getSubcomponents(): Readable<string[]> {
             return subcomponents;
+        },
+        fixSubcomponentAnchors(name: string): void {
+            if (name === saveData.main_circuit.display_name) {
+                return
+            }
+            let save = this.getCircuit(name)
+            if (!save) return
+            let circuit = save.circuit
+            let inputs = 0
+            let outputs = 0
+            for (const deviceKey in circuit.devices) {
+                if (deviceKey in circuit.devices) {
+                    let device = circuit.devices[deviceKey]
+                    if (device.type == 'Button') {
+                        inputs++
+                    }
+                    if (device.type == 'Lamp') {
+                        outputs++
+                    }
+                }
+            }
+            let allCircuits = [this.getMainCircuitName(), ...get(this.getSubcomponents())]
+            for (let circName of allCircuits) {
+                if (circName == name) { continue }
+                let otherSave = this.getCircuit(circName)
+                if (!otherSave) { continue }
+                let circ = otherSave.circuit
+                if (circ.subcircuits.indexOf(name) == -1) { continue }
+                for (const deviceKey in circ.devices) {
+                    console.log('FUCK')
+                    if (deviceKey in circ.devices && circ.devices[deviceKey].type == 'Subcircuit' && (circ.devices[deviceKey] as Subcomponent).celltype == name) {
+                        console.log('FOUND DEVICE')
+                        let subcomp = circ.devices[deviceKey] as Subcomponent
+                        subcomp.inputs = inputs
+                        subcomp.outputs = outputs
+                        circ.devices[deviceKey] = subcomp
+                        for (let connKey in circ.connectors) {
+                            if (connKey.split('_')[2] == subcomp.label.split('_')[1] && parseInt(connKey.split('_')[0][3]) > outputs) {
+                                // If this entry describes an output of this subcomponent, and its id is too high, delete it
+                                delete circ.connectors[connKey as outputAnchorName]
+                            } else {
+                              // Otherwise, see if this output connects to an input of this subcomponent,
+                              // and delete all connections that do
+                              let toDel = []
+                              for (const [index, connTup] of circ.connectors[connKey as outputAnchorName].entries()) {
+                                  if (connTup[0] == subcomp.label && parseInt(connTup[1].split('_')[0][2]) > inputs) { toDel.push(index) }
+                              }
+                              console.log(connKey, toDel)
+                              toDel.sort((a, b) => b - a)
+                              for (let i of toDel) { circ.connectors[connKey as outputAnchorName].splice(i, 1) }
+                            }
+                        }
+                    }
+                }
+            }
         },
 
         setSaveJson(saveJson: string) {
