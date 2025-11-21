@@ -48,7 +48,7 @@
         x="50%"
         y="50%"
         text-anchor="middle"
-        alignment-baseline="middle"
+        dominant-baseline="middle"
         textLength="{width * 0.8}px"
         lengthAdjust="spacingAndGlyphs"
         font-size="200%"
