@@ -270,6 +270,7 @@
         let copiedCircuits: any = {
             devices: {},
             connectors: {},
+            subcircuits: {}
         }
 
         copiedCircuits.devices = Object.fromEntries(
@@ -278,6 +279,13 @@
             )
         )
 
+        let all_subcircuit_names_used = Object.values(save.devices)
+            .filter( (d: any) => d.type === "Subcircuit")
+            .map( (d : any) => d.celltype);
+
+         all_subcircuit_names_used.forEach( subCircuitName=>{
+            copiedCircuits.subcircuits[subCircuitName] = circuitSave.getCircuit(subCircuitName)
+        })
 
         let anyEndsWith = (query:string , possibleSuffixes: string[]) =>{
             return possibleSuffixes.some((x: string)=>query.endsWith(x))
@@ -363,7 +371,11 @@
                     )
                 }
             }
-            console.log('rename',circuitRenaming);
+
+            for(let subCircuitName of Object.keys(circuitToPaste.subcircuits)){
+                circuitSave.setCircuit(subCircuitName, circuitToPaste.subcircuits[subCircuitName]);
+            }
+
             saveCircuitSave();
 
         })
