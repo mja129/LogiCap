@@ -6,7 +6,7 @@ Here's the whole file tree, with (what I think is) the important stuff linked be
 logicap! :P\
 ├── LICENSE\
 ├── README.md\
-├── [custom_digitaljs](#customdigitaljs)\
+├── [custom_digitaljs](#custom_digitaljs)\
 ├── custom_svelvet_edge\
 │   ├── Edge.svelte\
 │   └── Edge.svelte.d.ts\
@@ -73,7 +73,7 @@ logicap! :P\
 │   │   └── [circuitStore.ts](#circuitstorets)\
 │   ├── main.ts\
 │   ├── types\
-│   │   ├── [digital-js-representation.d.ts](#digitaljsrepresentationdts)\
+│   │   ├── [digital-js-representation.d.ts](#digital-js-representationdts)\
 │   │   ├── global.d.ts\
 │   │   └── svelvet-save.d.ts\
 │   └── vite-env.d.ts\
@@ -142,6 +142,7 @@ Honestly, have no idea how half this file works. Might be important at some poin
 The seventh circle of typescript hell!\
 Basically, a whole bunch of types that get used all over the place. New components needed to be integrated into that typing structure.\
 Take a look, it's largely self explanatory imho.\
+Also, has the `menuJsonData` object that the SideMenu uses to populate.\
 Also here is `getComponent()`, which is used by [Circuit.svelte](#circuitsvelte) to decide which svelte file in [Circuits](#circuits) to include.\
 New components need their svelte file imported into this file and an entry in `getComponent()`.
 
