@@ -42,7 +42,7 @@ logicap! :P\
 │   │   │   ├── CustomEdge.svelte\
 │   │   │   ├── NormalEdge.svelte\
 │   │   │   ├── Wire.svelte\
-│   │   │   ├── linkAnchors.ts\
+│   │   │   ├── [linkAnchors.ts](#linkAnchors)\
 │   │   │   ├── manipulateWire.ts\
 │   │   │   └── wireUtils.ts\
 │   │   ├── [Circuits](#circuits)\
@@ -134,7 +134,7 @@ A new component needs a `make[component name]()` function, and an entry in `devi
 
 # circuitEngine.svelte.ts
 
-Runs circuits and manages there state.\
+Runs circuits and manages their state.\
 Honestly, have no idea how half this file works. Might be important at some point so plugging it now.
 
 # circuitModel.ts
@@ -162,3 +162,14 @@ Highly recommend going into src and running `grep -Ril '<name of function/thing 
 
 Another step in components addition.\
 New components need to be typed and added to `Devices`
+
+# Adding a New Port Type (e.g., sel)
+
+The way things are currently set up for the anchor, by default, an input will be given the format of in[ioId]_[id] (so if ioId = "1", the input is in1)
+To have a port that does not start with "in", I added the "usePortName" flag to Anchor.svelte.
+So, in a `SimulationNodeAnchor`, if you include `usePortName={true}`, the input will just be [ioId].
+
+BUT, you also need to hardcode that new port name into other stuff to get things to work, namely:
+- Add the new port name to `inputIdentifier` in [digital-js-representation.d.ts](#digital-js-representationdts)
+- Add it to the regex in `findAnchorTargetClassName()` in [linkAnchors.ts](#linkAnchors)
+- Add it to `checkInput` in `checkAnchorRelation()` in [linkAnchors.ts](#linkAnchors)

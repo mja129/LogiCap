@@ -38,6 +38,20 @@ type LogicGate = {
     rotation?: number
 }
 
+type Mux = {
+    type: 'Mux'
+    label: string
+    bits: {
+        in: number
+        sel: number
+    }
+    position?: {
+        x: number
+        y: number
+    },
+    rotation?: number
+}
+
 type Subcomponent = {
     type: 'Subcircuit'
     celltype: string
@@ -73,7 +87,7 @@ type TunnelOutput = {
     rotation?: number
 }
 
-type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent
+type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Mux
 type Devices = Record<string, Device>
 
 type IODevice = Button | Lamp
@@ -123,7 +137,7 @@ type UUID = string
 // this key will kinda 
 type outputAnchorName = `out_${GateType}_${UUID}`
 type inputGateName = `${GateType}_${UUID}`
-type inputIdentifier = `in${number}` | `in`
+type inputIdentifier = `in${number}` | `in` | `sel`
 type inputAnchorName = `${inputIdentifier}_${GateType}_${UUID}`
 
 type ConnectionTuple = [inputGateName, inputAnchorName]
