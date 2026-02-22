@@ -1,8 +1,8 @@
 <script lang="ts" module>
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
     import { CircuitEngine, inputSetter, getRunning, getCurrTick } from '@CircuitEngine'
-    import { onDestroy } from 'svelte'
-    import { get } from 'svelte/store'
+    import { onDestroy, getContext } from 'svelte'
+    import { get, type Writable } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
 
     // Output anchor position — matches the line endpoint on the SVG
@@ -23,6 +23,17 @@
     } = $props()
 
     let signalOn: boolean = $state(false);
+
+    // Get selection state from parent Circuit.svelte
+    const isSelected = getContext<Writable<boolean>>('selected');
+
+    // Frequency menu input — initialized to current frequency
+    let freqInput: number = $state(frequency);
+
+    // Apply new frequency from the menu
+    function applyFrequency() {
+        frequency = freqInput;
+    }
 
     // Color reflects simulation state: gray when idle, green/red when running
     let buttonColor = $derived({
@@ -54,11 +65,10 @@
     });
 
     let connections = $derived(
-    get(CircuitStore).connectors[('out_' + nodeId) as outputAnchorName]
-);
-    onDestroy(unsubscriber);
+        get(CircuitStore).connectors[('out_' + nodeId) as outputAnchorName]
+    );
 
-    
+    onDestroy(unsubscriber);
 </script>
 
 <svg
@@ -87,9 +97,9 @@
         stroke-width="8"
     />
 
-    <!-- Clickable circle — also allows manual override during simulation -->
+    <!-- Clickable circle — allows manual override during simulation -->
     <circle class="button-circle"
-        onclick={toggleClock}
+        onclick={(e) => { e.stopPropagation(); toggleClock(); }}
         role="presentation"
         cx="50"
         cy="50"
@@ -100,6 +110,21 @@
         stroke-width="7"
     />
 </svg>
+
+<!-- Frequency menu appears above the clock when selected -->
+{#if $isSelected}
+    <div class="clock-context-menu" onclick={(e) => e.stopPropagation()}>
+        <label>
+            Frequency (ticks):
+            <input
+                type="number"
+                min="1"
+                bind:value={freqInput}
+            />
+        </label>
+        <button onclick={applyFrequency}>Apply</button>
+    </div>
+{/if}
 
 <SimulationNodeAnchor
     io="output"
@@ -113,5 +138,29 @@
 <style>
     :global(.running .button-circle:hover) {
         cursor: pointer;
+    }
+
+    /* Frequency menu — floats above the clock when selected */
+    .clock-context-menu {
+        position: absolute;
+        top: -60px;
+        left: 0;
+        z-index: 100;
+        background: var(--lightblue, #2a2a2a);
+        border: 2px solid black;
+        border-radius: 6px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 150px;
+    }
+    .clock-context-menu input {
+        width: 60px;
+        margin-left: 4px;
+    }
+    .clock-context-menu button {
+        cursor: pointer;
+        padding: 2px 8px;
     }
 </style>
