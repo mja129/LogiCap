@@ -149,6 +149,32 @@ function makeTunnelOutput(
     }
 }
 
+function makeClock(
+    nodeName: string,
+    options?: {
+        bits?: number
+        net?: string
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }): Clock {
+    return {
+        type: 'Clock',
+        label: options?.label || nodeName,
+        net: options?.net || nodeName,
+        bits: options?.bits || 1,
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation
+        }),
+    }
+}
+
 export const deviceJsonFactoryMap: Record<
     string,
     (nodeName: string, options?: any) => Device
@@ -177,6 +203,8 @@ export const deviceJsonFactoryMap: Record<
         makeTunnelInput(nodeName, options.celltype as string, ...(options ? [options] : [])),
     TunnelOutput: (nodeName, options?) =>
         makeTunnelOutput(nodeName, options.celltype as string, ...(options ? [options] : [])),
+    Clock: (nodeName, options?) =>
+        makeClock(nodeName, ...(options ? [options] : [])),
 }
 
 // // Example usage

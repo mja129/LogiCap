@@ -73,10 +73,20 @@ type TunnelOutput = {
     rotation?: number
 }
 
-type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent
+type Clock = {
+    type: 'Clock'
+    label: string
+    net: string
+    bits: number
+    position?: { x: number, y: number }
+    rotation?: number
+    frequency?: number // toggle every N ticks in the simulation
+}
+
+type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock
 type Devices = Record<string, Device>
 
-type IODevice = Button | Lamp
+type IODevice = Button | Lamp | Clock
 
 // DIGITALJS link node connection types
 

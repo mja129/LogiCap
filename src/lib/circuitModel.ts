@@ -21,6 +21,7 @@ import ButtonNode from '@Circuits/InputOutputNodes/ButtonNode.svelte'
 import Subcomponent from '@Circuits/Subcomponent.svelte'
 import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
 import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
+import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
@@ -32,8 +33,8 @@ export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes
 
-export type ioNodeTypes = 'Button' | 'Lamp'
-export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit'
+export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
+export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock'
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte
@@ -93,6 +94,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         groupElements: [
             { name: 'Lamp', nodeType: 'Lamp', icon: outputIcon },
             { name: 'Button', nodeType: 'Button', icon: inputIcon },
+            { name: 'Clock', nodeType: 'Clock', icon: inputIcon },
         ],
     },
     'Tunnels': {
@@ -145,5 +147,7 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return TunnelInput
         case 'TunnelOutput':
             return TunnelOutput
+        case 'Clock':
+            return Clock
     }
 }
