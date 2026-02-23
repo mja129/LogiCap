@@ -152,17 +152,14 @@ function makeTunnelOutput(
 function makeClock(
     nodeName: string,
     options?: {
-        bits?: number
-        net?: string
         label?: string
         position?: { x: number; y: number }
         rotation?: number
-    }): Clock {
+    }
+): Clock {
     return {
         type: 'Clock',
         label: options?.label || nodeName,
-        net: options?.net || nodeName,
-        bits: options?.bits || 1,
         ...(options?.position && {
             position: {
                 x: options.position.x,

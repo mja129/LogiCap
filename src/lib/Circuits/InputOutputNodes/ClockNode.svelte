@@ -1,6 +1,6 @@
 <script lang="ts" module>
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
-    import { CircuitEngine, inputSetter, getRunning, getCurrTick } from '@CircuitEngine'
+    import { CircuitEngine, inputSetter, getRunning, tickSignal } from '@CircuitEngine'
     import { onDestroy, getContext } from 'svelte'
     import { get, type Writable } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
@@ -49,18 +49,28 @@
         }
     }
 
-    // Watch the circuit engine for start/stop and auto-toggle on ticks
-    const unsubscriber = CircuitEngine.subscribe((circuit) => {
-        // Reset clock state when simulation stops
-        if (circuit === null) {
+    // Sync visual state with engine ticks
+    // DigitalJS handles the actual clock toggling internally
+    const tickUnsub = tickSignal.subscribe((tick) => {
+        if (!getRunning()) {
             signalOn = false;
             return;
         }
+        const currEngine = get(CircuitEngine);
+        if (currEngine) {
+            try {
+                const sig = currEngine.getLabelIndex().devices[nodeId].attributes.outputSignals.out._avec[0];
+                signalOn = sig === 1;
+            } catch {
+                // device not ready yet
+            }
+        }
+    });
 
-        // Auto-toggle: flip the signal every `frequency` ticks
-        const tick = getCurrTick();
-        if (tick > 0 && tick % frequency === 0) {
-            toggleClock();
+    // Reset visual state when simulation stops
+    const engineUnsub = CircuitEngine.subscribe((circuit) => {
+        if (circuit === null) {
+            signalOn = false;
         }
     });
 
@@ -68,7 +78,10 @@
         get(CircuitStore).connectors[('out_' + nodeId) as outputAnchorName]
     );
 
-    onDestroy(unsubscriber);
+    onDestroy(() => {
+        tickUnsub();
+        engineUnsub();
+    });
 </script>
 
 <svg
@@ -97,7 +110,7 @@
         stroke-width="8"
     />
 
-    <!-- Clickable circle — allows manual override during simulation -->
+    <!-- Clock circle — click to manually toggle during simulation -->
     <circle class="button-circle"
         onclick={(e) => { e.stopPropagation(); toggleClock(); }}
         role="presentation"
@@ -109,6 +122,23 @@
         stroke={buttonColor.stroke}
         stroke-width="7"
     />
+
+    <!-- Clock hour hand -->
+    <line
+        x1="50" y1="50" x2="50" y2="30"
+        stroke={buttonColor.stroke}
+        stroke-width="4"
+        stroke-linecap="round"
+    />
+    <!-- Clock minute hand -->
+    <line
+        x1="50" y1="50" x2="65" y2="50"
+        stroke={buttonColor.stroke}
+        stroke-width="3"
+        stroke-linecap="round"
+    />
+    <!-- Center dot -->
+    <circle cx="50" cy="50" r="3" fill={buttonColor.stroke} />
 </svg>
 
 <!-- Frequency menu appears above the clock when selected -->

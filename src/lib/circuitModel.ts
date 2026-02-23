@@ -13,6 +13,7 @@ import nandIcon from '@icons/circuits/Nand.webp'
 import notIcon from '@icons/circuits/Not.webp'
 import outputIcon from '@icons/circuits/outputIcon.png'
 import inputIcon from '@icons/circuits/inputIcon.png'
+import clockIcon from '@icons/circuits/Clock.png'
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
 import SingleIoLogic from '@Circuits/LogicGates/SingleIoLogic.svelte'
@@ -94,7 +95,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         groupElements: [
             { name: 'Lamp', nodeType: 'Lamp', icon: outputIcon },
             { name: 'Button', nodeType: 'Button', icon: inputIcon },
-            { name: 'Clock', nodeType: 'Clock', icon: inputIcon },
+            { name: 'Clock', nodeType: 'Clock', icon: clockIcon },
         ],
     },
     'Tunnels': {

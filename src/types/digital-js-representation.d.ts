@@ -76,11 +76,8 @@ type TunnelOutput = {
 type Clock = {
     type: 'Clock'
     label: string
-    net: string
-    bits: number
     position?: { x: number, y: number }
     rotation?: number
-    frequency?: number // toggle every N ticks in the simulation
 }
 
 type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock
