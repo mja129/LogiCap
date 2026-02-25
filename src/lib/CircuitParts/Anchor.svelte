@@ -47,6 +47,7 @@
         side,
         offset = [],
         usePixelOffset = false,
+        usePortName = false, //flag, that if true, would just use the ioId, (ex: sel rather than insel)
     }: {
         io: 'input' | 'output'
         ioId: string
@@ -55,8 +56,10 @@
         side: Direction
         offset?: [number, number] | []
         usePixelOffset?: boolean
+        usePortName?: boolean
     } = $props()
-    const anchorId = `${io === 'input' ? 'in' : 'out'}${ioId}_${id}`
+    const anchorId = usePortName ? `${ioId}_${id}` :
+        `${io === 'input' ? 'in' : 'out'}${ioId}_${id}`
 
     const rotation: Writable<number> = getContext('rotation')
     rotation.subscribe(() => {

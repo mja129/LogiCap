@@ -82,6 +82,36 @@ function makeLogicNode(
     }
 }
 
+// Mux really only needs two things:
+// bits.in (bit-width of inputs/outputs) 
+// bits.sel (bit-width of selector input, which determines number of inputs)
+function makeMux(
+    nodeName: string,
+    options?: {
+        bits?: { in: number, sel: number}
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Mux {
+    return {
+        type: 'Mux',
+        label: nodeName,
+        bits : { 
+            in: options?.bits?.in || 1,
+            sel: options?.bits?.sel || 1      
+        },
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation
+        }),
+    }
+}
+
 function makeSubcomponentNode(
     nodeName: string,
     celltype: string,
@@ -171,6 +201,7 @@ export const deviceJsonFactoryMap: Record<
         makeLogicNode('Not', nodeName, ...(options ? [options] : [])),
     Repeater: (nodeName, options?) =>
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
+    Mux: makeMux,
     Subcircuit: (nodeName, options?) => 
         makeSubcomponentNode(nodeName, options.celltype as string, options.inputs as number, options.outputs as number, ...(options ? [options] : [])), 
     TunnelInput: (nodeName, options?) =>
