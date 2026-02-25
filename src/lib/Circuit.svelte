@@ -23,6 +23,8 @@
 <script lang="ts">
     let { nodeId, gateType, position, nodeProps }: SimNodeProps = $props()
     const nodeComponent = getComponent(gateType);
+    let isSelected: Writable<boolean> = writable(false);
+    setContext('selected', isSelected);
 
     // obtain rotation from CircuitStore if available
     let rotation: Writable<number> = writable($CircuitStore.devices[nodeId].rotation || 0);
@@ -31,6 +33,15 @@
 
     // used for executing actions on already selected nodes
     let wasSelected = false;
+
+    function syncSelected(node: HTMLElement, sel: boolean) {
+        $isSelected = sel;
+        return {
+            update(sel: boolean) {
+                $isSelected = sel;
+            }
+        };
+    }
 </script>
 
 <!-- I added this here because I kept changing the SvelvetNode properties in all
@@ -72,6 +83,7 @@ of the different components now I just need to do it here -->
         <div
             class:selected
             style="transform:rotate({$rotation}deg)"
+            use:syncSelected={selected}
         >
             <MyComponent {nodeId} {...nodeProps} />
         </div>

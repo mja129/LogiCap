@@ -40,6 +40,9 @@ function subcircuitParse(circuitJson: any): Subcircuit {
     if (device['type'] == 'Button') {
       device['type'] = 'Input'
       inputs.push(device)
+    } else if (device['type'] == 'Clock') {
+    device['type'] = 'Input'
+    inputs.push(device)
     } else if (device['type'] == 'Lamp') {
       device['type'] = 'Output'
       outputs.push(device)

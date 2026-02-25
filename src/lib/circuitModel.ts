@@ -13,6 +13,7 @@ import nandIcon from '@icons/circuits/Nand.webp'
 import notIcon from '@icons/circuits/Not.webp'
 import outputIcon from '@icons/circuits/outputIcon.png'
 import inputIcon from '@icons/circuits/inputIcon.png'
+import clockIcon from '@icons/circuits/Clock.png'
 import muxIcon from '@icons/circuits/Mux.png'
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
@@ -22,6 +23,7 @@ import ButtonNode from '@Circuits/InputOutputNodes/ButtonNode.svelte'
 import Subcomponent from '@Circuits/Subcomponent.svelte'
 import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
 import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
+import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 import Mux from '@Circuits/Multiplexer.svelte'
 
 // Types that represent the different groups
@@ -34,8 +36,8 @@ export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes
 
-export type ioNodeTypes = 'Button' | 'Lamp'
-export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Mux'
+export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
+export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux'
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte
@@ -97,6 +99,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         groupElements: [
             { name: 'Lamp', nodeType: 'Lamp', icon: outputIcon },
             { name: 'Button', nodeType: 'Button', icon: inputIcon },
+            { name: 'Clock', nodeType: 'Clock', icon: clockIcon },
         ],
     },
     'Tunnels': {
@@ -157,5 +160,7 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return TunnelInput
         case 'TunnelOutput':
             return TunnelOutput
+        case 'Clock':
+            return Clock
     }
 }

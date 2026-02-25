@@ -21,6 +21,8 @@ export let wireSignals = writable<Record<string, number>>({}); //Wire signal sto
 let currentTick = $state(0)
 export const getCurrTick = () => currentTick
 
+export let tickSignal: Writable<number> = writable(0); // Used to trigger updates in components that subscribe to tickSignal whenever the tick changes
+
 Object.defineProperty(CustomHeadlessCircuit.prototype, "running", {
     get() {
         //console.warn("Overriding `running` getter at runtime.");
@@ -73,6 +75,7 @@ function start(tickRate: number) {
     }
     currEngine.updateGates()
     currentTick = currEngine.tick;
+    tickSignal.set(currentTick);
     setTimeout(() => start(tickRate), tickRate);
 }
 
