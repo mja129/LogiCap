@@ -11,7 +11,7 @@ export function findAnchorTargetClassName(targetClassList: string[]): string | n
 
     // Check if any class name matches the patterns
     const matchingClass = [...targetClassList].find((className: string) =>
-        /^(in\d+|in_|out_)/.test(className)
+        /^(in\d+|in_|out_|sel_)/.test(className)
     );
 
     return matchingClass || null;
@@ -23,7 +23,7 @@ export function findAnchorTargetClassName(targetClassList: string[]): string | n
 function checkAnchorRelation(anchor1: string, anchor2: string): 'good_in_to_out' | 'good_out_to_in' | 'bad_dual_input' | 'bad_dual_output' | "bad" {
 
     const checkAnchor: Function = (anchor: string, anchorType: string) => anchor.startsWith(anchorType)
-    const checkInput: Function = (anchor: string) => checkAnchor(anchor, 'in')
+    const checkInput: Function = (anchor: string) => checkAnchor(anchor, 'in') || checkAnchor(anchor, 'sel')
     const checkOutput: Function = (anchor: string) => checkAnchor(anchor, 'out')
 
     const getTup = (anchor: string) => ({ isInput: checkInput(anchor), isOutput: checkOutput(anchor) })
