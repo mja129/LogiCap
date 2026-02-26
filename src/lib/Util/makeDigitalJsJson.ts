@@ -1,4 +1,5 @@
 import { circuitSave } from '@src/App.svelte'
+import type { SingleSaveDataFormat } from '../circuitSave'
 
 //Hardcoded Encoder Circuits
 import { ENCODER_2_1 } from './encoderCircuits'
@@ -117,20 +118,28 @@ function makeMux(
     }
 }
 
-//ENCODER
+//Primary Encoder
 function makeEncoder(
     nodeName: string,
-    options?: { position?: { x: number; y: number }, rotation?: number }
+    options?: { selbits?:number, position?: { x: number; y: number }, rotation?: number }
 ): Subcomponent {
-    //Inject hardcoded circuit template if not already present
+    //Inject hardcoded circuit based on selbits
+    const selbits = options!.selbits
+    const encoderMap: Record<number, SingleSaveDataFormat> = {
+        1: ENCODER_2_1,
+        // 2: ENCODER_4_2,
+        // 3: ENCODER_8_3,
+        // 4: ENCODER_16_4,
+    }
+
     circuitSave.createSubcomponent("Encoder");
-    circuitSave.setCircuit("Encoder", ENCODER_2_1);
+    circuitSave.setCircuit("Encoder", encoderMap[selbits]);
 
     return {
         type: 'Subcircuit',
         label: nodeName,
-        inputs: 2,
-        outputs: 2,
+        inputs: 2 ** selbits, //2^bits
+        outputs: selbits + 1, //1 for valid bit
         celltype: "Encoder",
         ...(options?.position && {
             position: {

@@ -3,6 +3,8 @@
     import { CircuitStore } from '@CircuitStore'
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
 
+    const anchorDiameter = 15;
+    const anchorPadding = 5;
     // Constant offsets for the anchors
     // type MuxAnchors = 'in1' | 'in2' | 'out'
 
@@ -16,25 +18,38 @@
 
 <script lang="ts">
     let {
-        nodeId
+        nodeId,
+        inputs,
+        outputs
     }: {
         nodeId: string
+        inputs: number
+        outputs: number
     } = $props()
+
+    //calculate size, alignment from number of inputs/outputs
+    const width = 100;
+    const height = 200;
+    // const height = ((anchorDiameter + anchorPadding) * Math.max(inputs, outputs)) + anchorPadding;
+    // const inputOffset = ((height - ((anchorDiameter + anchorPadding) * inputs) + anchorPadding) / 2.0) + 1;
+    // const outputOffset = ((height - ((anchorDiameter + anchorPadding) * outputs) + anchorPadding) / 2.0) + 1;
+
 </script>
+
 
 <!-- SVG of the Encoder -->
 <svg
-    width="100"
-    height="200"
-    viewBox="-2 -2 140 235"
+    width={width}
+    height={height}
+    viewBox="-2 -2 {width + 40} {height + 35}"
     xmlns="http://www.w3.org/2000/svg"
     style="max-width:unset;"
 >
     <!-- Box -->
     <rect
         x="0" y="0"
-        width = "90"
-        height = "130"
+        width = {width - 10}
+        height = {height - 70}
         stroke="lightgray"
         stroke-width="1"
     />
@@ -63,8 +78,8 @@
     </text>
     <!-- Pri Label -->
     <text
-        x="23"
-        y="70"
+        x={width / 4}
+        y={height / 3}
         text-anchor="start"
         dominant-baseline="middle"
         font-size="40"
@@ -73,23 +88,6 @@
         Pri
     </text>
 </svg>
-
-
-<SimulationNodeAnchor
-    io="input"
-    ioId="1"
-    id={nodeId}
-    side="west"
-    offset={[-6.5,14.5]}
-/>
-
-<SimulationNodeAnchor
-    io="input"
-    ioId="2"
-    id={nodeId}
-    side="west"
-    offset={[-6.5,42.5]}
-/>
 
 <!-- Valid bit -->
 <SimulationNodeAnchor
@@ -103,13 +101,27 @@
     offset={[60,15]}
 />
 
-<SimulationNodeAnchor
-    io="output"
-    ioId="2"
-    id={nodeId}
-    side="east"
-    connections={get(CircuitStore).connectors[
-        ('out2_' + nodeId) as outputAnchorName
-    ]}
-    offset={[60,28.5]}
-/>
+{#each { length: inputs } as _, index}
+    <SimulationNodeAnchor
+        io="input"
+        ioId={(index + 1).toString()}
+        id={nodeId}
+        side="west"
+        offset={[-6.5, 30 + ((anchorDiameter + anchorPadding + 13.5) * index)]}
+        usePixelOffset={true}
+    />
+{/each}
+{#each { length: outputs-1 } as _, index}
+    <SimulationNodeAnchor
+        io="output"
+        ioId={(index + 2).toString()}
+        id={nodeId}
+        connections={get(CircuitStore).connectors[
+            (`out${index+2}_` + nodeId) as outputAnchorName
+        ]}
+        side="east"
+        offset={[60, 30 + ((anchorDiameter + anchorPadding + 13.5) * (index+1))]}
+        usePixelOffset={true}
+    />
+{/each}
+
