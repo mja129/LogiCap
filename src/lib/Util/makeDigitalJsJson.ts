@@ -139,7 +139,7 @@ const ENCODER_TEST: SingleSaveDataFormat = {
                 "bits": 1,
                 "label": "Lamp_enc0",
                 "position": {
-                    "x": 200,
+                    "x": 150,
                     "y": 0
                 }
             }

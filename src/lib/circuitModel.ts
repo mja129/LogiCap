@@ -23,13 +23,9 @@ import ButtonNode from '@Circuits/InputOutputNodes/ButtonNode.svelte'
 import Subcomponent from '@Circuits/Subcomponent.svelte'
 import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
 import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
-<<<<<<< HEAD
 import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
-import Mux from '@Circuits/Multiplexer.svelte'
-=======
 import Mux from '@Circuits/Plexers/Multiplexer.svelte'
 import Encoder from '@Circuits/Plexers/Encoder.svelte'
->>>>>>> 1c3ec250 (Added dummy encoder)
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
@@ -42,14 +38,8 @@ export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
 export type plexerTypes = 'Mux' | 'Encoder'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
-
-<<<<<<< HEAD
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
-export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux'
-=======
-export type ioNodeTypes = 'Button' | 'Lamp'
 export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit'
->>>>>>> 1c3ec250 (Added dummy encoder)
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte

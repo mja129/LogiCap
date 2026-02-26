@@ -13,9 +13,11 @@
                 'Subcomponents': {
                     svg: old.Subcomponents.svg,
                     groupElements: [
-                        ...(subcomponents.map((subcircuit: string) => {
-                            return { name: subcircuit, nodeType: 'Subcircuit', icon: subcomponentIcon} as menuJsonElement;
-                        })),
+                        ...(subcomponents
+                            .filter((subcircuit: string) => subcircuit !== 'Encoder') //don't include hardcoded circuits like Encoder
+                            .map((subcircuit: string) => {
+                                return { name: subcircuit, nodeType: 'Subcircuit', icon: subcomponentIcon} as menuJsonElement;
+                            })),
                     ]
                 },
                 GhostElement: { ...old.GhostElement }
