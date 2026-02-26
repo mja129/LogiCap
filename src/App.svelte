@@ -20,7 +20,10 @@
      */
     export function saveCircuitSave() {
         saveCircuit();
-        (circuitSave.getCircuit(get(currentCircuit)) as SingleSaveDataFormat).circuit = get(CircuitStore);
+        // const curr = get(currentCircuit);
+        // if(curr !== 'Encoder') { //Prevents the function from overwriting the hardcoded Encoder circuit
+            (circuitSave.getCircuit(get(currentCircuit)) as SingleSaveDataFormat).circuit = get(CircuitStore);
+        // }
         localStorage.setItem('currentCircuitSave', circuitSave.getSaveJson());
     }
 
@@ -426,8 +429,9 @@
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
+            <!-- For gateType, uses celltype to identify Encoder and use its own Svelte file -->
             <Circuit
-                gateType={device.type as logicGateTypes}
+                gateType={((device as Subcomponent).celltype === 'Encoder' ? 'Encoder' : device.type) as logicGateTypes}
                 position={device.position}
                 {nodeId}
                 nodeProps={{

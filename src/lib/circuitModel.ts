@@ -23,21 +23,33 @@ import ButtonNode from '@Circuits/InputOutputNodes/ButtonNode.svelte'
 import Subcomponent from '@Circuits/Subcomponent.svelte'
 import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
 import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
+<<<<<<< HEAD
 import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 import Mux from '@Circuits/Multiplexer.svelte'
+=======
+import Mux from '@Circuits/Plexers/Multiplexer.svelte'
+import Encoder from '@Circuits/Plexers/Encoder.svelte'
+>>>>>>> 1c3ec250 (Added dummy encoder)
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
 // or their grouping in the menu
-export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Tunnels' | 'Mux' | 'Subcomponents' | 'GhostElement'
+export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Tunnels' | 'Plexers' | 'Subcomponents' | 'GhostElement'
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
-export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes
+export type plexerTypes = 'Mux' | 'Encoder'
+export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
+
+<<<<<<< HEAD
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
 export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux'
+=======
+export type ioNodeTypes = 'Button' | 'Lamp'
+export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit'
+>>>>>>> 1c3ec250 (Added dummy encoder)
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte
@@ -59,6 +71,7 @@ type SubcomponentProps = ComponentProps<typeof Subcomponent>
 type TunnelInputProps = ComponentProps<typeof TunnelInput>
 type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
+type EncoderProps = ComponentProps<typeof Encoder>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -75,6 +88,7 @@ export type AllNodePropsWithoutId =
     | Omit<TunnelInputProps, 'nodeId'>
     | Omit<TunnelOutputProps, 'nodeId'>
     | Omit<MuxProps, 'nodeId'>
+    | Omit<EncoderProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -110,10 +124,11 @@ export const menuJsonData: Writable<menuJsonType> = writable({
             { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: outputIcon },
         ],
     },
-    'Mux' : {
+    'Plexers' : {
         svg: undefined,
         groupElements: [
             { name: 'Mux', nodeType: 'Mux', icon: muxIcon },
+            { name: 'Encoder', nodeType: 'Encoder', icon: inputIcon },
         ],
     },
     'Subcomponents': {
@@ -154,6 +169,8 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return Lamp
         case 'Mux':
             return Mux
+        case 'Encoder':
+            return Encoder
         case 'Subcircuit':
             return Subcomponent
         case 'TunnelInput':

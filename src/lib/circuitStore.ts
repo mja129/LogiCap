@@ -120,6 +120,10 @@ const createCircuitStore = (): CircuitStoreType => {
                         })
                     }
                 }
+                //If it's an Encoder, add it to "subcircuits" in the JSON
+                else if (gateType == "Encoder"){
+                    if (currCircuit.subcircuits.indexOf('Encoder') == -1) currCircuit.subcircuits.push('Encoder')
+                }
                 currCircuit.devices[nodeName] = newDevice
                 newDevices = currCircuit.devices
 

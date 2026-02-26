@@ -1,3 +1,6 @@
+import { circuitSave } from '@src/App.svelte'
+import type { SingleSaveDataFormat } from '../circuitSave'
+
 // These functions should use eachother.
 //
 // export a function map from this function, then depending on the type, create this json in app.svelte
@@ -108,6 +111,79 @@ function makeMux(
         }),
         ...(options?.rotation && {
             rotation: options.rotation
+        }),
+    }
+}
+
+//Hard coded encoder JSON
+//Note: ONLY ONE UNDERSCORE ALLOWED!!!
+const ENCODER_TEST: SingleSaveDataFormat = {
+    circuit: {
+        devices: {
+            Button_enc0: {
+                "type": "Button",
+                "label": "Button_enc0",
+                "net": "Button_enc0",
+                "bits": 1,
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            Lamp_enc0: {
+                "type": "Lamp",
+                "net": "Lamp_enc0",
+                "inputs": 1,
+                "outputs": 0,
+                "order": 0,
+                "bits": 1,
+                "label": "Lamp_enc0",
+                "position": {
+                    "x": 200,
+                    "y": 0
+                }
+            }
+        },
+        connectors: {
+            "out_Button_enc0": [
+            [
+                "Lamp_enc0",
+                "in_Lamp_enc0"
+            ]
+            ]
+      },
+      subcircuits: [],
+      wireManipulations: {
+        "out_Button_enc0-in_Lamp_enc0": "step"
+      }
+    },
+    zoom: 1,
+    translation: { x: 0, y: 0}
+}
+
+//ENCODER
+function makeEncoder(
+    nodeName: string,
+    options?: { position?: { x: number; y: number }, rotation?: number }
+): Subcomponent {
+    //Inject hardcoded circuit template if not already present
+    circuitSave.createSubcomponent("Encoder");
+    circuitSave.setCircuit("Encoder", ENCODER_TEST);
+
+    return {
+        type: 'Subcircuit',
+        label: nodeName,
+        inputs: 1,
+        outputs: 1,
+        celltype: "Encoder",
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
         }),
     }
 }
@@ -225,6 +301,7 @@ export const deviceJsonFactoryMap: Record<
     Repeater: (nodeName, options?) =>
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
     Mux: makeMux,
+    Encoder: makeEncoder,
     Subcircuit: (nodeName, options?) => 
         makeSubcomponentNode(nodeName, options.celltype as string, options.inputs as number, options.outputs as number, ...(options ? [options] : [])), 
     TunnelInput: (nodeName, options?) =>
