@@ -94,7 +94,29 @@ type Clock = {
     rotation?: number
 }
 
-type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux
+
+type Dff = {
+    type: 'Dff'
+    label: string
+    bits: number
+    polarity: {
+        clock: boolean
+        arst: boolean
+        srst: boolean
+        aload: boolean
+        set: boolean
+        clr: boolean
+        enable: boolean
+    }
+    enable_srst: boolean
+    initial?: string        // binary string
+    arst_value?: string     // binary string, value on async reset
+    srst_value?: string     // binary string, value on sync reset
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
+type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff
 type Devices = Record<string, Device>
 
 type IODevice = Button | Lamp | Clock
