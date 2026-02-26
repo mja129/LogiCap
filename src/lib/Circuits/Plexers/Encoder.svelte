@@ -22,33 +22,27 @@
     } = $props()
 </script>
 
-<!-- SVG of the Mux -->
+<!-- SVG of the Encoder -->
 <svg
-    width="75"
-    height="80"
-    viewBox="-2 -2 100 120"
+    width="100"
+    height="200"
+    viewBox="-2 -2 140 235"
     xmlns="http://www.w3.org/2000/svg"
     style="max-width:unset;"
 >
-    <!-- Trapezoid body -->
-    <polygon
-        points="0,0 60,15 60,85 0,100"
-        fill="black"
-        stroke="lightgray"
-        stroke-width="1"
-    />
-    <!-- sel prong going down -->
+    <!-- Box -->
     <rect
-        x="27" y="95"
-        width = "5"
-        height = "80"
+        x="0" y="0"
+        width = "90"
+        height = "130"
         stroke="lightgray"
         stroke-width="1"
     />
+
     <!-- 0 Label -->
     <text
-        x="10"
-        y="19.5"
+        x="12"
+        y="25"
         text-anchor="start"
         dominant-baseline="middle"
         font-size="30"
@@ -56,16 +50,27 @@
     >
         0
     </text>
-    <!-- 1 Label -->
+    <!-- V-bit Label -->
     <text
-        x="10"
-        y="80"
+        x="62"
+        y="27.5"
         text-anchor="start"
         dominant-baseline="middle"
-        font-size="30"
+        font-size="35"
         fill="white"
     >
-        1
+        V
+    </text>
+    <!-- Pri Label -->
+    <text
+        x="23"
+        y="70"
+        text-anchor="start"
+        dominant-baseline="middle"
+        font-size="40"
+        fill="white"
+    >
+        Pri
     </text>
 </svg>
 
@@ -75,16 +80,36 @@
     ioId="1"
     id={nodeId}
     side="west"
-    offset={[0,0]}
+    offset={[-6.5,14.5]}
 />
 
+<SimulationNodeAnchor
+    io="input"
+    ioId="2"
+    id={nodeId}
+    side="west"
+    offset={[-6.5,42.5]}
+/>
+
+<!-- Valid bit -->
 <SimulationNodeAnchor
     io="output"
     ioId="1"
     id={nodeId}
     side="east"
     connections={get(CircuitStore).connectors[
-        ('out_' + nodeId) as outputAnchorName
+        ('out1_' + nodeId) as outputAnchorName
     ]}
-    offset={[100, 100]}
+    offset={[60,15]}
+/>
+
+<SimulationNodeAnchor
+    io="output"
+    ioId="2"
+    id={nodeId}
+    side="east"
+    connections={get(CircuitStore).connectors[
+        ('out2_' + nodeId) as outputAnchorName
+    ]}
+    offset={[60,28.5]}
 />

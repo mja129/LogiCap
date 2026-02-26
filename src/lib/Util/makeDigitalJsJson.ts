@@ -1,5 +1,7 @@
 import { circuitSave } from '@src/App.svelte'
-import type { SingleSaveDataFormat } from '../circuitSave'
+
+//Hardcoded Encoder Circuits
+import { ENCODER_2_1 } from './encoderCircuits'
 
 // These functions should use eachother.
 //
@@ -115,52 +117,6 @@ function makeMux(
     }
 }
 
-//Hard coded encoder JSON
-//Note: ONLY ONE UNDERSCORE ALLOWED!!!
-const ENCODER_TEST: SingleSaveDataFormat = {
-    circuit: {
-        devices: {
-            Button_enc0: {
-                "type": "Button",
-                "label": "Button_enc0",
-                "net": "Button_enc0",
-                "bits": 1,
-                "position": {
-                    "x": 0,
-                    "y": 0
-                }
-            },
-            Lamp_enc0: {
-                "type": "Lamp",
-                "net": "Lamp_enc0",
-                "inputs": 1,
-                "outputs": 0,
-                "order": 0,
-                "bits": 1,
-                "label": "Lamp_enc0",
-                "position": {
-                    "x": 150,
-                    "y": 0
-                }
-            }
-        },
-        connectors: {
-            "out_Button_enc0": [
-            [
-                "Lamp_enc0",
-                "in_Lamp_enc0"
-            ]
-            ]
-      },
-      subcircuits: [],
-      wireManipulations: {
-        "out_Button_enc0-in_Lamp_enc0": "step"
-      }
-    },
-    zoom: 1,
-    translation: { x: 0, y: 0}
-}
-
 //ENCODER
 function makeEncoder(
     nodeName: string,
@@ -168,13 +124,13 @@ function makeEncoder(
 ): Subcomponent {
     //Inject hardcoded circuit template if not already present
     circuitSave.createSubcomponent("Encoder");
-    circuitSave.setCircuit("Encoder", ENCODER_TEST);
+    circuitSave.setCircuit("Encoder", ENCODER_2_1);
 
     return {
         type: 'Subcircuit',
         label: nodeName,
-        inputs: 1,
-        outputs: 1,
+        inputs: 2,
+        outputs: 2,
         celltype: "Encoder",
         ...(options?.position && {
             position: {
