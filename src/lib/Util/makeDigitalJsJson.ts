@@ -202,6 +202,44 @@ function makeClock(
     }
 }
 
+// D Flip-Flop with all control ports enabled
+// All polarities default to true (active-high / rising-edge)
+function makeDff(
+    nodeName: string,
+    options?: {
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Dff {
+    return {
+        type: 'Dff',
+        label: options?.label || nodeName,
+        bits: 1,
+        polarity: {
+            clock: true,    // rising edge triggered
+            arst: true,     // active-high async reset
+            srst: true,     // active-high sync reset
+            aload: true,    // active-high async load
+            set: true,      // active-high set
+            clr: true,      // active-high clear
+            enable: true,   // active-high enable
+        },
+        enable_srst: true,
+        arst_value: '0',
+        srst_value: '0',
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
 export const deviceJsonFactoryMap: Record<
     string,
     (nodeName: string, options?: any) => Device
@@ -233,6 +271,7 @@ export const deviceJsonFactoryMap: Record<
         makeTunnelOutput(nodeName, options.celltype as string, ...(options ? [options] : [])),
     Clock: (nodeName, options?) =>
         makeClock(nodeName, ...(options ? [options] : [])),
+    Dff: makeDff,
 }
 
 // // Example usage

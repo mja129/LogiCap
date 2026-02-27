@@ -15,6 +15,7 @@ import outputIcon from '@icons/circuits/outputIcon.png'
 import inputIcon from '@icons/circuits/inputIcon.png'
 import clockIcon from '@icons/circuits/Clock.png'
 import muxIcon from '@icons/circuits/Mux.png'
+import dffIcon from '@icons/circuits/inputIcon.png'
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
 import SingleIoLogic from '@Circuits/LogicGates/SingleIoLogic.svelte'
@@ -25,11 +26,12 @@ import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
 import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
 import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 import Mux from '@Circuits/Multiplexer.svelte'
+import DffNode from '@Circuits/Sequential/DffNode.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
 // or their grouping in the menu
-export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Tunnels' | 'Mux' | 'Subcomponents' | 'GhostElement'
+export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Sequential' | 'Tunnels' | 'Mux' | 'Subcomponents' | 'GhostElement'
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
@@ -37,6 +39,7 @@ export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes
 
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
+export type sequentialTypes = 'Dff'
 export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux'
 
 // types for the structure of the menu
@@ -59,6 +62,7 @@ type SubcomponentProps = ComponentProps<typeof Subcomponent>
 type TunnelInputProps = ComponentProps<typeof TunnelInput>
 type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
+type DffNodeProps = ComponentProps<typeof DffNode>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -75,6 +79,7 @@ export type AllNodePropsWithoutId =
     | Omit<TunnelInputProps, 'nodeId'>
     | Omit<TunnelOutputProps, 'nodeId'>
     | Omit<MuxProps, 'nodeId'>
+    | Omit<DffNodeProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -100,6 +105,12 @@ export const menuJsonData: Writable<menuJsonType> = writable({
             { name: 'Lamp', nodeType: 'Lamp', icon: outputIcon },
             { name: 'Button', nodeType: 'Button', icon: inputIcon },
             { name: 'Clock', nodeType: 'Clock', icon: clockIcon },
+        ],
+    },
+    'Sequential': {
+    svg: undefined,
+    groupElements: [
+        { name: 'D Flip-Flop', nodeType: 'Dff', icon: dffIcon },
         ],
     },
     'Tunnels': {
@@ -162,5 +173,7 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return TunnelOutput
         case 'Clock':
             return Clock
+        case 'Dff':
+            return DffNode
     }
 }
