@@ -4,6 +4,8 @@
     import { type CircuitSave, createCircuitSave, type SingleSaveDataFormat } from '@src/lib/circuitSave.ts'
     import { get, type Readable, writable, type Writable } from 'svelte/store'
 
+    export const canvasTransform = writable({ x: 0, y: 0, scale: 1 })
+
     export function onWireConnection(wireId: string) {
         console.log('Success new connection made id: ' + wireId)
         // saveCircuit() // we could auto-save on wire linking
@@ -80,6 +82,8 @@
     import SettingsMenu from '@AppComponents/SettingsMenu.svelte'
     import ZoomThing from './lib/ZoomThing.svelte'
     import { setScale, setTranslation } from '@Util/graphUtils'
+    import WireCanvas from './lib/CircuitParts/WireCanvas.svelte'
+    import { wireMode, selectedWireIds } from './lib/wireModeStore'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
@@ -105,6 +109,7 @@
         if (!match) return
 
         const [, x, y, scale] = match.map(Number)
+        canvasTransform.set({ x, y, scale })
         let saveData = circuitSave.getCircuit(get(currentCircuit));
         if (saveData !== null) {
             saveData.zoom = scale;
@@ -146,6 +151,13 @@
 
             parseTransform(el.style.transform)
 
+            // Re-apply the current transform so Svelvet's Background component
+            // re-reads offsetWidth/Height now that layout has settled, fixing
+            // the initial dot-grid offset (same issue as the window resize case).
+            const { x, y, scale } = get(canvasTransform)
+            setTranslation({ x, y })
+            setScale(scale)
+
             observer = new MutationObserver(() => {
                 parseTransform(el.style.transform)
             })
@@ -161,6 +173,16 @@
     // save circuit on page reload.
     window.addEventListener('beforeunload', () => {
         saveCircuitSave();
+    })
+
+    // When the window resizes, svelvet's Background component doesn't know the
+    // wrapper dimensions changed (it only re-reads offsetWidth/Height when
+    // translationStore updates). Re-applying the current translation forces the
+    // reactive block to re-run with the correct dimensions.
+    window.addEventListener('resize', () => {
+        const { x, y, scale } = get(canvasTransform);
+        setTranslation({ x, y });
+        setScale(scale);
     })
 
     // create new node in the global store for circuitStore digital js backend.
@@ -239,6 +261,17 @@
             // delete newDeviceList[id]
         })
         currentDevicesData = newDeviceList
+
+        // Also delete any selected wire segments
+        const selWires = get(selectedWireIds);
+        if (selWires.size > 0) {
+            CircuitStore.update(circuit => {
+                circuit.wireSegments = circuit.wireSegments.filter(seg => !selWires.has(seg.id));
+                return circuit;
+            });
+            selectedWireIds.set(new Set());
+        }
+
         // setDevices(newDeviceList);
         saveCircuitSave();
     }
@@ -414,32 +447,36 @@
     <TabMenu />
 
     <!-- [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/border) -->
-    <Svelvet
-        theme="LogiCap"
-        zoom={initialScale}
-        translation={initialTranslation}
-        editable={false}
-        disableSelection={false}
-        controls
-    >
-        <ZoomThing></ZoomThing>
-        <Minimap width={100} corner="NE" slot="minimap" />
-        <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
-        {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
-            <Circuit
-                gateType={device.type as logicGateTypes}
-                position={device.position}
-                {nodeId}
-                nodeProps={{
-                    ...(device.type && { gateType: device.type }),
-                    width: 80,
-                    height: 50,
-                    ...((device as Subcomponent).celltype && { celltype: (device as Subcomponent).celltype, inputs: (device as Subcomponent).inputs, outputs: (device as Subcomponent).outputs }),
-                    // Add any other specific props your node components need
-                }}
-            />
-        {/each}
-    </Svelvet>
+    <div class="canvas-container">
+        <Svelvet
+            theme="LogiCap"
+            zoom={initialScale}
+            translation={initialTranslation}
+            editable={false}
+            disableSelection={false}
+            pannable={$wireMode == 0}
+            controls
+        >
+            <ZoomThing></ZoomThing>
+            <Minimap width={100} corner="NE" slot="minimap" />
+            <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
+            {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
+                <Circuit
+                    gateType={device.type as logicGateTypes}
+                    position={device.position}
+                    {nodeId}
+                    nodeProps={{
+                        ...(device.type && { gateType: device.type }),
+                        width: 80,
+                        height: 50,
+                        ...((device as Subcomponent).celltype && { celltype: (device as Subcomponent).celltype, inputs: (device as Subcomponent).inputs, outputs: (device as Subcomponent).outputs }),
+                        // Add any other specific props your node components need
+                    }}
+                />
+            {/each}
+        </Svelvet>
+        <WireCanvas />
+    </div>
 </main>
 
 <style>
@@ -484,6 +521,12 @@
         outline: none !important;
         border: none !important;
         box-shadow: unset !important;
+    }
+    .canvas-container {
+        position: relative;
+        flex: 1;
+        height: 100%;
+        display: flex;
     }
     :global(.svelvet-wrapper) {
         /* max-height: calc(100% - 3.5vh); */

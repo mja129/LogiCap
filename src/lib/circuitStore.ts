@@ -23,6 +23,7 @@ export function createEmptyCircuit(): Circuit {
         connectors: {},
         subcircuits: [],
         wireManipulations: {},
+        wireSegments: [],
     };
 }
 
@@ -42,6 +43,7 @@ const createCircuitStore = (): CircuitStoreType => {
                     connectors: {},
                     subcircuits: [],
                     wireManipulations: {},
+                    wireSegments: [],
                 }
             }),
         addConnection: (fromId: outputAnchorName, toId: inputAnchorName) => {
@@ -321,6 +323,7 @@ export function loadCircuit(circuit: Circuit) {
         devices: circuit.devices,
         connectors: circuit.connectors,
         subcircuits: circuit.subcircuits,
-        wireManipulations: circuit.wireManipulations
+        wireManipulations: circuit.wireManipulations,
+        wireSegments: circuit.wireSegments ?? [],
     });
 }

@@ -449,7 +449,7 @@ export const ConstantView = NumBaseView.extend({
 // Clock
 export const Clock = Box.define('Clock', {
     /* default properties */
-    propagation: 100,
+    propagation: 1,
 
     ports: {
         items: [
