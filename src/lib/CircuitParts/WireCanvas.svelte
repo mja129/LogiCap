@@ -104,23 +104,54 @@
         dragActive = false;
     }
 
-    // Select a wire segment. Shift+click toggles; plain click replaces selection.
-    function selectWire(e: MouseEvent, id: string) {
-        if ($wireMode !== 0) {return;}
-        e.stopPropagation();
-        // TODO: MOVE BELOW TO MOUSEUP SO MOVING MULTIPLE WIRES + OTHER STUFF IS POSSIBLE
-        
+    /*
+     * Superb level of jank here.
+     * To deselect svelvet stuff, need to fire a mousedown on the svelvet canvas to deselect
+     * any currently selected nodes. This begins a pan,
+     * so immediately fire a mouseup (whose listener is on the window for
+     * some reason :DDDD) to stop the drag.
+     */
+    function deselectNodes() {
+        var wrapper = document.querySelector('.svelvet-wrapper');
+        if (wrapper) {
+            wrapper.dispatchEvent(new MouseEvent('mousedown'));
+        }
+        window.dispatchEvent(new MouseEvent('mouseup'));
     }
 
     function onMouseDown(e: MouseEvent) {
-        if ($wireMode != 1 || e.buttons ^ 1) {return;}
-        if (drawStart == null) {
-            const pt = eventToGrid(e);
-            drawStart = pt;
-            cursorPoint = pt;
-            dragActive = true;
+        if (e.buttons ^ 1) {return;}
+        if ($wireMode == 0) {
+            var target = e.target as HTMLElement;
+            if (target.classList.contains('wire')) {
+                var id = target.dataset.id as string;
+                selectedWireIds.update(s => {
+                    const next = new Set(s);
+                    // If shift key is down, toggle select on this wire
+                    if (e.shiftKey) {
+                        if (next.has(id)) {next.delete(id);} else {next.add(id);}
+                    // otherwise, if this wire is selected, we want to move whole selection
+                    // if not selected, deselect all and select this wire
+                    } else {
+                        if (next.has(id)) {
+                            // MOVE SELECTED WIRES/NODES
+                        } else {
+                            deselectNodes();
+                            return new Set([id]);
+                        }
+                    }
+                    return next;
+                });
+            }
         } else {
-            finalizeWire();
+            if (drawStart == null) {
+                const pt = eventToGrid(e);
+                drawStart = pt;
+                cursorPoint = pt;
+                dragActive = true;
+            } else {
+                finalizeWire();
+            }
         }
     }
 
@@ -141,33 +172,6 @@
     }
 
     function onMouseUp(e: MouseEvent) {
-        /*
-         * Superb level of jank here.
-         * Need to fire a mousedown on the svelvet canvas to deselect
-         * any currently selected Svelvet nodes. This begins a pan,
-         * so immediately fire a mouseup (whose listener is on the window for
-         * some reason :DDDD) to stop the drag.
-         */
-        if (!e.shiftKey) {
-            var wrapper = document.querySelector('.svelvet-wrapper');
-            if (wrapper) {
-                wrapper.dispatchEvent(new MouseEvent('mousedown'));
-            }
-            window.dispatchEvent(new MouseEvent('mouseup'));
-        }
-        var target = e.target as HTMLElement
-        if (target.classList.contains('wire')) {
-            var id = target.dataset.id as string;
-            console.log(id);
-            selectedWireIds.update(s => {
-                if (e.shiftKey) {
-                    const next = new Set(s);
-                    if (next.has(id)) {next.delete(id);} else {next.add(id);}
-                    return next;
-                }
-                return new Set([id]);
-            });
-        }
         if (!dragActive || e.buttons ^ 1) {return;}
         dragActive = false;
         // Finalize only if the cursor actually moved to a different grid point (drag mode)
@@ -289,7 +293,7 @@
                 <line
                     class="wire-l wire"
                     class:draggable={$wireMode == 0}
-                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation()}}}
+                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
                     x1={gp(seg.from.gx)}
                     y1={gp(seg.from.gy)}
@@ -302,7 +306,7 @@
                 <circle
                     class="wire-ep wire"
                     class:draggable={$wireMode == 0}
-                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation()}}}
+                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
                     cx={gp(seg.from.gx)}
                     cy={gp(seg.from.gy)}
@@ -312,7 +316,7 @@
                 <circle
                     class="wire-ep wire"
                     class:draggable={$wireMode == 0}
-                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation()}}}
+                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
                     cx={gp(seg.to.gx)}
                     cy={gp(seg.to.gy)}
@@ -326,7 +330,7 @@
                 <line
                     class="wire-l wire selected"
                     class:draggable={$wireMode == 0}
-                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation()}}}
+                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
                     x1={gp(seg.from.gx)}
                     y1={gp(seg.from.gy)}
@@ -338,7 +342,7 @@
                 <circle
                     class="wire-ep wire selected"
                     class:draggable={$wireMode == 0}
-                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation()}}}
+                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
                     cx={gp(seg.from.gx)}
                     cy={gp(seg.from.gy)}
@@ -347,7 +351,7 @@
                 <circle
                     class="wire-ep wire selected"
                     class:draggable={$wireMode == 0}
-                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation()}}}
+                    onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
                     cx={gp(seg.to.gx)}
                     cy={gp(seg.to.gy)}
