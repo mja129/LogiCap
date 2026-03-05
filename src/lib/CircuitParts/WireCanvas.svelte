@@ -251,6 +251,17 @@
                 selectedWireIds.set(new Set());
             }
         }
+        // Deselect wires if box select has moved significantly
+        function handleDocMouseMove(e: MouseEvent) {
+            if ($wireMode == 0 && boxSelectStart) {
+                const pt = screenToCanvas(e.clientX, e.clientY);
+                const dx = Math.abs(pt.x - boxSelectStart.x);
+                const dy = Math.abs(pt.y - boxSelectStart.y);
+                if (dx >= 1 || dy >= 1) {
+                    selectedWireIds.set(new Set());
+                }
+            }
+        }
         // Finalize box selection
         function handleDocMouseUp(e: MouseEvent) {
             if ($wireMode == 1 || !boxSelecting || e.button !== 0) {return;}
@@ -264,7 +275,7 @@
             boxSelectStart = null;
             boxSelectEnd = null;
             // Ignore clicks that barely moved (not an intentional drag)
-            if (rw * get(canvasTransform).scale < 4 && rh * get(canvasTransform).scale < 4) return;
+            if (rw * get(canvasTransform).scale < 4 && rh * get(canvasTransform).scale < 4) {return;}
             const toSelect = new Set<string>();
             for (const seg of get(CircuitStore).wireSegments) {
                 if (lineIntersectsRect(
@@ -281,11 +292,13 @@
         document.documentElement.addEventListener('mouseleave', handleWindowMouseLeave);
         document.addEventListener('mousedown', handleDocMouseDown);
         document.addEventListener('mouseup', handleDocMouseUp);
+        document.addEventListener('mousemove', handleDocMouseMove);
         return () => {
             window.removeEventListener('mouseup', handleWindowMouseUp);
             document.documentElement.removeEventListener('mouseleave', handleWindowMouseLeave);
             document.removeEventListener('mousedown', handleDocMouseDown);
             document.removeEventListener('mouseup', handleDocMouseUp);
+            document.removeEventListener('mousemove', handleDocMouseMove);
         };
     });
 </script>
