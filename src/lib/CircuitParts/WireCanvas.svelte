@@ -20,6 +20,8 @@
 
     // for moving wires
     let clickStart: GridPoint | null = null;
+    // for selecting wires
+    let clickedWire: string | null = null;
 
     // Box selection state
     let boxSelecting = false;
@@ -135,6 +137,8 @@
                     } else {
                         if (next.has(id)) {
                             // MOVE SELECTED WIRES/NODES
+                            // If next mouseup is on the same wire, we want to just select this one
+                            clickedWire = id;
                         } else {
                             deselectNodes();
                             return new Set([id]);
@@ -172,11 +176,22 @@
     }
 
     function onMouseUp(e: MouseEvent) {
-        if (!dragActive || e.buttons ^ 1) {return;}
-        dragActive = false;
-        // Finalize only if the cursor actually moved to a different grid point (drag mode)
-        if (cursorPoint && drawStart && (cursorPoint.gx !== drawStart.gx || cursorPoint.gy !== drawStart.gy)) {
-            finalizeWire();
+        if ($wireMode == 1) {
+            if (!dragActive || e.buttons ^ 1) {return;}
+            dragActive = false;
+            // Finalize only if the cursor actually moved to a different grid point (drag mode)
+            if (cursorPoint && drawStart && (cursorPoint.gx !== drawStart.gx || cursorPoint.gy !== drawStart.gy)) {
+                finalizeWire();
+            }
+        } else {
+            // If mouseup is on the same wire as we mousedowned on, clear selection and select this wire
+            // CLICKEDWIRE SHOULD BE NULLED IF MOUSEMOVE DETECTS WE'RE MOVING SELECTION
+            var target = e.target as HTMLElement;
+            if (target.classList.contains('wire') && (clickedWire && target.dataset.id as string == clickedWire)) {
+                deselectNodes();
+                selectedWireIds.update(() => new Set([target.dataset.id as string]));
+                clickedWire == null;
+            }
         }
     }
 
@@ -367,10 +382,10 @@
                     x2={gp(cursorPoint.gx)}
                     y2={gp(cursorPoint.gy)}
                     stroke="#333"
-                    stroke-width="4"
-                    stroke-dasharray="6 4"
+                    stroke-width="3"
+                    stroke-dasharray="6 5"
                     stroke-linecap="round"
-                    opacity="0.6"
+                    opacity="1"
                 />
                 <!-- Dots at start of draw and cursor -->
                 <circle
