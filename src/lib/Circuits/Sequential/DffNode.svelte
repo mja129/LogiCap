@@ -7,24 +7,24 @@
 
     // Left side: D, clk
     const leftOffsets: Record<string, [number, number]> = {
-        in:  [-7, 40],
-        clk: [-7, 80],
+        in:  [-7, 25],
+        clk: [-7, 55],
     }
-    // Top: en, set, aload
-    const topOffsets: Record<string, [number, number]> = {
-        en:    [35, -7],
-        set:   [75, -7],
-        aload: [115, -7],
-    }
-    // Bottom: arst, srst, clr, ain
-    const bottomOffsets: Record<string, [number, number]> = {
-        arst: [25, 127],
-        srst: [55, 127],
-        clr:  [85, 127],
-        ain:  [115, 127],
-    }
+    // Top: en, set, aload (optional — uncomment when polarity is enabled)
+    // const topOffsets: Record<string, [number, number]> = {
+    //     en:    [35, -7],
+    //     set:   [75, -7],
+    //     aload: [115, -7],
+    // }
+    // Bottom: arst, srst, clr, ain (optional — uncomment when polarity is enabled)
+    // const bottomOffsets: Record<string, [number, number]> = {
+    //     arst: [25, 127],
+    //     srst: [55, 127],
+    //     clr:  [85, 127],
+    //     ain:  [115, 127],
+    // }
     // Right: Q
-    const outputOffset: [number, number] = [157, 60];
+    const outputOffset: [number, number] = [107, 40];
 </script>
 
 <script lang="ts">
@@ -74,15 +74,15 @@
 </script>
 
 <svg
-    width="150"
-    height="120"
-    viewBox="0 0 150 120"
+    width="100"
+    height="75"
+    viewBox="0 0 100 75"
     xmlns="http://www.w3.org/2000/svg"
 >
     <!-- Component body -->
     <rect
         x="5" y="5"
-        width="140" height="110"
+        width="90" height="65"
         fill="black"
         stroke={dffColor.stroke}
         stroke-width="2"
@@ -90,91 +90,96 @@
     />
 
     <!-- Title -->
-    <text x="75" y="22"
+    <text x="50" y="20"
         text-anchor="middle" fill={dffColor.stroke}
-        font-size="14" font-weight="bold">DFF</text>
+        font-size="12" font-weight="bold">DFF</text>
 
-    <!-- Left port labels -->
-    <text x="16" y="43" fill={dffColor.stroke}
+    <!-- D label -->
+    <text x="14" y="28" fill={dffColor.stroke}
         font-size="10" dominant-baseline="middle">D</text>
-    <text x="20" y="83" fill={dffColor.stroke}
+
+    <!-- clk label -->
+    <text x="20" y="58" fill={dffColor.stroke}
         font-size="10" dominant-baseline="middle">clk</text>
 
     <!-- Clock triangle -->
     <polygon
-        points="10,76 18,83 10,90"
+        points="10,51 17,58 10,65"
         fill="none"
         stroke={dffColor.stroke}
         stroke-width="1.5"
     />
 
-    <!-- Top port labels -->
-    <text x="35" y="3" fill={dffColor.stroke}
+    <!-- Top port labels (optional — uncomment when polarity is enabled) -->
+    <!-- <text x="35" y="3" fill={dffColor.stroke}
         font-size="8" text-anchor="middle">en</text>
     <text x="75" y="3" fill={dffColor.stroke}
         font-size="8" text-anchor="middle">set</text>
     <text x="115" y="3" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">aload</text>
+        font-size="8" text-anchor="middle">aload</text> -->
 
-    <!-- Bottom port labels -->
-    <text x="25" y="119" fill={dffColor.stroke}
+    <!-- Bottom port labels (optional — uncomment when polarity is enabled) -->
+    <!-- <text x="25" y="119" fill={dffColor.stroke}
         font-size="8" text-anchor="middle">arst</text>
     <text x="55" y="119" fill={dffColor.stroke}
         font-size="8" text-anchor="middle">srst</text>
     <text x="85" y="119" fill={dffColor.stroke}
         font-size="8" text-anchor="middle">clr</text>
     <text x="115" y="119" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">ain</text>
+        font-size="8" text-anchor="middle">ain</text> -->
 
-    <!-- Output label -->
-    <text x="130" y="63"
+    <!-- Q label -->
+    <text x="82" y="43"
         text-anchor="end" fill={dffColor.stroke}
         font-size="10" dominant-baseline="middle">Q</text>
 
     <!-- Output wire stub -->
     <line
-        x1="145" x2="170"
-        y1="60" y2="60"
+        x1="95" x2="120"
+        y1="40" y2="40"
         stroke={dffColor.stroke}
         stroke-width="4"
     />
 
     <!-- Output state indicator -->
     <circle
-        cx="125" cy="60" r="5"
+        cx="80" cy="40" r="5"
         fill={dffColor.fill}
         stroke={dffColor.stroke}
         stroke-width="1.5"
     />
 </svg>
 
-<!-- Left anchors: D and clk -->
+<!-- D input -->
 <SimulationNodeAnchor
     io="input" ioId="" id={nodeId}
     side="west" offset={leftOffsets['in']}
 />
+<!-- clk input -->
 <SimulationNodeAnchor
     io="input" ioId="clk" id={nodeId}
     side="west" offset={leftOffsets['clk']}
 />
 
-<!-- Top anchors: en, set, aload -->
-{#each Object.entries(topOffsets) as [port, offset]}
+<!-- Top anchors: en, set, aload (optional — uncomment when polarity is enabled) -->
+<!-- {#each Object.entries(topOffsets) as [port, offset]}
     <SimulationNodeAnchor
         io="input" ioId={port} id={nodeId}
         side="north" offset={offset}
+        usePortName={true}
     />
-{/each}
+{/each} -->
 
-<!-- Bottom anchors: arst, srst, clr, ain -->
-{#each Object.entries(bottomOffsets) as [port, offset]}
+<!-- Bottom anchors: arst, srst, clr, ain (optional — uncomment when polarity is enabled) -->
+<!-- {#each Object.entries(bottomOffsets) as [port, offset]}
     <SimulationNodeAnchor
         io="input" ioId={port} id={nodeId}
         side="south" offset={offset}
+        usePortName={true}
     />
-{/each}
+{/each} -->
 
-<!-- Output anchor -->
+<!-- Q output -->
 <SimulationNodeAnchor
     io="output" ioId="" id={nodeId}
     connections={connections}

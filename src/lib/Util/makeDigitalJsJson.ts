@@ -217,17 +217,8 @@ function makeDff(
         label: options?.label || nodeName,
         bits: 1,
         polarity: {
-            clock: true,    // rising edge triggered
-            arst: true,     // active-high async reset
-            srst: true,     // active-high sync reset
-            aload: true,    // active-high async load
-            set: true,      // active-high set
-            clr: true,      // active-high clear
-            enable: true,   // active-high enable
+            clock: true,
         },
-        enable_srst: true,
-        arst_value: '0',
-        srst_value: '0',
         ...(options?.position && {
             position: {
                 x: options.position.x,

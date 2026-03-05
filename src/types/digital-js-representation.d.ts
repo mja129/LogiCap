@@ -100,18 +100,18 @@ type Dff = {
     label: string
     bits: number
     polarity: {
-        clock: boolean
-        arst: boolean
-        srst: boolean
-        aload: boolean
-        set: boolean
-        clr: boolean
-        enable: boolean
+        clock?: boolean
+        arst?: boolean
+        srst?: boolean
+        aload?: boolean
+        set?: boolean
+        clr?: boolean
+        enable?: boolean
     }
-    enable_srst: boolean
-    initial?: string        // binary string
-    arst_value?: string     // binary string, value on async reset
-    srst_value?: string     // binary string, value on sync reset
+    enable_srst?: boolean
+    initial?: string
+    arst_value?: string
+    srst_value?: string
     position?: { x: number; y: number }
     rotation?: number
 }
