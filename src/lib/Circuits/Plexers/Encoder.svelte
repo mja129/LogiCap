@@ -28,8 +28,8 @@
     } = $props()
 
     //calculate size, alignment from number of inputs/outputs
-    const width = 100;
-    const height = 200;
+    const width = 50;
+    const height = 80;
     // const height = ((anchorDiameter + anchorPadding) * Math.max(inputs, outputs)) + anchorPadding;
     // const inputOffset = ((height - ((anchorDiameter + anchorPadding) * inputs) + anchorPadding) / 2.0) + 1;
     // const outputOffset = ((height - ((anchorDiameter + anchorPadding) * outputs) + anchorPadding) / 2.0) + 1;
@@ -41,15 +41,15 @@
 <svg
     width={width}
     height={height}
-    viewBox="-2 -2 {width + 40} {height + 35}"
+    viewBox="0 0 {width} {height}"
     xmlns="http://www.w3.org/2000/svg"
     style="max-width:unset;"
 >
     <!-- Box -->
     <rect
         x="0" y="0"
-        width = {width - 10}
-        height = {height - 70}
+        width = {width}
+        height = {height}
         stroke="lightgray"
         stroke-width="1"
     />
@@ -101,6 +101,7 @@
     offset={[60,15]}
 />
 
+<!-- Dynamically size something based on something idk comment here awesome!! -->
 {#each { length: inputs } as _, index}
     <SimulationNodeAnchor
         io="input"

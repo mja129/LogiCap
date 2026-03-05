@@ -2,7 +2,7 @@ import { circuitSave } from '@src/App.svelte'
 import type { SingleSaveDataFormat } from '../circuitSave'
 
 //Hardcoded Encoder Circuits
-import { ENCODER_2_1 } from './encoderCircuits'
+import { ENCODER_2_1, ENCODER_4_2 } from './encoderCircuits'
 
 // These functions should use eachother.
 //
@@ -125,22 +125,27 @@ function makeEncoder(
 ): Subcomponent {
     //Inject hardcoded circuit based on selbits
     const selbits = options!.selbits
+    const encoderType = options!.celltype
     const encoderMap: Record<number, SingleSaveDataFormat> = {
         1: ENCODER_2_1,
-        // 2: ENCODER_4_2,
+        2: ENCODER_4_2,
         // 3: ENCODER_8_3,
         // 4: ENCODER_16_4,
     }
 
-    circuitSave.createSubcomponent("Encoder");
-    circuitSave.setCircuit("Encoder", encoderMap[selbits]);
+
+    // console.log("CoderTypeVar: ",encoderType)
+    circuitSave.createSubcomponent(encoderType);
+    circuitSave.setCircuit(encoderType, encoderMap[selbits]);
+    // console.log("Encoder circuit set:", circuitSave.getCircuit("Encoder"));
+    // console.log("selbits:", selbits);
 
     return {
         type: 'Subcircuit',
         label: nodeName,
         inputs: 2 ** selbits, //2^bits
         outputs: selbits + 1, //1 for valid bit
-        celltype: "Encoder",
+        celltype: encoderType, //used to determine which Encoder_# to use so different types don't overwrite each other
         ...(options?.position && {
             position: {
                 x: options.position.x,

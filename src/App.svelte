@@ -20,10 +20,7 @@
      */
     export function saveCircuitSave() {
         saveCircuit();
-        // const curr = get(currentCircuit);
-        // if(curr !== 'Encoder') { //Prevents the function from overwriting the hardcoded Encoder circuit
-            (circuitSave.getCircuit(get(currentCircuit)) as SingleSaveDataFormat).circuit = get(CircuitStore);
-        // }
+        (circuitSave.getCircuit(get(currentCircuit)) as SingleSaveDataFormat).circuit = get(CircuitStore);
         localStorage.setItem('currentCircuitSave', circuitSave.getSaveJson());
     }
 
@@ -204,7 +201,10 @@
             newDeviceList = CircuitStore.addCircuitDevice(
               gateType,
               uuid,
-              { selbits }
+              { 
+                selbits,
+                celltype: `Encoder_${selbits}`
+             } //also passes celltype so it's accessible in circuitStore.ts
             ) as Devices
         } else if (e.celltype) {
           try {
@@ -447,7 +447,7 @@
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
             <!-- For gateType, uses celltype to identify Encoder and use its own Svelte file -->
             <Circuit
-                gateType={((device as Subcomponent).celltype === 'Encoder' ? 'Encoder' : device.type) as logicGateTypes}
+                gateType={((device as Subcomponent).celltype?.startsWith('Encoder') ? 'Encoder' : device.type) as logicGateTypes}
                 position={device.position}
                 {nodeId}
                 nodeProps={{
