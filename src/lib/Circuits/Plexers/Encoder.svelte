@@ -28,8 +28,8 @@
     } = $props()
 
     //calculate size, alignment from number of inputs/outputs
-    const width = 50;
-    const height = 80;
+    const width = 55;
+    const height = 40 + (22.5 * inputs);
     // const height = ((anchorDiameter + anchorPadding) * Math.max(inputs, outputs)) + anchorPadding;
     // const inputOffset = ((height - ((anchorDiameter + anchorPadding) * inputs) + anchorPadding) / 2.0) + 1;
     // const outputOffset = ((height - ((anchorDiameter + anchorPadding) * outputs) + anchorPadding) / 2.0) + 1;
@@ -56,72 +56,63 @@
 
     <!-- 0 Label -->
     <text
-        x="12"
-        y="25"
+        x="10"
+        y="19"
         text-anchor="start"
         dominant-baseline="middle"
-        font-size="30"
+        font-size="150%"
         fill="white"
     >
         0
     </text>
     <!-- V-bit Label -->
     <text
-        x="62"
-        y="27.5"
+        x="40"
+        y="19"
         text-anchor="start"
         dominant-baseline="middle"
-        font-size="35"
+        font-size="150%"
         fill="white"
     >
         V
     </text>
     <!-- Pri Label -->
     <text
-        x={width / 4}
-        y={height / 3}
+        x=25%
+        y=50%
         text-anchor="start"
         dominant-baseline="middle"
-        font-size="40"
+        font-size="200%"
         fill="white"
     >
         Pri
     </text>
 </svg>
 
-<!-- Valid bit -->
-<SimulationNodeAnchor
-    io="output"
-    ioId="1"
-    id={nodeId}
-    side="east"
-    connections={get(CircuitStore).connectors[
-        ('out1_' + nodeId) as outputAnchorName
-    ]}
-    offset={[60,15]}
-/>
-
 <!-- Dynamically size something based on something idk comment here awesome!! -->
+ <!-- Inputs Nodes -->
 {#each { length: inputs } as _, index}
     <SimulationNodeAnchor
         io="input"
         ioId={(index + 1).toString()}
         id={nodeId}
         side="west"
-        offset={[-6.5, 30 + ((anchorDiameter + anchorPadding + 13.5) * index)]}
+        offset={[-7.5, 13 + (25 * index)]}
         usePixelOffset={true}
     />
 {/each}
-{#each { length: outputs-1 } as _, index}
+
+<!-- Output Nodes -->
+{#each { length: outputs } as _, index}
     <SimulationNodeAnchor
         io="output"
-        ioId={(index + 2).toString()}
+        ioId={(index + 1).toString()}
         id={nodeId}
         connections={get(CircuitStore).connectors[
-            (`out${index+2}_` + nodeId) as outputAnchorName
+            (`out${index+1}_` + nodeId) as outputAnchorName
         ]}
         side="east"
-        offset={[60, 30 + ((anchorDiameter + anchorPadding + 13.5) * (index+1))]}
+        offset={[50, 13 + (40 * index)]}
         usePixelOffset={true}
     />
 {/each}

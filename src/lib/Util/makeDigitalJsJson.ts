@@ -2,7 +2,7 @@ import { circuitSave } from '@src/App.svelte'
 import type { SingleSaveDataFormat } from '../circuitSave'
 
 //Hardcoded Encoder Circuits
-import { ENCODER_2_1, ENCODER_4_2 } from './encoderCircuits'
+import { ENCODER_2_1, ENCODER_4_2, ENCODER_8_3 } from './encoderCircuits'
 
 // These functions should use eachother.
 //
@@ -129,7 +129,7 @@ function makeEncoder(
     const encoderMap: Record<number, SingleSaveDataFormat> = {
         1: ENCODER_2_1,
         2: ENCODER_4_2,
-        // 3: ENCODER_8_3,
+        3: ENCODER_8_3
         // 4: ENCODER_16_4,
     }
 
