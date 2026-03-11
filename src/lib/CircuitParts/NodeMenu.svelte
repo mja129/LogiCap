@@ -3,7 +3,6 @@
     let { children }: { children: Snippet } = $props()
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="node-menu" onclick={(e) => e.stopPropagation()}>
     {@render children()}
 </div>
