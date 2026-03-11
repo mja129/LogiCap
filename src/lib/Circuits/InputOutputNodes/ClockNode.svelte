@@ -1,8 +1,8 @@
 <script lang="ts" module>
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
     import { CircuitEngine, inputSetter, getRunning, tickSignal } from '@CircuitEngine'
-    import { onDestroy, getContext } from 'svelte'
-    import { get, type Writable } from 'svelte/store'
+    import { onDestroy, onMount, getContext, type Snippet } from 'svelte'
+    import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
 
     // Output anchor position — matches the line endpoint on the SVG
@@ -24,8 +24,7 @@
 
     let signalOn: boolean = $state(false);
 
-    // Get selection state from parent Circuit.svelte
-    const isSelected = getContext<Writable<boolean>>('selected');
+    const registerMenu = getContext<(s: Snippet) => void>('registerMenu');
 
     // Frequency menu input — initialized to current frequency
     let freqInput: number = $state(frequency);
@@ -34,6 +33,10 @@
     function applyFrequency() {
         frequency = freqInput;
     }
+
+    onMount(() => {
+        registerMenu(clockMenu);
+    });
 
     // Color reflects simulation state: gray when idle, green/red when running
     let buttonColor = $derived({
@@ -141,20 +144,17 @@
     <circle cx="50" cy="50" r="3" fill={buttonColor.stroke} />
 </svg>
 
-<!-- Frequency menu appears above the clock when selected -->
-{#if $isSelected}
-    <div class="clock-context-menu" onclick={(e) => e.stopPropagation()}>
-        <label>
-            Frequency (ticks):
-            <input
-                type="number"
-                min="1"
-                bind:value={freqInput}
-            />
-        </label>
-        <button onclick={applyFrequency}>Apply</button>
-    </div>
-{/if}
+{#snippet clockMenu()}
+    <label>
+        Frequency (ticks):
+        <input
+            type="number"
+            min="1"
+            bind:value={freqInput}
+        />
+    </label>
+    <button onclick={applyFrequency}>Apply</button>
+{/snippet}
 
 <SimulationNodeAnchor
     io="output"
@@ -170,27 +170,4 @@
         cursor: pointer;
     }
 
-    /* Frequency menu — floats above the clock when selected */
-    .clock-context-menu {
-        position: absolute;
-        top: -60px;
-        left: 0;
-        z-index: 100;
-        background: var(--lightblue, #2a2a2a);
-        border: 2px solid black;
-        border-radius: 6px;
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        min-width: 150px;
-    }
-    .clock-context-menu input {
-        width: 60px;
-        margin-left: 4px;
-    }
-    .clock-context-menu button {
-        cursor: pointer;
-        padding: 2px 8px;
-    }
 </style>
