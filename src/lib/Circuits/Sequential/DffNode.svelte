@@ -159,6 +159,7 @@
 <SimulationNodeAnchor
     io="input" ioId="clk" id={nodeId}
     side="west" offset={leftOffsets['clk']}
+    usePortName={true}
 />
 
 <!-- Top anchors: en, set, aload (optional — uncomment when polarity is enabled) -->

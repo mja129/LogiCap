@@ -166,7 +166,7 @@ type UUID = string
 // this key will kinda 
 type outputAnchorName = `out_${GateType}_${UUID}`
 type inputGateName = `${GateType}_${UUID}`
-type inputIdentifier = `in${number}` | `in` | `sel`
+type inputIdentifier = `in${number}` | `in` | `sel` | `clk`
 type inputAnchorName = `${inputIdentifier}_${GateType}_${UUID}`
 
 type ConnectionTuple = [inputGateName, inputAnchorName]
