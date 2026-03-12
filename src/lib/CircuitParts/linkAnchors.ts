@@ -11,7 +11,7 @@ export function findAnchorTargetClassName(targetClassList: string[]): string | n
 
     // Check if any class name matches the patterns
     const matchingClass = [...targetClassList].find((className: string) =>
-        /^(in\d+|in_|out_|sel_)/.test(className)
+        /^(in\d+|in_|out_|sel_|clk_)/.test(className)
     );
 
     return matchingClass || null;
@@ -23,7 +23,7 @@ export function findAnchorTargetClassName(targetClassList: string[]): string | n
 function checkAnchorRelation(anchor1: string, anchor2: string): 'good_in_to_out' | 'good_out_to_in' | 'bad_dual_input' | 'bad_dual_output' | "bad" {
 
     const checkAnchor: Function = (anchor: string, anchorType: string) => anchor.startsWith(anchorType)
-    const checkInput: Function = (anchor: string) => checkAnchor(anchor, 'in') || checkAnchor(anchor, 'sel')
+    const checkInput: Function = (anchor: string) => checkAnchor(anchor, 'in') || checkAnchor(anchor, 'sel') || checkAnchor(anchor, 'clk')
     const checkOutput: Function = (anchor: string) => checkAnchor(anchor, 'out')
 
     const getTup = (anchor: string) => ({ isInput: checkInput(anchor), isOutput: checkOutput(anchor) })
@@ -47,7 +47,7 @@ function matchAnchors(sourceClass: string, destClass: string): { fromOutputId: s
 
     const fromOutputId = (sourcePort.startsWith('out') && sourceClass) || (destClass);
     // console.log("sourcePort.startsWith('in'): " + sourcePort.startsWith('in'));
-    const toInputId = sourcePort.startsWith('in') ? sourceClass : destClass;
+    const toInputId = (sourcePort.startsWith('in') || sourcePort.startsWith('sel') || sourcePort.startsWith('clk')) ? sourceClass : destClass;
     return { fromOutputId, toInputId };
 }
 
@@ -87,7 +87,7 @@ export function checkLink(
 
     if (validate.startsWith('bad')) return validate
 
-    const checkInput = (a: string) => a.startsWith('in')
+    const checkInput = (a: string) => a.startsWith('in') || a.startsWith('sel') || a.startsWith('clk')
     // destination cannot be a node that is already linked, but only if the destination is an ouput node.
     if (destAnchorLinked && checkInput(destClassName)) {
         // cannot connect to an input that is already linked

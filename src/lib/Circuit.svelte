@@ -1,6 +1,7 @@
 <script lang="ts" module>
     import { Node } from 'svelvet'
-    import { setContext, type Component } from 'svelte'
+    import { setContext, type Component, type Snippet } from 'svelte'
+    import NodeMenu from '@CircuitParts/NodeMenu.svelte'
     import {
         getComponent,
         type AllNodeProps,
@@ -25,6 +26,9 @@
     const nodeComponent = getComponent(gateType);
     let isSelected: Writable<boolean> = writable(false);
     setContext('selected', isSelected);
+
+    let menuContent = $state<Snippet | null>(null);
+    setContext('registerMenu', (snippet: Snippet) => { menuContent = snippet; });
 
     // obtain rotation from CircuitStore if available
     let rotation: Writable<number> = writable($CircuitStore.devices[nodeId].rotation || 0);
@@ -87,6 +91,12 @@ of the different components now I just need to do it here -->
         >
             <MyComponent {nodeId} {...nodeProps} />
         </div>
+
+        {#if $isSelected && menuContent}
+            <NodeMenu>
+                {@render menuContent()}
+            </NodeMenu>
+        {/if}
 
     </Node>
 {/snippet}
