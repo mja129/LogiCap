@@ -1,6 +1,6 @@
+
 <script lang="ts" module>
     import { get } from 'svelte/store'
-
     import { CircuitStore } from '@CircuitStore'
     import type { dualInputLogicTypes, logicGateTypes } from '@CircuitModel'
 
@@ -14,12 +14,12 @@
     import { onMount } from 'svelte'
     import { getViewbox, parseSvg } from '@Util/parseSvg'
 
-    type LogicGateAnchors = 'in1' | 'in2' | 'out'
-
-    const anchorOffsets: Record<LogicGateAnchors, [number, number]> = {
-        in1: [-7.5, 68.5],
-        in2: [-7.5, 7.5],
-        out: [100, 37.58],
+    // Use explicit pixel positions to avoid percentage-based drift.
+    const anchorPositions = {
+        in1: { x: -11, y: 11 },   
+        in2: { x: -11, y: 55 },   
+        // Pulling the output yellow dot left to meet the bubble
+        out: { x: 77, y: 33 }, 
     }
 
     const gateSVGs: Record<dualInputLogicTypes, string> = {
@@ -35,7 +35,7 @@
 <script lang="ts">
     let {
         width = 80,
-        height = 50,
+        height = 80,
         gateType = 'And',
         nodeId,
     }: {
@@ -45,14 +45,26 @@
         nodeId: string
     } = $props()
 
-    // make the svgFile that we linked into an actual svg on the page as opposed to an image with an 'src={circuitSvgImport}' attribute
     let gateSVGElement: SVGElement;
+
     onMount(() => {
         const parsedSvg = parseSvg(gateSVGs[gateType as dualInputLogicTypes])
-        gateSVGElement.setAttribute('viewBox', getViewbox(parsedSvg));
-        gateSVGElement.setAttribute('width', width.toString())
-        gateSVGElement.setAttribute('height', height.toString())
-        gateSVGElement.innerHTML = parsedSvg.innerHTML
+
+        // allow the SVG to draw outside its box to reach the -11px anchors
+        gateSVGElement.style.overflow = 'visible'
+
+        // setting viewBox to match width/height exactly (1:1 mapping). 
+        // This stops the browser from auto-scaling and distorting the gate.
+        gateSVGElement.setAttribute("viewBox", `0 0 ${width} ${height}`)
+        gateSVGElement.setAttribute("width", width.toString())
+        gateSVGElement.setAttribute("height", height.toString())
+
+        // Translate LEFT (-11) to meet the input anchors, not RIGHT
+        gateSVGElement.innerHTML = `
+            <g transform="translate(-11,0)">
+                ${parsedSvg.innerHTML}
+            </g>
+            `
     })
 </script>
 
@@ -63,22 +75,23 @@
     ioId="1"
     id={nodeId}
     side="west"
-    offset={anchorOffsets['in1']}
+    position={anchorPositions['in1']}
 />
+
 <SimulationNodeAnchor
     io="input"
     ioId="2"
     id={nodeId}
     side="west"
-    offset={anchorOffsets['in2']}
+    position={anchorPositions['in2']}
 />
+
 <SimulationNodeAnchor
     io="output"
     ioId=""
     id={nodeId}
-    connections={get(CircuitStore).connectors[
-        ('out_' + nodeId) as outputAnchorName
-    ]}
     side="east"
-    offset={anchorOffsets['out']}
+    position={anchorPositions['out']}
 />
+
+
