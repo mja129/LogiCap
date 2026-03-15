@@ -12,7 +12,7 @@
      * Anchor x: 77 (66 + 11) hits the next vertical grid dot line.
      * Anchor y: 33 (centered vertically on the wire grid).
      */
-    const anchorPosition = { x: 77, y: 33 };
+    const anchorPosition = { x: 91, y: 33 };
 </script>
 
 <script lang="ts">
@@ -45,9 +45,9 @@
 </script>
 
 <svg
-    width="77"
+    width="66"
     height="66"
-    viewBox="0 0 77 66"
+    viewBox="0 0 66 66"
     xmlns="http://www.w3.org/2000/svg"
     style="max-width:unset; overflow:visible; display: block;"
 >
@@ -64,7 +64,7 @@
     <line
         x1="66"
         y1="33"
-        x2="77"
+        x2="88"
         y2="33"
         stroke={buttonColor.stroke}
         stroke-width="4"

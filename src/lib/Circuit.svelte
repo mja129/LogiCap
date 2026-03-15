@@ -169,7 +169,7 @@ of the different components now I just need to do it here -->
         -->
         <div
             class:selected
-            style="transform:rotate({$rotation}deg)"
+            style="position: relative; width: max-content; height: max-content; transform:rotate({$rotation}deg); display: flex;"
             use:syncSelected={selected}
             use:captureSvelvetNode={node}
             onmousedown={onCustomDragStart} 
@@ -209,9 +209,13 @@ of the different components now I just need to do it here -->
         drop-shadow(-2px 2px lawngreen) drop-shadow(-2px -2px lawngreen);
     }
 
+
     /* Since nodes are now permenately set to locked, i need to change the cursor forcefully*/
     :global(.svelvet-node) {
         cursor: grab !important;
+        padding: 0 !important;      
+        border: none !important; 
+        background: none !important; 
     }
     
     /* Make it look like you are physically holding it when clicking */

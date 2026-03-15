@@ -64,7 +64,7 @@
 
 <div 
     class="custom-anchor-positioner" 
-    style="position:absolute; left: {leftVal}; top: {topVal};"
+    style="position:absolute; left: {leftVal}; top: {topVal}; width: 0px; height: 0px;"
 >
     <SvelvetAnchor
         let:linked
@@ -82,10 +82,18 @@
 </div>
 
 <style>
-    /* Forcing Svelvet's internal container to surrender its coordinates and respect MY math */
-    :global(.custom-anchor-positioner > div) {
+    /* 1. Target the injected Svelvet wrapper.
+      2. Pin it to the 0x0 origin of our positioner.
+      3. Shift it up and left by exactly half its own size (radius).
+      4. DO NOT touch width/height so it stays a perfect circle!
+    */
+    :global(.custom-anchor-positioner > *) {
+        position: absolute !important;
         top: 0 !important;
         left: 0 !important;
+        right: auto !important; 
+        bottom: auto !important; 
+        margin: 0 !important;
         transform: translate(-50%, -50%) !important; 
     }
 </style>
