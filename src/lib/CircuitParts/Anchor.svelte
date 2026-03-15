@@ -1,128 +1,91 @@
+
+<!-- I completely refactored this for the new wiring system, idk how good this is-->
 <script lang="ts" module>
     import { Anchor as SvelvetAnchor, type Direction } from 'svelvet'
     import CustomAnchor from './CustomAnchor.svelte'
-    import Wire from './Wire.svelte'
     import { getRunning } from '@CircuitEngine'
-    import { getContext, onDestroy, onMount } from 'svelte'
-    import { writable, type Writable } from 'svelte/store'
-    import { findOutputAnchor } from '@CircuitStore'
 
-    let anchorRendererQ: Writable<Array<string>> = writable([]);
-
+    // Calculates which way the wire should route out of the anchor
     function getDirection(offset: Direction, rotation: number) : Direction {
-        switch (offset) { // adjust for offset
-            case 'north':
-                rotation += 90;
-                break;
-            case 'east':
-                rotation += 180;
-                break;
-            case 'south':
-                rotation += 270;
-                break;
+        let rot = rotation;
+        switch (offset) {
+            case 'north': rot += 90; break;
+            case 'east': rot += 180; break;
+            case 'south': rot += 270; break;
         }
-        rotation %= 360; // ensure within bounds (0, 90, 180, 270)
-        switch (rotation) {
-            case 0:
-                return 'west' as Direction;
-            case 90:
-                return 'north' as Direction;
-            case 180:
-                return 'east' as Direction;
-            case 270:
-                return 'south' as Direction;
-            default:
-                // should not ever make it here
-                return 'west' as Direction;
+        rot %= 360; 
+        switch (rot) {
+            case 0: return 'west';
+            case 90: return 'north';
+            case 180: return 'east';
+            case 270: return 'south';
+            default: return 'west';
         }
     }
 </script>
 
 <script lang="ts">
+    import { getContext } from 'svelte'
+    import { writable, type Writable } from 'svelte/store'
+
     let {
         io,
         ioId,
         id,
-        connections,
-        side,
+        side = 'west',
         offset = [],
         usePixelOffset = false,
-        usePortName = false, //flag, that if true, would just use the ioId, (ex: sel rather than insel)
+        usePortName = false,
+        position 
     }: {
         io: 'input' | 'output'
         ioId: string
         id: string
-        connections?: any
-        side: Direction
+        side?: Direction
         offset?: [number, number] | []
         usePixelOffset?: boolean
         usePortName?: boolean
+        position?: { x: number; y: number}
     } = $props()
+
     const anchorId = usePortName ? `${ioId}_${id}` :
-        `${io === 'input' ? 'in' : 'out'}${ioId}_${id}`
+        `${io === 'input' ? 'in' : 'out'}${ioId}_${id}` 
 
-    const rotation: Writable<number> = getContext('rotation')
-    rotation.subscribe(() => {
-        let outputId = findOutputAnchor(anchorId);
-        if (outputId) { // if we have an output
-            anchorRendererQ.update((curr) => [...curr, outputId]);
-        }
-    });
+    // Grabbing the rotation from Circuit.svelte context safely
+    let rotationStore = getContext<Writable<number>>('rotation');
+    if (!rotationStore) {
+        rotationStore = writable(0); // Failsafe if not wrapped in Circuit.svelte
+    }
 
-    /*
-     * when a component's input anchors are rotated, the connection(s) to those input anchors are lost.
-     * to rerender those connections, we must rerender the component(s) outputting the connection(s).
-     * we use a list that stores the IDs of anchors that need to rerender themselves.
-     * anchors are subscribed to this list so that they know when to rerender.
-     */
-    let updateTrigger = $state(false)
-    let isProcessing = false
-    onMount(() => {
-        const unsubscriber = anchorRendererQ.subscribe((value) => {
-            if (value.includes(anchorId) && !isProcessing) {
-                isProcessing = true;
-                // so this timeout is basically black magic
-                setTimeout(() => {
-                    updateTrigger = !updateTrigger;
-                    anchorRendererQ.update(() => {
-                        return value.filter((signal) => signal !== anchorId)
-                    });
-                    isProcessing = false;
-                });
-            }
-        });
-        onDestroy(unsubscriber);
-    });
+    // Wrapper div math
+    const leftVal = position ? `${position.x}px` : (offset.length ? `${offset[0]}${usePixelOffset ? 'px' : '%'}` : '0px');
+    const topVal = position ? `${position.y}px` : (offset.length ? `${offset[1]}${usePixelOffset ? 'px' : '%'}` : '0px');
 </script>
 
-{#snippet anchor()}
-    <div
-        style={`position:absolute;left: ${offset[0]}${usePixelOffset ? "px" : "%"}; top: ${offset[1]}${usePixelOffset ? "px" : "%"};`}
+<div 
+    class="custom-anchor-positioner" 
+    style="position:absolute; left: {leftVal}; top: {topVal};"
+>
+    <SvelvetAnchor
+        let:linked
+        let:hovering
+        let:connecting
+        id={anchorId}
+        key={anchorId}
+        direction={getDirection(side, $rotationStore)}
+        output={io === 'output'}
+        input={io === 'input'}
+        locked={getRunning()}
     >
-        <SvelvetAnchor
-            let:linked
-            let:hovering
-            let:connecting
-            id={anchorId}
-            key={anchorId}
-            direction={getDirection(side, $rotation)}
-            output={(io === 'output' && true) || false}
-            input={(io === 'input' && true) || false}
-            locked={getRunning()}
-            {connections}
-        >
-            <CustomAnchor {io} {connecting} {linked} {anchorId} {hovering} />
-            <Wire initAncId={anchorId} slot="edge" />
-        </SvelvetAnchor>
-    </div>
-{/snippet}
+        <CustomAnchor {io} {connecting} {linked} {anchorId} {hovering} />
+    </SvelvetAnchor>
+</div>
 
-{#key $rotation}
-    {#if io === 'input'}
-        {@render anchor()}
-    {:else}
-        {#key updateTrigger} <!-- rerender when updateTrigger changes -->
-            {@render anchor()}
-        {/key}
-    {/if}
-{/key}
+<style>
+    /* Forcing Svelvet's internal container to surrender its coordinates and respect MY math */
+    :global(.custom-anchor-positioner > div) {
+        top: 0 !important;
+        left: 0 !important;
+        transform: translate(-50%, -50%) !important; 
+    }
+</style>

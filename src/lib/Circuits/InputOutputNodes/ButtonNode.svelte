@@ -5,25 +5,28 @@
     import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
 
-    const anchorOffset: [number, number] = [95, 40.4];
+    /**
+     * GRID MATH:
+     * Node starts at 0,0.
+     * Button is 66x66.
+     * Anchor x: 77 (66 + 11) hits the next vertical grid dot line.
+     * Anchor y: 33 (centered vertically on the wire grid).
+     */
+    const anchorPosition = { x: 77, y: 33 };
 </script>
 
 <script lang="ts">
     let {
-        width = 80,
-        height = 50,
         nodeId,
     }: {
-        width?: number
-        height?: number
         nodeId: string
     } = $props()
 
     let signalOn: boolean = $state(false);
 
     let buttonColor = $derived({
-        fill: getRunning() ? signalOn ? 'green' : 'red' : 'gray',
-        stroke: getRunning() ? signalOn ? 'var(--lime-green)' : 'var(--lime-red)' : 'lightgray',
+        fill: getRunning() ? (signalOn ? 'green' : 'red') : 'gray',
+        stroke: getRunning() ? (signalOn ? 'var(--lime-green)' : 'var(--lime-red)') : 'lightgray',
     })
 
     function toggleButton() {
@@ -33,67 +36,84 @@
         }
     }
 
-   const unsubscriber = CircuitEngine.subscribe((circuit) => {
-        // Turn off buttons on simulation stop
+    const unsubscriber = CircuitEngine.subscribe((circuit) => {
         if (circuit === null) {
             signalOn = false;
-            return;
         }
     });
     onDestroy(unsubscriber);
 </script>
 
 <svg
-    width="75"
-    height="60"
-    viewBox="-2 2 140 95"
+    width="77"
+    height="66"
+    viewBox="0 0 77 66"
     xmlns="http://www.w3.org/2000/svg"
+    style="max-width:unset; overflow:visible; display: block;"
 >
     <rect
         x="0"
         y="0"
-        width="100"
-        height="100"
+        width="66"
+        height="66"
         fill="black"
         stroke={buttonColor.stroke}
         stroke-width="2"
     />
+    
     <line
-        x1="100"
-        x2="190"
-        y1="50"
-        y2="50"
+        x1="66"
+        y1="33"
+        x2="77"
+        y2="33"
         stroke={buttonColor.stroke}
-        stroke-width="8"
+        stroke-width="4"
     />
 
-    <!-- Circle -->
-    <circle class="button-circle"
-        onclick={toggleButton}
+    <circle 
+        class="button-circle"
+        onmousedown={(e) => {
+            e.stopPropagation();
+            console.log("Mouse down on button SVG");
+            toggleButton();
+        }}
         role="presentation"
-        cx="50"
-        cy="50"
-        r="30"
+        cx="33"
+        cy="33"
+        r="20"
         aria-label="input button node toggle"
         fill={buttonColor.fill}
         stroke={buttonColor.stroke}
-        stroke-width="7"
+        stroke-width="4"
     />
 </svg>
 
+<!-- We no longer need a connections prop for our node anchors, since that's handle @ compile time -->
 <SimulationNodeAnchor
     io="output"
     ioId=""
     id={nodeId}
-    connections={get(CircuitStore).connectors[
-        ('out_' + nodeId) as outputAnchorName
-    ]}
+    
     side="east"
-    offset={anchorOffset}
+    position={anchorPosition}
 />
 
 <style>
-    :global(.running .button-circle:hover) {
+    /* Inherited from Lamp fix to ensure zero-drift origin */
+    :global(.svelvet-node) {
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+    }
+
+    .button-circle {
+        transition: fill 0.1s ease;
+    }
+
+    /* Change cursor only when simulation is active */
+    :global(.svelvet-node .button-circle:hover) {
         cursor: pointer;
     }
 </style>

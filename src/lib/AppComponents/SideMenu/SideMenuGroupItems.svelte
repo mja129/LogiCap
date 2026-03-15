@@ -88,6 +88,7 @@
         }
     }
 
+    // This handles the drop logic
     function handleGlobalClick(event: MouseEvent): void {
         event.stopPropagation()
         if (draggingItem && ghostElement) {

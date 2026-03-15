@@ -156,11 +156,12 @@ type WireType = string
 type SvelvetConnectors = Record<outputAnchorName, ConnectionList>
 type GridPoint = { gx: number; gy: number }
 type WireSegment = { id: string; from: GridPoint; to: GridPoint }
+
+// rip wireManipulations
 type Circuit = {
     devices: Devices
     connectors: SvelvetConnectors
     subcircuits: string[]
-    wireManipulations: Record<string, WireType>
     wireSegments: WireSegment[]
 }
 

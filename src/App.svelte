@@ -455,7 +455,7 @@
             editable={false}
             disableSelection={false}
             pannable={$wireMode == 0}
-            controls
+            controls 
         >
             <ZoomThing></ZoomThing>
             <Minimap width={100} corner="NE" slot="minimap" />

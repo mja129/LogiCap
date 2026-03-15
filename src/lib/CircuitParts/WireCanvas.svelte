@@ -30,6 +30,7 @@
 
     // Dots are offset by half a grid square
     const HALF = GRID_SIZE / 2;
+    //const HALF = 0;
 
     // Svelvet's transform-origin is 50% 50% (browser default), so translate values are
     // center-relative. Add the center offset to convert to top-left-relative screen coords.
@@ -42,7 +43,7 @@
         const ct = get(canvasTransform);
         const effTx = ct.x + rect.width  * (1 - ct.scale) / 2;
         const effTy = ct.y + rect.height * (1 - ct.scale) / 2;
-        return {
+        return{ 
             x: (clientX - rect.left - effTx) / ct.scale,
             y: (clientY - rect.top  - effTy) / ct.scale,
         };
