@@ -8,7 +8,7 @@ export type PortGridMap = Record<string, { type: 'input' | 'output', anchorId: s
 
 const ptKey = (gx: number, gy: number) => `${gx},${gy}`;
 
-// Add this helper near the top, below your types
+// Helper function, does what it says on the tin
 function isPointOnSegment(p: GridPoint, seg: WireSegment): boolean {
     // Find bounds regardless of which direction the wire was drawn
     const minX = Math.min(seg.from.gx, seg.to.gx);
@@ -25,13 +25,13 @@ function isPointOnSegment(p: GridPoint, seg: WireSegment): boolean {
         return p.gx === seg.from.gx && p.gy >= minY && p.gy <= maxY;
     }
     
-    // Diagonal failsafe (if you ever add non-orthogonal routing)
+    // Diagonal failsafe (for non-orthogonal routing)
     const crossProduct = (p.gy - seg.from.gy) * (seg.to.gx - seg.from.gx) - (p.gx - seg.from.gx) * (seg.to.gy - seg.from.gy);
     if (crossProduct !== 0) return false;
     return p.gx >= minX && p.gx <= maxX && p.gy >= minY && p.gy <= maxY;
 }
 
-// Keep your getPointsOnSegment helper! We still need it to find the ports at the end.
+// Need this to find the ports at the end.
 function getPointsOnSegment(seg: WireSegment): string[] {
     const points: string[] = [];
     const dx = Math.sign(seg.to.gx - seg.from.gx);
@@ -51,16 +51,16 @@ function getPointsOnSegment(seg: WireSegment): string[] {
     return points;
 }
 
-// The Brand New BFS!
+// BFS
 export function extractNets(segments: WireSegment[]): Set<string>[] {
-    // 1. Graph nodes are now Segments (using their index in the array)
+    // Graph nodes are now Segments (using their index in the array)
     const adjList = new Map<number, number[]>();
 
     for (let i = 0; i < segments.length; i++) {
         adjList.set(i, []);
     }
 
-    // 2. Build edges ONLY if an endpoint touches another segment (T-Junctions & Corners)
+    // Build edges ONLY if an endpoint touches another segment (T-Junctions & Corners)
     for (let i = 0; i < segments.length; i++) {
         for (let j = i + 1; j < segments.length; j++) {
             const segA = segments[i];
@@ -81,7 +81,7 @@ export function extractNets(segments: WireSegment[]): Set<string>[] {
     const visited = new Set<number>();
     const nets: Set<string>[] = [];
 
-    // 3. BFS to group the Segments into Nets
+    // BFS to group the Segments into Nets
     for (let i = 0; i < segments.length; i++) {
         if (!visited.has(i)) {
             const queue = [i];
@@ -161,6 +161,9 @@ export function compileCircuitConnections(
         console.log(`  Net ${index}:`, Array.from(net));
     });
 
+
+    // The time complexity of this is diabolical.
+    // This will need some optimization
     nets.forEach(net => {
         const netOutputs: string[] = [];
         const netInputs: string[] = [];
