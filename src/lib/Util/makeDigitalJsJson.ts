@@ -118,7 +118,7 @@ function makeMux(
     }
 }
 
-//Primary Encoder
+//Priority Encoder
 function makeEncoder(
     nodeName: string,
     options?: { selbits?:number, position?: { x: number; y: number }, rotation?: number }
@@ -133,12 +133,8 @@ function makeEncoder(
         4: ENCODER_16_4
     }
 
-
-    // console.log("CoderTypeVar: ",encoderType)
     circuitSave.createSubcomponent(encoderType);
     circuitSave.setCircuit(encoderType, encoderMap[selbits]);
-    // console.log("Encoder circuit set:", circuitSave.getCircuit("Encoder"));
-    // console.log("selbits:", selbits);
 
     return {
         type: 'Subcircuit',

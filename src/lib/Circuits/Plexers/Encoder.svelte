@@ -2,18 +2,6 @@
     import { get } from 'svelte/store'
     import { CircuitStore } from '@CircuitStore'
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
-
-    const anchorDiameter = 15;
-    const anchorPadding = 5;
-    // Constant offsets for the anchors
-    // type MuxAnchors = 'in1' | 'in2' | 'out'
-
-    // const anchorOffsets: Record<MuxAnchors, [number, number]> = {
-    //     in0: [-6.5, 10],
-    //     in1: [-6.5, 60],
-    //     sel: [24.5, 95],
-    //     out: [53.75,35],
-    // }
 </script>
 
 <script lang="ts">
@@ -29,10 +17,8 @@
 
     //calculate size, alignment from number of inputs/outputs
     const width = 55;
-    const height = 40 + (22.5 * inputs);
-    // const height = ((anchorDiameter + anchorPadding) * Math.max(inputs, outputs)) + anchorPadding;
-    // const inputOffset = ((height - ((anchorDiameter + anchorPadding) * inputs) + anchorPadding) / 2.0) + 1;
-    // const outputOffset = ((height - ((anchorDiameter + anchorPadding) * outputs) + anchorPadding) / 2.0) + 1;
+    const height = 40 + (23 * inputs);
+    const outputOffset = height / outputs;
 
 </script>
 
@@ -89,8 +75,8 @@
     </text>
 </svg>
 
-<!-- Dynamically size something based on something idk comment here awesome!! -->
- <!-- Inputs Nodes -->
+<!-- Dynamically add/offset inputs and outputs depending on selbits, similar to subcomp -->
+<!-- Inputs Nodes -->
 {#each { length: inputs } as _, index}
     <SimulationNodeAnchor
         io="input"
@@ -112,8 +98,7 @@
             (`out${index+1}_` + nodeId) as outputAnchorName
         ]}
         side="east"
-        offset={[50, 13 + (40 * index)]}
+        offset={[50, 13 + outputOffset * index]}
         usePixelOffset={true}
     />
 {/each}
-

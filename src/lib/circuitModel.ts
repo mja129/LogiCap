@@ -13,8 +13,11 @@ import nandIcon from '@icons/circuits/Nand.webp'
 import notIcon from '@icons/circuits/Not.webp'
 import outputIcon from '@icons/circuits/outputIcon.png'
 import inputIcon from '@icons/circuits/inputIcon.png'
+import tunnelInputIcon from '@icons/circuits/TunnelIn.png'
+import tunnelOutputIcon from '@icons/circuits/TunnelOut.png'
 import clockIcon from '@icons/circuits/Clock.png'
 import muxIcon from '@icons/circuits/Mux.png'
+import encIcon from '@icons/circuits/Pri.png'
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
 import SingleIoLogic from '@Circuits/LogicGates/SingleIoLogic.svelte'
@@ -110,15 +113,15 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         svg: undefined,
         groupElements: [
             // TODO give these their own icons
-            { name: 'Tunnel Input', nodeType: 'TunnelInput', icon: outputIcon },
-            { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: outputIcon },
+            { name: 'Tunnel Input', nodeType: 'TunnelInput', icon: tunnelInputIcon },
+            { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: tunnelOutputIcon },
         ],
     },
     'Plexers' : {
         svg: undefined,
         groupElements: [
             { name: 'Mux', nodeType: 'Mux', icon: muxIcon },
-            { name: 'Encoder', nodeType: 'Encoder', icon: inputIcon },
+            { name: 'Encoder', nodeType: 'Encoder', icon: encIcon },
         ],
     },
     'Subcomponents': {

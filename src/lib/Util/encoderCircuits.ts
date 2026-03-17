@@ -1,5 +1,7 @@
 import type { SingleSaveDataFormat } from '../circuitSave'
 
+// Hard-coded Priority Encoder circuits
+
 // 2 to 1 Encoder
 export const ENCODER_2_1: SingleSaveDataFormat = {
     circuit: {
