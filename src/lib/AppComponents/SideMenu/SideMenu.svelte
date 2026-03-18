@@ -157,6 +157,7 @@
             <li
                 id="menu_group_{index}"
                 style={getAnimationStyle(showSubMenu, index)}
+                class={key === 'Subcomponents' ? 'scrollable' : ''}
             >
                 <!-- Use a more descriptive clickable element -->
                 <div class="menu_group_section">
@@ -283,6 +284,7 @@
     /* All list element decedents of .side_menu class */
     nav.side_menu li {
         justify-content: center;
+        overflow: hidden; /* prevent overflow from inflating scroll height */
     }
     /* Direct child image decendant of li*/
     /* The sketched line*/
@@ -354,6 +356,29 @@
     nav.side_menu ul > li:last-child img {
         /* padding-inline: 4px; */
         /* Lowkey weird the centering that the preforms, try toggling it.*/
+        display: none;
+    }
+
+    /* "Hacky" way to create a scrollbar within the Subcomponents group */
+    :global(li.scrollable .side_menu_group) {
+        overflow-y: auto;
+        -ms-overflow-style: auto;
+        max-height: 320px;
+    }
+    :global(li.scrollable .side_menu_group::-webkit-scrollbar) {
+        width: 10px
+    }
+    :global(li.scrollable .side_menu_group::-webkit-scrollbar-thumb) {
+        background-color: transparent
+    }
+    :global(li.scrollable .side_menu_group::-webkit-scrollbar-track) {
+        background-color: rgba(0, 0, 0, 0.06);
+    }
+    :global(li.scrollable .side_menu_group::-webkit-scrollbar-thumb:hover) {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+    /* Don't add extra space inside the ol */
+    :global(li.scrollable .side_menu_group:last-child::after) {
         display: none;
     }
 </style>
