@@ -241,10 +241,21 @@
         background-color: inherit;
     }
 
-    /*   Hide scrollbar but still scroll safari   */
+    /* Scrollbar */
     nav.side_menu::-webkit-scrollbar {
-        display: none;
+        width: 10px
     }
+    /* Scrollbar is invisible unless hovered over */
+    nav.side_menu::-webkit-scrollbar-thumb {
+    background-color: transparent
+    }
+    nav.side_menu::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.05);
+    }
+    nav.side_menu::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+    }
+    
     nav.side_menu {
         /* width: 30%; */
         flex: 0 0 22.5%;
@@ -263,10 +274,10 @@
         box-shadow: 0px 6px 0px 6px #000000;
         /* translate: height 5s; */
 
-        /* Hide scrollbar but still scroll crome+firefox   */
-        overflow: hidden;
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
+        /* Enable scrolling - Unsure if Firefox supported */
+        overflow-y: auto;
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+        -ms-overflow-style: auto; /* IE and Edge */
     }
 
     /* All list element decedents of .side_menu class */
