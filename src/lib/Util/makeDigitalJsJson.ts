@@ -2,7 +2,8 @@ import { circuitSave } from '@src/App.svelte'
 import type { SingleSaveDataFormat } from '../circuitSave'
 
 //Hardcoded Encoder Circuits
-import { encoderMap } from './encoderCircuits'
+import { encoderMap } from './Hardcoded Circuits/encoderCircuits'
+import { DEMUX } from './Hardcoded Circuits/demuxCircuit'
 
 // These functions should use eachother.
 //
@@ -114,6 +115,33 @@ function makeMux(
         }),
         ...(options?.rotation && {
             rotation: options.rotation
+        }),
+    }
+}
+
+//Demux (hardcoded)
+function makeDemux(
+    nodeName: string,
+    options?: { position?: { x: number; y: number }, rotation?: number }
+): Subcomponent {
+    //Inject hardcoded circuit
+    circuitSave.createSubcomponent('Demux');
+    circuitSave.setCircuit('Demux', DEMUX);
+
+    return {
+        type: 'Subcircuit',
+        label: nodeName,
+        inputs: 2,
+        outputs: 2,
+        celltype: 'Demux',
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
         }),
     }
 }
@@ -261,6 +289,7 @@ export const deviceJsonFactoryMap: Record<
     Repeater: (nodeName, options?) =>
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
     Mux: makeMux,
+    Demux: makeDemux,
     Encoder: makeEncoder,
     Subcircuit: (nodeName, options?) => 
         makeSubcomponentNode(nodeName, options.celltype as string, options.inputs as number, options.outputs as number, ...(options ? [options] : [])), 

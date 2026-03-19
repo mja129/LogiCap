@@ -1,4 +1,4 @@
-import type { SingleSaveDataFormat } from '../circuitSave'
+import type { SingleSaveDataFormat } from '../../circuitSave'
 
 // Hard-coded Priority Encoder circuits
 

@@ -206,6 +206,15 @@
                 celltype: `Encoder_${selbits}`
              } //also passes celltype so it's accessible in circuitStore.ts
             ) as Devices
+        } else if (gateType == 'Demux') {
+            //Create device
+            newDeviceList = CircuitStore.addCircuitDevice(
+              gateType,
+              uuid,
+              { 
+                celltype: 'Demux'
+             } //also passes celltype so it's accessible in circuitStore.ts
+            ) as Devices
         } else if (e.celltype) {
           try {
             newDeviceList = CircuitStore.addCircuitDevice(
@@ -233,6 +242,15 @@
         saveCircuitSave();
     }
     // fitView={true}
+
+    //Helper function to map a device to its display gate type
+    //Add a new if-statement for each hard-coded circuit
+    function getGateType(device: CircuitDevice): logicGateTypes {
+        const sub = device as Subcomponent;
+        if (sub.celltype?.startsWith('Encoder')) return 'Encoder';
+        if (sub.celltype?.startsWith('Demux')) return 'Demux';
+        return device.type as logicGateTypes;
+    }
 
     let setDevices = (d: Devices) => (currentDevicesData = d)
 
@@ -447,7 +465,7 @@
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
             <!-- For gateType, uses celltype to identify Encoder and use its own Svelte file -->
             <Circuit
-                gateType={((device as Subcomponent).celltype?.startsWith('Encoder') ? 'Encoder' : device.type) as logicGateTypes}
+                gateType={getGateType(device)}
                 position={device.position}
                 {nodeId}
                 nodeProps={{

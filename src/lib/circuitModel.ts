@@ -28,6 +28,7 @@ import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
 import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
 import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 import Mux from '@Circuits/Plexers/Multiplexer.svelte'
+import Demux from '@Circuits/Plexers/Demultiplexer.svelte'
 import Encoder from '@Circuits/Plexers/Encoder.svelte'
 
 // Types that represent the different groups
@@ -38,7 +39,7 @@ export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Tunnels' | 'Plexe
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
-export type plexerTypes = 'Mux' | 'Encoder'
+export type plexerTypes = 'Mux' | 'Demux' | 'Encoder'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
@@ -64,6 +65,7 @@ type SubcomponentProps = ComponentProps<typeof Subcomponent>
 type TunnelInputProps = ComponentProps<typeof TunnelInput>
 type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
+// type DemuxProps = ComponentProps<typeof Demux>
 type EncoderProps = ComponentProps<typeof Encoder>
 
 // needed in SimNode.svelte
@@ -81,6 +83,7 @@ export type AllNodePropsWithoutId =
     | Omit<TunnelInputProps, 'nodeId'>
     | Omit<TunnelOutputProps, 'nodeId'>
     | Omit<MuxProps, 'nodeId'>
+    // | Omit<DemuxProps, 'nodeId'>
     | Omit<EncoderProps, 'nodeId'>
 
 // add back in nodeId
@@ -112,7 +115,6 @@ export const menuJsonData: Writable<menuJsonType> = writable({
     'Tunnels': {
         svg: undefined,
         groupElements: [
-            // TODO give these their own icons
             { name: 'Tunnel Input', nodeType: 'TunnelInput', icon: tunnelInputIcon },
             { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: tunnelOutputIcon },
         ],
@@ -121,6 +123,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         svg: undefined,
         groupElements: [
             { name: 'Mux', nodeType: 'Mux', icon: muxIcon },
+            { name: 'Demux', nodeType: 'Demux', icon: muxIcon },
             { name: 'Encoder', nodeType: 'Encoder', icon: encIcon },
         ],
     },
@@ -162,6 +165,8 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return Lamp
         case 'Mux':
             return Mux
+        case 'Demux':
+            return Demux
         case 'Encoder':
             return Encoder
         case 'Subcircuit':
