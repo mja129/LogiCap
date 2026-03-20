@@ -10,6 +10,8 @@
                 'Input/Output': { ...old['Input/Output'] },
                 'Plexers' : { ...old['Plexers'] },
                 'Tunnels': { ...old['Tunnels'] },
+                'Sequential': { ...old['Sequential'] },
+                'Arithmetic': { ...old['Arithmetic'] },
                 'Subcomponents': {
                     svg: old.Subcomponents.svg,
                     groupElements: [

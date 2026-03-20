@@ -21,6 +21,10 @@ export let wireSignals = writable<Record<string, number>>({}); //Wire signal sto
 let currentTick = $state(0)
 export const getCurrTick = () => currentTick
 
+let tickRate = $state(10) // ms between ticks, lower = faster
+export const getTickRate = () => tickRate
+export const setTickRate = (ms: number) => { tickRate = ms }
+
 export let tickSignal: Writable<number> = writable(0); // Used to trigger updates in components that subscribe to tickSignal whenever the tick changes
 
 Object.defineProperty(CustomHeadlessCircuit.prototype, "running", {
@@ -39,7 +43,7 @@ Object.defineProperty(CustomHeadlessCircuit.prototype, "running", {
 /*
     Toggles running
 */
-export function toggleSimulation(tickRate: number) {
+export function toggleSimulation() {
 
     if (!running) {
         console.log("Simulation Started")
@@ -49,7 +53,7 @@ export function toggleSimulation(tickRate: number) {
             console.log(get(CircuitStore));
             CircuitEngine.set(new CustomHeadlessCircuit(get(CircuitStore)))
         }
-        start(tickRate)
+        start()
     }
     else {
         console.log("Simulation Stopped")
@@ -63,7 +67,7 @@ export function toggleSimulation(tickRate: number) {
 /*
     Basically how other non headless circuits run like in engines.mjs
 */
-function start(tickRate: number) {
+function start() {
     // you shouldn't ever run this function when running is false.
     if (running === false) {
         return;
@@ -76,7 +80,7 @@ function start(tickRate: number) {
     currEngine.updateGates()
     currentTick = currEngine.tick;
     tickSignal.set(currentTick);
-    setTimeout(() => start(tickRate), tickRate);
+    setTimeout(() => start(), tickRate);
 }
 
 export function resetCircuit() {

@@ -11,6 +11,8 @@
         updateTick,
         getRunning,
         getCurrTick,
+        getTickRate,
+        setTickRate,
     } from '@CircuitEngine'
 
     import UpdateGatesNextIcon from '~icons/streamline/button-fast-forward-2'
@@ -84,7 +86,13 @@
         event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
     ) {
         toggleRunningClass()
-        toggleSimulation(10)
+        toggleSimulation()
+    }
+
+    function onTickRateInput(event: Event) {
+        const input = event.currentTarget as HTMLInputElement
+        const ms = Math.max(1, parseInt(input.value) || 10)
+        setTickRate(ms)
     }
 
     function updateGatesNext(
@@ -192,6 +200,17 @@
             {getCurrTick()}
         </p>
     </button>
+    <div class="tickRateControl" title="Tick rate (ms per tick). Lower = faster.">
+        <label for="tickRateInput">ms</label>
+        <input
+            id="tickRateInput"
+            type="number"
+            min="1"
+            max="10000"
+            value={getTickRate()}
+            oninput={onTickRateInput}
+        />
+    </div>
 {/snippet}
 
 <div class="floatingMenu">
@@ -278,6 +297,23 @@
         font-size: 1.3rem;
         padding-inline: 5px;
         min-width: 60px;
+        margin-block: 4px;
+    }
+    .tickRateControl {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        margin-left: 6px;
+        font-size: 0.85rem;
+    }
+    .tickRateControl input {
+        width: 52px;
+        border: 3px solid black;
+        border-radius: 5px;
+        background-color: white;
+        text-align: right;
+        font-size: 1rem;
+        padding-inline: 3px;
         margin-block: 4px;
     }
     button {

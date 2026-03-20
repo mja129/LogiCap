@@ -18,6 +18,7 @@ import tunnelOutputIcon from '@icons/circuits/TunnelOut.png'
 import clockIcon from '@icons/circuits/Clock.png'
 import muxIcon from '@icons/circuits/Mux.png'
 import encIcon from '@icons/circuits/Pri.png'
+import dffIcon from '@icons/circuits/inputIcon.png'
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
 import SingleIoLogic from '@Circuits/LogicGates/SingleIoLogic.svelte'
@@ -29,11 +30,14 @@ import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
 import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 import Mux from '@Circuits/Plexers/Multiplexer.svelte'
 import Encoder from '@Circuits/Plexers/Encoder.svelte'
+import DffNode from '@Circuits/Sequential/DffNode.svelte'
+import AdderNode from '@Circuits/Arithmetic/AdderNode.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
 // or their grouping in the menu
-export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Tunnels' | 'Plexers' | 'Subcomponents' | 'GhostElement'
+
+export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Sequential' | 'Tunnels' | 'Plexers' | 'Subcomponents' | 'Arithmetic' | 'GhostElement'
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
@@ -42,7 +46,9 @@ export type plexerTypes = 'Mux' | 'Encoder'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
-export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit'
+export type sequentialTypes = 'Dff'
+export type arithmeticTypes = 'Addition'
+export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux' | 'Dff' | arithmeticTypes
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte
@@ -65,6 +71,8 @@ type TunnelInputProps = ComponentProps<typeof TunnelInput>
 type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
 type EncoderProps = ComponentProps<typeof Encoder>
+type DffNodeProps = ComponentProps<typeof DffNode>
+type AdderNodeProps = ComponentProps<typeof AdderNode>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -82,6 +90,8 @@ export type AllNodePropsWithoutId =
     | Omit<TunnelOutputProps, 'nodeId'>
     | Omit<MuxProps, 'nodeId'>
     | Omit<EncoderProps, 'nodeId'>
+    | Omit<DffNodeProps, 'nodeId'>
+    | Omit<AdderNodeProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -109,6 +119,12 @@ export const menuJsonData: Writable<menuJsonType> = writable({
             { name: 'Clock', nodeType: 'Clock', icon: clockIcon },
         ],
     },
+    'Sequential': {
+    svg: undefined,
+    groupElements: [
+        { name: 'D Flip-Flop', nodeType: 'Dff', icon: dffIcon },
+        ],
+    },
     'Tunnels': {
         svg: undefined,
         groupElements: [
@@ -122,6 +138,12 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         groupElements: [
             { name: 'Mux', nodeType: 'Mux', icon: muxIcon },
             { name: 'Encoder', nodeType: 'Encoder', icon: encIcon },
+        ],
+    },
+    'Arithmetic': {
+        svg: undefined,
+        groupElements: [
+            { name: 'Adder', nodeType: 'Addition', icon: inputIcon },
         ],
     },
     'Subcomponents': {
@@ -172,5 +194,9 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return TunnelOutput
         case 'Clock':
             return Clock
+        case 'Dff':
+            return DffNode
+        case 'Addition':
+            return AdderNode
     }
 }
