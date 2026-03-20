@@ -4005,6 +4005,13 @@ export const ENCODER_16_4: SingleSaveDataFormat = {
     translation: {x: 0, y: 0}
 }
 
+export const encoderMap: Record<string, SingleSaveDataFormat> = {
+    'Encoder_1': ENCODER_2_1,
+    'Encoder_2': ENCODER_4_2,
+    'Encoder_3': ENCODER_8_3,
+    'Encoder_4': ENCODER_16_4,
+}
+
 // export const SAMPLE: SingleSaveDataFormat = {
 //   circuit: {
 //       devices: {

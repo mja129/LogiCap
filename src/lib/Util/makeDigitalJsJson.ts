@@ -2,7 +2,7 @@ import { circuitSave } from '@src/App.svelte'
 import type { SingleSaveDataFormat } from '../circuitSave'
 
 //Hardcoded Encoder Circuits
-import { ENCODER_2_1, ENCODER_4_2, ENCODER_8_3, ENCODER_16_4 } from './encoderCircuits'
+import { encoderMap } from './encoderCircuits'
 
 // These functions should use eachother.
 //
@@ -126,15 +126,9 @@ function makeEncoder(
     //Inject hardcoded circuit based on selbits
     const selbits = options!.selbits
     const encoderType = options!.celltype
-    const encoderMap: Record<number, SingleSaveDataFormat> = {
-        1: ENCODER_2_1,
-        2: ENCODER_4_2,
-        3: ENCODER_8_3,
-        4: ENCODER_16_4
-    }
 
     circuitSave.createSubcomponent(encoderType);
-    circuitSave.setCircuit(encoderType, encoderMap[selbits]);
+    circuitSave.setCircuit(encoderType, encoderMap[encoderType]);
 
     return {
         type: 'Subcircuit',

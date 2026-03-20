@@ -1,5 +1,6 @@
 import { writable, get, type Writable } from 'svelte/store'
 import { deviceJsonFactoryMap } from './Util/makeDigitalJsJson'
+import { isSubUsedElsewhere } from '@Util/hardcodedUtils.ts'
 import { circuitSave, currentCircuit } from '@src/App.svelte'
 
 // Explains the json representation
@@ -141,6 +142,7 @@ const createCircuitStore = (): CircuitStoreType => {
                 // if this is the last of a subcircuit, remove it from subcircuits
                 if (currCircuit.devices[gateTypePlus_uuid].type === 'Subcircuit') {
                     const sub: Subcomponent = currCircuit.devices[gateTypePlus_uuid] as Subcomponent;
+                    const isEncoder = sub.celltype?.startsWith('Encoder_');
                     let found = false;
                     for (const deviceId in currCircuit.devices) {
                         if (deviceId === gateTypePlus_uuid) {
@@ -154,6 +156,10 @@ const createCircuitStore = (): CircuitStoreType => {
                     }
                     if (!found) {
                         currCircuit.subcircuits.splice(currCircuit.subcircuits.indexOf(sub.celltype), 1);
+                        // Remove encoder subcircuit from memory since not needed anymore
+                        if(isEncoder && !isSubUsedElsewhere(sub.celltype, get(currentCircuit), circuitSave)) {
+                            circuitSave.deleteSubcomponent(sub.celltype);
+                        }
                     }
                 }
 

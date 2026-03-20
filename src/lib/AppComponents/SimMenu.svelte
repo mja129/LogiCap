@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Component } from 'svelte'
+    import { get } from 'svelte/store'
 
     import {
         CircuitStore,
@@ -21,8 +22,9 @@
     import TrashIcon from '~icons/material-symbols/delete-outline'
     import ButtonNode from '../Circuits/InputOutputNodes/ButtonNode.svelte'
     import LoadIcon from '~icons/lucide/upload'
-    import { circuitSave, saveCircuitSave, setCurrentCircuit } from '@src/App.svelte'
+    import { circuitSave, currentCircuit, saveCircuitSave, setCurrentCircuit } from '@src/App.svelte'
     import { downloadJson, receiveJson } from '@Util/fileUtils.ts'
+    import { isSubUsedElsewhere } from '@Util/hardcodedUtils.ts'
 
     type Icon = { Component: Component<any>; width: number }
     type IconName = string
@@ -132,6 +134,19 @@
     }
 
     function onTrash() {
+        // Before clearing, remove an encoder subcircuits from memory that
+        // are only used by this canvas and won't be needed after clearing
+        const circuit = get(CircuitStore);
+        for (const deviceId in circuit.devices) {
+            const device = circuit.devices[deviceId];
+            if (device.type === 'Subcircuit') {
+                const celltype = (device as Subcomponent).celltype;
+                if (celltype?.startsWith('Encoder_') && !isSubUsedElsewhere(celltype, get(currentCircuit), circuitSave)) {
+                    circuitSave.deleteSubcomponent(celltype);
+                }
+            }
+        }
+
         CircuitStore.reset()
 
         // clears the currentDevicesData variable in app.svelte
