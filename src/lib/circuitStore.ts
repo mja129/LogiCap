@@ -8,22 +8,18 @@ import { circuitSave, currentCircuit } from '@src/App.svelte'
 
 interface CircuitStoreType extends Writable<Circuit> {
     reset(): void
-    addConnection(
-        fromAnchorId: outputAnchorName,
-        toAnchorId: inputAnchorName
-    ): void
-    removeConnection(inputAnchorId: string): void
     addCircuitDevice(gateType: string, uuid: string, options?: any, celltype?: string): Devices
     removeCircuitDevice(gateTypePlus_uuid:string) : Devices
 }
 
 // TODO put somewhere better?
+// gutting the wireManipulations -- its no longer need with the new wiring system
 export function createEmptyCircuit(): Circuit {
     return {
         devices: {},
         connectors: {},
         subcircuits: [],
-        wireManipulations: {},
+        wireSegments: [],
     };
 }
 
@@ -42,48 +38,10 @@ const createCircuitStore = (): CircuitStoreType => {
                     devices: {},
                     connectors: {},
                     subcircuits: [],
-                    wireManipulations: {},
+                    wireSegments: [],
                 }
             }),
-        addConnection: (fromId: outputAnchorName, toId: inputAnchorName) => {
-            const toNodeId: inputGateName = toId.substring(
-                toId.indexOf('_') + 1
-            ) as inputGateName
-            update((currCircuit) => {
-                if (!(fromId in currCircuit.connectors)) {
-                    currCircuit.connectors[fromId] = []
-                }
-                // I wanna check if the full array copy is needed here, I think it is tbh
-                currCircuit.connectors[fromId] = [
-                    ...currCircuit.connectors[fromId],
-                    [toNodeId, toId],
-                ]
-                console.log(currCircuit.connectors)
-                return currCircuit
-            })
-        },
-        removeConnection: (inputAnchorId: string) => {
-            update((currCircuit) => {
-                const newConnectors: SvelvetConnectors = {}
-                // O(N*M) where N is number of output anchors
-                // and M is the number of connections per output anchor
-                // this could be faster.
-                for (const fromAnchorId in currCircuit.connectors) {
-                    // Filter out any connections that match the `toAnchorId`
-                    // This logic would also remove duplicates, could be good or bad.
-                    newConnectors[fromAnchorId as outputAnchorName] = [
-                        ...currCircuit.connectors[
-                            fromAnchorId as outputAnchorName
-                        ].filter(([, anchorId]) => {
-                            return anchorId !== inputAnchorId
-                        }),
-                    ]
-                }
-                // console.log(newConnectors);
-                currCircuit.connectors = newConnectors
-                return currCircuit
-            })
-        },
+        
         addCircuitDevice: (gateType: string, uuid: string, options?: any) => {
             const nodeName: string = `${gateType}_${uuid}`
             let newDevices: Devices | null = null;
@@ -175,13 +133,6 @@ const createCircuitStore = (): CircuitStoreType => {
                     }
                 }
 
-                // remove unnecessary wire manipulations
-                for (const manipulationId in currCircuit.wireManipulations) {
-                    if (manipulationId.indexOf(gateTypePlus_uuid) != -1) {
-                        delete currCircuit.wireManipulations[manipulationId];
-                    }
-                }
-
                 // remove the device
                 delete currCircuit.devices[gateTypePlus_uuid];
                 newDevices = currCircuit.devices;
@@ -204,28 +155,6 @@ type NodeInfoList = {
     uuid: string
     position: { x: number; y: number }
 }[]
-
-// this function could be associated with the circuit store object
-export function findOutputAnchor(inputAnchorId: string) {
-    let outputAnchorId: outputAnchorName | undefined
-    // O(N*M) where N is number of output anchors
-    // and M is the number of connections per output anchor
-    // this could be faster.
-    for (const fromAnchorId in get(CircuitStore).connectors) {
-        // Filter out any connections that match the `toAnchorId`
-        // This logic would also remove duplicates, could be good or bad.
-        get(CircuitStore).connectors[
-            fromAnchorId as outputAnchorName
-        ].forEach(([inputNode, inputAnc]) => {
-            // console.log(inputAnc)
-            if (inputAnc === inputAnchorId) {
-                outputAnchorId = fromAnchorId as outputAnchorName
-            }
-        })
-    }
-    // console.log(outputAnchorTuple)
-    return outputAnchorId
-}
 
 // SAVE RELATED CODE //
 
@@ -315,8 +244,8 @@ function validateSavedCircuit(savedCircuit: any) {
     if (!savedCircuit?.devices || !savedCircuit?.connectors || !savedCircuit?.subcircuits) {
 		let missingProps = "";
 		if(!savedCircuit?.devices) missingProps += "[Devices]";
-		if(!savedCircuit?.devices) missingProps += "[Connectors]";
-		if(!savedCircuit?.devices) missingProps += "[Subciruits]";
+		if(!savedCircuit?.connectors) missingProps += "[Connectors]";
+		if(!savedCircuit?.subcircuits) missingProps += "[Subcircuits]";
 
 
       throw new Error('Parsed circuit object is missing required properties ' + missingProps);
@@ -332,6 +261,6 @@ export function loadCircuit(circuit: Circuit) {
         devices: circuit.devices,
         connectors: circuit.connectors,
         subcircuits: circuit.subcircuits,
-        wireManipulations: circuit.wireManipulations
+        wireSegments: circuit.wireSegments ?? [],
     });
 }

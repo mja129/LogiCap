@@ -50,6 +50,7 @@
     import SketchyLine_21 from '@assets/svg/sketchLineSvg/line_21.svg'
     import SketchyLine_29 from '@assets/svg/sketchLineSvg/line_29.svg'
     import { onMount } from 'svelte'
+    import { wireMode } from '@src/lib/wireModeStore'
 
     // function passed down from app.svelte that will run after circuit is dropped on the canvas
     // passed further down to the SideMenuGroupItems.svelte
@@ -155,7 +156,19 @@
             alt="sketched line bottom border for main app bar"
         />
     </div>
-    <ul>
+    <div class="wire_mode_section">
+        <button
+            class="wire_mode_btn"
+            class:active={$wireMode == 1}
+            onclick={() => wireMode.update(m => m != 1 ? 1 : 0)}
+            title={$wireMode == 1 ? 'Exit wire create mode' : 'Enter wire create mode'}
+        >
+            Create Wires
+        </button>
+    </div>
+    <ul
+        class:disable={$wireMode == 1}
+    >
         <!-- Use <li> for each menu item -->
         {#each menuEntries as [key, value], index (key)}
             <li
@@ -262,6 +275,7 @@
     }
     
     nav.side_menu {
+        z-index: 10;
         /* width: 30%; */
         flex: 0 0 22.5%;
         height: 100%;
@@ -384,5 +398,51 @@
     /* Don't add extra space inside the ol */
     :global(li.scrollable .side_menu_group:last-child::after) {
         display: none;
+    }
+
+    ul {
+        pointer-events: auto;
+    }
+    
+    ul.disable {
+        pointer-events: none;
+    }
+
+    .wire_mode_section {
+        padding: 8px 10px;
+    }
+
+
+    .wire_mode_btn {
+        width: 30%;
+        padding-block: 8px !important;
+        padding-left: 15px !important;
+        font-size: 2.5ex !important;
+        border: 2px solid black !important;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: left !important;
+    }
+
+    :global(.light .wire_mode_btn) {
+        background-color: var(--side-menu-bg);
+        color: black;
+    }
+
+    :global(.dark .wire_mode_btn) {
+        background-color: var(--side-menu-bg-dark);
+        color: white;
+    }
+
+    :global(.light .wire_mode_btn.active) {
+        background-color: #003594;
+        color: white;
+        border-color: #003594 !important;
+    }
+
+    :global(.dark .wire_mode_btn.active) {
+        background-color: var(--neon-purple);
+        color: white;
+        border-color: var(--neon-purple) !important;
     }
 </style>

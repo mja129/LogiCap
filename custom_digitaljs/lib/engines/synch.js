@@ -24,6 +24,7 @@ class SynchEngine extends _base.BaseEngine {
     this._alarms = new Map();
     this._alarmQueue = new Map();
     this._addGraph(graph);
+    this.ready_clocks = [];
   }
   get hasPendingEvents() {
     return this._queue.size > 0;
@@ -90,11 +91,12 @@ class SynchEngine extends _base.BaseEngine {
   }
   updateGatesNext() {
     const k = this._pq.poll() | 0;
-    console.assert(k >= this._tick);
     this._tick = k;
     const q = this._queue.get(k);
+    // Hack for clock delay
+    console.assert(this.ready_clocks.length || k >= this._tick);
     let count = 0;
-    while (q.size) {
+    while (q && q.size) {
       const [gate, args] = q.entries().next().value;
       q.delete(gate);
       if (gate instanceof this._cells.Subcircuit) continue;
@@ -105,19 +107,34 @@ class SynchEngine extends _base.BaseEngine {
       const newOutputSignals = gate.operation(args);
       if ('_clock_hack' in newOutputSignals) {
         delete newOutputSignals['_clock_hack'];
-        this._enqueue(gate);
+        // this._enqueue(gate);
+        this.ready_clocks.push({
+          out: newOutputSignals,
+          clock: gate
+        });
+      } else {
+        gate.set('outputSignals', newOutputSignals);
       }
-      gate.set('outputSignals', newOutputSignals);
       count++;
+    }
+    if (count == 0) {
+      this.updateClocks();
     }
     this._queue.delete(k);
     this._tick = k + 1 | 0;
     this._checkMonitors();
     this.trigger('postUpdateGates', k, count);
-    return Promise.resolve(count);
+    return count;
+  }
+  updateClocks() {
+    this.ready_clocks.forEach(clock => {
+      clock.clock.set('outputSignals', clock.out);
+      this._enqueue(clock.clock);
+    });
+    this.ready_clocks = [];
   }
   updateGates() {
-    if (this._pq.peek() == this._tick) return this.updateGatesNext();else {
+    if (this._pq.peek() == this._tick || this.ready_clocks.length > 0) return this.updateGatesNext();else {
       const k = this._tick | 0;
       this._tick = k + 1 | 0;
       this._checkMonitors();
