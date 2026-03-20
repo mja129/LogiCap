@@ -13,8 +13,11 @@ import nandIcon from '@icons/circuits/Nand.webp'
 import notIcon from '@icons/circuits/Not.webp'
 import outputIcon from '@icons/circuits/outputIcon.png'
 import inputIcon from '@icons/circuits/inputIcon.png'
+import tunnelInputIcon from '@icons/circuits/TunnelIn.png'
+import tunnelOutputIcon from '@icons/circuits/TunnelOut.png'
 import clockIcon from '@icons/circuits/Clock.png'
 import muxIcon from '@icons/circuits/Mux.png'
+import encIcon from '@icons/circuits/Pri.png'
 import dffIcon from '@icons/circuits/inputIcon.png'
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
@@ -25,19 +28,22 @@ import Subcomponent from '@Circuits/Subcomponent.svelte'
 import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
 import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
 import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
-import Mux from '@Circuits/Multiplexer.svelte'
+import Mux from '@Circuits/Plexers/Multiplexer.svelte'
+import Encoder from '@Circuits/Plexers/Encoder.svelte'
 import DffNode from '@Circuits/Sequential/DffNode.svelte'
 import AdderNode from '@Circuits/Arithmetic/AdderNode.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
 // or their grouping in the menu
-export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Sequential' | 'Tunnels' | 'Mux' | 'Subcomponents' | 'Arithmetic' | 'GhostElement'
+
+export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Sequential' | 'Tunnels' | 'Plexers' | 'Subcomponents' | 'Arithmetic' | 'GhostElement'
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
-export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes
+export type plexerTypes = 'Mux' | 'Encoder'
+export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
 export type sequentialTypes = 'Dff'
@@ -64,6 +70,7 @@ type SubcomponentProps = ComponentProps<typeof Subcomponent>
 type TunnelInputProps = ComponentProps<typeof TunnelInput>
 type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
+type EncoderProps = ComponentProps<typeof Encoder>
 type DffNodeProps = ComponentProps<typeof DffNode>
 type AdderNodeProps = ComponentProps<typeof AdderNode>
 
@@ -82,6 +89,7 @@ export type AllNodePropsWithoutId =
     | Omit<TunnelInputProps, 'nodeId'>
     | Omit<TunnelOutputProps, 'nodeId'>
     | Omit<MuxProps, 'nodeId'>
+    | Omit<EncoderProps, 'nodeId'>
     | Omit<DffNodeProps, 'nodeId'>
     | Omit<AdderNodeProps, 'nodeId'>
 
@@ -121,14 +129,15 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         svg: undefined,
         groupElements: [
             // TODO give these their own icons
-            { name: 'Tunnel Input', nodeType: 'TunnelInput', icon: outputIcon },
-            { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: outputIcon },
+            { name: 'Tunnel Input', nodeType: 'TunnelInput', icon: tunnelInputIcon },
+            { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: tunnelOutputIcon },
         ],
     },
-    'Mux' : {
+    'Plexers' : {
         svg: undefined,
         groupElements: [
             { name: 'Mux', nodeType: 'Mux', icon: muxIcon },
+            { name: 'Encoder', nodeType: 'Encoder', icon: encIcon },
         ],
     },
     'Arithmetic': {
@@ -175,6 +184,8 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return Lamp
         case 'Mux':
             return Mux
+        case 'Encoder':
+            return Encoder
         case 'Subcircuit':
             return Subcomponent
         case 'TunnelInput':

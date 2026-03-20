@@ -1,3 +1,9 @@
+import { circuitSave } from '@src/App.svelte'
+import type { SingleSaveDataFormat } from '../circuitSave'
+
+//Hardcoded Encoder Circuits
+import { encoderMap } from './encoderCircuits'
+
 // These functions should use eachother.
 //
 // export a function map from this function, then depending on the type, create this json in app.svelte
@@ -108,6 +114,36 @@ function makeMux(
         }),
         ...(options?.rotation && {
             rotation: options.rotation
+        }),
+    }
+}
+
+//Priority Encoder
+function makeEncoder(
+    nodeName: string,
+    options?: { selbits?:number, position?: { x: number; y: number }, rotation?: number }
+): Subcomponent {
+    //Inject hardcoded circuit based on selbits
+    const selbits = options!.selbits
+    const encoderType = options!.celltype
+
+    circuitSave.createSubcomponent(encoderType);
+    circuitSave.setCircuit(encoderType, encoderMap[encoderType]);
+
+    return {
+        type: 'Subcircuit',
+        label: nodeName,
+        inputs: 2 ** selbits, //2^bits
+        outputs: selbits + 1, //1 for valid bit
+        celltype: encoderType, //used to determine which Encoder_# to use so different types don't overwrite each other
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
         }),
     }
 }
@@ -284,6 +320,7 @@ export const deviceJsonFactoryMap: Record<
     Repeater: (nodeName, options?) =>
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
     Mux: makeMux,
+    Encoder: makeEncoder,
     Subcircuit: (nodeName, options?) => 
         makeSubcomponentNode(nodeName, options.celltype as string, options.inputs as number, options.outputs as number, ...(options ? [options] : [])), 
     TunnelInput: (nodeName, options?) =>

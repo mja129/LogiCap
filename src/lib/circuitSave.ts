@@ -2,6 +2,8 @@ import { createEmptyCircuit } from '@CircuitStore'
 import { get, type Readable, writable, type Writable } from 'svelte/store'
 import type { XYPair } from 'svelvet'
 
+import { encoderMap } from '@Util/encoderCircuits'
+
 type SaveDataFormat = {
     main_circuit: SingleSaveDataFormat & { display_name: string },
     subcircuits: { [key: string]: SingleSaveDataFormat },
@@ -39,6 +41,25 @@ function createEmptySingleSave() : SingleSaveDataFormat {
     }
 }
 
+/**
+ * Encoder subcircuits are stripped from the save format to reduce file size
+ * since they are hardcoded.
+ * This function reinjects them in saveData after loading
+ */
+function injectEncoders(saveData: SaveDataFormat) {
+    // Get all the circuits (including subcircuits)
+    const allCircuits = [saveData.main_circuit, ...Object.values(saveData.subcircuits)];
+    for (const circ of allCircuits) {
+        for (const encoderName of circ.circuit.subcircuits) {
+            // Check if it's an Encoder and the Encoder_# is not already injected
+            if (encoderName.startsWith('Encoder_') && !(encoderName in saveData.subcircuits)) {
+                // Inject it
+                saveData.subcircuits[encoderName] = encoderMap[encoderName];
+            }
+        }
+    }
+}
+
 function parseSaveData(data: string) : SaveDataFormat {
     let saveData: SaveDataFormat = JSON.parse(data);
     // handle missing entries
@@ -64,6 +85,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
     let saveData: SaveDataFormat;
     if (circuitSaveJson != null) {
         saveData = parseSaveData(circuitSaveJson);
+        injectEncoders(saveData); //reinject hardcoded encoders not in save
     } else {
         saveData = {
             main_circuit: {
@@ -204,10 +226,18 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
 
         setSaveJson(saveJson: string) {
             saveData = parseSaveData(saveJson);
+            injectEncoders(saveData); //reinject hardcoded encoders not in save
             subcomponents.set(Object.keys(saveData.subcircuits));
         },
         getSaveJson(): string {
-            return JSON.stringify(saveData);
+            // Filter out Encoders before serializing to reduce save file size
+            const stripped = {
+                ...saveData,
+                subcircuits: Object.fromEntries(
+                    Object.entries(saveData.subcircuits).filter(([key]) => !key.startsWith('Encoder_'))
+                )
+            };
+            return JSON.stringify(stripped);
         }
     }
 }
