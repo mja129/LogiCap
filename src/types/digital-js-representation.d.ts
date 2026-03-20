@@ -94,7 +94,45 @@ type Clock = {
     rotation?: number
 }
 
-type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux
+
+type Dff = {
+    type: 'Dff'
+    label: string
+    bits: number
+    polarity: {
+        clock?: boolean
+        arst?: boolean
+        srst?: boolean
+        aload?: boolean
+        set?: boolean
+        clr?: boolean
+        enable?: boolean
+    }
+    enable_srst?: boolean
+    initial?: string
+    arst_value?: string
+    srst_value?: string
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
+type Addition = {
+    type: 'Addition'
+    label: string
+    bits: {
+        in1: number
+        in2: number
+        out: number
+    }
+    signed?: {
+        in1?: boolean
+        in2?: boolean
+    }
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
+type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition
 type Devices = Record<string, Device>
 
 type IODevice = Button | Lamp | Clock
@@ -142,9 +180,10 @@ type GateType = string
 type UUID = string
 
 // this key will kinda 
-type outputAnchorName = `out_${GateType}_${UUID}`
+type outputAnchorPrefix = 'out' | 'cout'
+type outputAnchorName = `${outputAnchorPrefix}_${GateType}_${UUID}`
 type inputGateName = `${GateType}_${UUID}`
-type inputIdentifier = `in${number}` | `in` | `sel`
+type inputIdentifier = `in${number}` | `in` | `sel` | `clk` | `cin`
 type inputAnchorName = `${inputIdentifier}_${GateType}_${UUID}`
 
 type ConnectionTuple = [inputGateName, inputAnchorName]

@@ -202,6 +202,65 @@ function makeClock(
     }
 }
 
+// D Flip-Flop with all control ports enabled
+// All polarities default to true (active-high / rising-edge)
+function makeDff(
+    nodeName: string,
+    options?: {
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Dff {
+    return {
+        type: 'Dff',
+        label: options?.label || nodeName,
+        bits: 1,
+        polarity: {
+            clock: true,
+        },
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
+function makeAddition(
+    nodeName: string,
+    options?: {
+        bits?: { in1: number; in2: number; out: number }
+        signed?: { in1?: boolean; in2?: boolean }
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Addition {
+    return {
+        type: 'Addition',
+        label: nodeName,
+        bits: {
+            in1: options?.bits?.in1 || 8,
+            in2: options?.bits?.in2 || 8,
+            out: options?.bits?.out || 8,
+        },
+        ...(options?.signed && { signed: options.signed }),
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
 export const deviceJsonFactoryMap: Record<
     string,
     (nodeName: string, options?: any) => Device
@@ -233,6 +292,8 @@ export const deviceJsonFactoryMap: Record<
         makeTunnelOutput(nodeName, options.celltype as string, ...(options ? [options] : [])),
     Clock: (nodeName, options?) =>
         makeClock(nodeName, ...(options ? [options] : [])),
+    Dff: makeDff,
+    Addition: makeAddition,
 }
 
 // // Example usage
