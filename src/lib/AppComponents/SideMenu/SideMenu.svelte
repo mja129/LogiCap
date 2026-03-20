@@ -11,6 +11,7 @@
                 'Mux' : { ...old['Mux'] },
                 'Tunnels': { ...old['Tunnels'] },
                 'Sequential': { ...old['Sequential'] },
+                'Arithmetic': { ...old['Arithmetic'] },
                 'Subcomponents': {
                     svg: old.Subcomponents.svg,
                     groupElements: [

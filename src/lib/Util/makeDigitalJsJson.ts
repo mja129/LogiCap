@@ -231,6 +231,36 @@ function makeDff(
     }
 }
 
+function makeAddition(
+    nodeName: string,
+    options?: {
+        bits?: { in1: number; in2: number; out: number }
+        signed?: { in1?: boolean; in2?: boolean }
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Addition {
+    return {
+        type: 'Addition',
+        label: nodeName,
+        bits: {
+            in1: options?.bits?.in1 || 8,
+            in2: options?.bits?.in2 || 8,
+            out: options?.bits?.out || 8,
+        },
+        ...(options?.signed && { signed: options.signed }),
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
 export const deviceJsonFactoryMap: Record<
     string,
     (nodeName: string, options?: any) => Device
@@ -263,6 +293,7 @@ export const deviceJsonFactoryMap: Record<
     Clock: (nodeName, options?) =>
         makeClock(nodeName, ...(options ? [options] : [])),
     Dff: makeDff,
+    Addition: makeAddition,
 }
 
 // // Example usage

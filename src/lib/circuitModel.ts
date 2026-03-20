@@ -27,11 +27,12 @@ import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
 import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 import Mux from '@Circuits/Multiplexer.svelte'
 import DffNode from '@Circuits/Sequential/DffNode.svelte'
+import AdderNode from '@Circuits/Arithmetic/AdderNode.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
 // or their grouping in the menu
-export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Sequential' | 'Tunnels' | 'Mux' | 'Subcomponents' | 'GhostElement'
+export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Sequential' | 'Tunnels' | 'Mux' | 'Subcomponents' | 'Arithmetic' | 'GhostElement'
 
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
@@ -40,7 +41,8 @@ export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTy
 
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
 export type sequentialTypes = 'Dff'
-export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux'
+export type arithmeticTypes = 'Addition'
+export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux' | 'Dff' | arithmeticTypes
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte
@@ -63,6 +65,7 @@ type TunnelInputProps = ComponentProps<typeof TunnelInput>
 type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
 type DffNodeProps = ComponentProps<typeof DffNode>
+type AdderNodeProps = ComponentProps<typeof AdderNode>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -80,6 +83,7 @@ export type AllNodePropsWithoutId =
     | Omit<TunnelOutputProps, 'nodeId'>
     | Omit<MuxProps, 'nodeId'>
     | Omit<DffNodeProps, 'nodeId'>
+    | Omit<AdderNodeProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -125,6 +129,12 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         svg: undefined,
         groupElements: [
             { name: 'Mux', nodeType: 'Mux', icon: muxIcon },
+        ],
+    },
+    'Arithmetic': {
+        svg: undefined,
+        groupElements: [
+            { name: 'Adder', nodeType: 'Addition', icon: inputIcon },
         ],
     },
     'Subcomponents': {
@@ -175,5 +185,7 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return Clock
         case 'Dff':
             return DffNode
+        case 'Addition':
+            return AdderNode
     }
 }
