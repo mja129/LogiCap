@@ -2,7 +2,7 @@ import { createEmptyCircuit } from '@CircuitStore'
 import { get, type Readable, writable, type Writable } from 'svelte/store'
 import type { XYPair } from 'svelvet'
 
-import { encoderMap } from '@Util/encoderCircuits'
+import { encoderMap } from '@Util/Hardcoded Circuits/encoderCircuits'
 
 type SaveDataFormat = {
     main_circuit: SingleSaveDataFormat & { display_name: string },
