@@ -142,7 +142,7 @@ const createCircuitStore = (): CircuitStoreType => {
                 // if this is the last of a subcircuit, remove it from subcircuits
                 if (currCircuit.devices[gateTypePlus_uuid].type === 'Subcircuit') {
                     const sub: Subcomponent = currCircuit.devices[gateTypePlus_uuid] as Subcomponent;
-                    const isEncoder = sub.celltype?.startsWith('Encoder_');
+                    const isHardcoded = sub.celltype?.startsWith('Encoder_') || sub.celltype === 'Demux';
                     let found = false;
                     for (const deviceId in currCircuit.devices) {
                         if (deviceId === gateTypePlus_uuid) {
@@ -156,8 +156,8 @@ const createCircuitStore = (): CircuitStoreType => {
                     }
                     if (!found) {
                         currCircuit.subcircuits.splice(currCircuit.subcircuits.indexOf(sub.celltype), 1);
-                        // Remove encoder subcircuit from memory since not needed anymore
-                        if(isEncoder && !isSubUsedElsewhere(sub.celltype, get(currentCircuit), circuitSave)) {
+                        // Remove hardcoded subcircuit from memory since not needed anymore
+                        if(isHardcoded && !isSubUsedElsewhere(sub.celltype, get(currentCircuit), circuitSave)) {
                             circuitSave.deleteSubcomponent(sub.celltype);
                         }
                     }

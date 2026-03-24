@@ -213,7 +213,7 @@
               uuid,
               { 
                 celltype: 'Demux'
-             } //also passes celltype so it's accessible in circuitStore.ts
+             }
             ) as Devices
         } else if (e.celltype) {
           try {

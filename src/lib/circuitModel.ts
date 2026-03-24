@@ -65,7 +65,7 @@ type SubcomponentProps = ComponentProps<typeof Subcomponent>
 type TunnelInputProps = ComponentProps<typeof TunnelInput>
 type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
-// type DemuxProps = ComponentProps<typeof Demux>
+type DemuxProps = ComponentProps<typeof Demux>
 type EncoderProps = ComponentProps<typeof Encoder>
 
 // needed in SimNode.svelte
@@ -83,7 +83,7 @@ export type AllNodePropsWithoutId =
     | Omit<TunnelInputProps, 'nodeId'>
     | Omit<TunnelOutputProps, 'nodeId'>
     | Omit<MuxProps, 'nodeId'>
-    // | Omit<DemuxProps, 'nodeId'>
+    | Omit<DemuxProps, 'nodeId'>
     | Omit<EncoderProps, 'nodeId'>
 
 // add back in nodeId

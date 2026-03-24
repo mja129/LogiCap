@@ -4,13 +4,13 @@
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
 
     // Constant offsets for the anchors
-    type MuxAnchors = 'in0' | 'in1' | 'out0' | 'out1'
+    type MuxAnchors = 'in0' | 'sel' | 'out0' | 'out1'
 
     const anchorOffsets: Record<MuxAnchors, [number, number]> = {
-        in0: [-6.5, 10],
-        in1: [-6.5, 60],
-        out0: [24.5, 95],
-        out1: [53.75,35],
+        in0: [-6.5, 35],
+        sel: [24.5, 95],
+        out0: [53.75, 10],
+        out1: [53.75, 60],
     }
 </script>
 
@@ -47,7 +47,7 @@
     />
     <!-- 0 Label -->
     <text
-        x="10"
+        x="37"
         y="19.5"
         text-anchor="start"
         dominant-baseline="middle"
@@ -58,7 +58,7 @@
     </text>
     <!-- 1 Label -->
     <text
-        x="10"
+        x="39"
         y="80"
         text-anchor="start"
         dominant-baseline="middle"
@@ -69,7 +69,7 @@
     </text>
 </svg>
 
-<!-- Anchor nodes: in0, in1, sel, out -->
+<!-- Anchor nodes: in0, sel, out0, out1 -->
 <SimulationNodeAnchor
     io="input"
     ioId="1"
@@ -83,7 +83,7 @@
     ioId="2"
     id={nodeId}
     side="west"
-    offset={anchorOffsets['in1']}
+    offset={anchorOffsets['sel']}
 />
 
 <SimulationNodeAnchor
