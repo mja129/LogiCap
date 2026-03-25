@@ -3,6 +3,7 @@ import type { SingleSaveDataFormat } from '../circuitSave'
 
 //Hardcoded Encoder Circuits
 import { encoderMap } from './Hardcoded Circuits/encoderCircuits'
+import { decoderMap } from './Hardcoded Circuits/decoderCircuits'
 import { DEMUX } from './Hardcoded Circuits/demuxCircuit'
 
 // These functions should use eachother.
@@ -176,6 +177,36 @@ function makeEncoder(
     }
 }
 
+//Decoder
+function makeDecoder(
+    nodeName: string,
+    options?: { selbits?:number, position?: { x: number; y: number }, rotation?: number }
+): Subcomponent {
+    //Inject hardcoded circuit based on selbits
+    const selbits = options!.selbits
+    const decoderType = options!.celltype
+
+    circuitSave.createSubcomponent(decoderType);
+    circuitSave.setCircuit(decoderType, decoderMap[decoderType]);
+
+    return {
+        type: 'Subcircuit',
+        label: nodeName,
+        inputs: selbits,
+        outputs: 2 ** selbits,
+        celltype: decoderType, //used to determine which Decoder_# to use so different types don't overwrite each other
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
+        }),
+    }
+}
+
 function makeSubcomponentNode(
     nodeName: string,
     celltype: string,
@@ -291,6 +322,7 @@ export const deviceJsonFactoryMap: Record<
     Mux: makeMux,
     Demux: makeDemux,
     Encoder: makeEncoder,
+    Decoder: makeDecoder,
     Subcircuit: (nodeName, options?) => 
         makeSubcomponentNode(nodeName, options.celltype as string, options.inputs as number, options.outputs as number, ...(options ? [options] : [])), 
     TunnelInput: (nodeName, options?) =>

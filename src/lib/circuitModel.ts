@@ -17,7 +17,9 @@ import tunnelInputIcon from '@icons/circuits/TunnelIn.png'
 import tunnelOutputIcon from '@icons/circuits/TunnelOut.png'
 import clockIcon from '@icons/circuits/Clock.png'
 import muxIcon from '@icons/circuits/Mux.png'
+import demuxIcon from '@icons/circuits/Demux.png'
 import encIcon from '@icons/circuits/Pri.png'
+import decIcon from '@icons/circuits/Dec.png'
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
 import SingleIoLogic from '@Circuits/LogicGates/SingleIoLogic.svelte'
@@ -30,6 +32,7 @@ import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 import Mux from '@Circuits/Plexers/Multiplexer.svelte'
 import Demux from '@Circuits/Plexers/Demultiplexer.svelte'
 import Encoder from '@Circuits/Plexers/Encoder.svelte'
+import Decoder from '@Circuits/Plexers/Decoder.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
@@ -39,7 +42,7 @@ export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Tunnels' | 'Plexe
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
-export type plexerTypes = 'Mux' | 'Demux' | 'Encoder'
+export type plexerTypes = 'Mux' | 'Demux' | 'Encoder' | 'Decoder'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
@@ -67,6 +70,7 @@ type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
 type DemuxProps = ComponentProps<typeof Demux>
 type EncoderProps = ComponentProps<typeof Encoder>
+type DecoderProps = ComponentProps<typeof Decoder>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -85,6 +89,7 @@ export type AllNodePropsWithoutId =
     | Omit<MuxProps, 'nodeId'>
     | Omit<DemuxProps, 'nodeId'>
     | Omit<EncoderProps, 'nodeId'>
+    | Omit<DecoderProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -123,8 +128,9 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         svg: undefined,
         groupElements: [
             { name: 'Mux', nodeType: 'Mux', icon: muxIcon },
-            { name: 'Demux', nodeType: 'Demux', icon: muxIcon },
+            { name: 'Demux', nodeType: 'Demux', icon: demuxIcon },
             { name: 'Encoder', nodeType: 'Encoder', icon: encIcon },
+            { name: 'Decoder', nodeType: 'Decoder', icon: decIcon }
         ],
     },
     'Subcomponents': {
@@ -169,6 +175,8 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return Demux
         case 'Encoder':
             return Encoder
+        case 'Decoder':
+            return Decoder
         case 'Subcircuit':
             return Subcomponent
         case 'TunnelInput':

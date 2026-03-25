@@ -187,6 +187,15 @@
                 celltype: tunnelName.toLowerCase(), // make tunnels case insensitive bc everything is capitalized in this font lol
               }
           ) as Devices
+        } else if (gateType == 'Demux') {
+            //Create device
+            newDeviceList = CircuitStore.addCircuitDevice(
+              gateType,
+              uuid,
+              { 
+                celltype: 'Demux'
+             }
+            ) as Devices
         } else if (gateType == 'Encoder') {
         // Get the amount of bits for the Encoder using a prompt()
             let selStr = prompt('Enter number of select bits (1, 2, 3, or 4):')
@@ -206,13 +215,23 @@
                 celltype: `Encoder_${selbits}`
              } //also passes celltype so it's accessible in circuitStore.ts
             ) as Devices
-        } else if (gateType == 'Demux') {
-            //Create device
+        } else if (gateType == 'Decoder') {
+        // Get the amount of bits for the Decoder using a prompt()
+            let selStr = prompt('Enter number of select bits (1, 2, 3, or 4):')
+            if(!selStr) return
+            let selbits = parseInt(selStr) //convert string to int
+            //Diagnostic
+            if(![1, 2, 3, 4].includes(selbits)) {
+                alert('Invalid number of data bits. Enter either 1, 2, 3, or 4.')
+                return
+            }
+            //Create device and pass bits in
             newDeviceList = CircuitStore.addCircuitDevice(
               gateType,
               uuid,
               { 
-                celltype: 'Demux'
+                selbits,
+                celltype: `Decoder_${selbits}`
              }
             ) as Devices
         } else if (e.celltype) {
@@ -247,8 +266,9 @@
     //Add a new if-statement for each hard-coded circuit
     function getGateType(device: CircuitDevice): logicGateTypes {
         const sub = device as Subcomponent;
-        if (sub.celltype?.startsWith('Encoder')) return 'Encoder';
         if (sub.celltype?.startsWith('Demux')) return 'Demux';
+        if (sub.celltype?.startsWith('Encoder')) return 'Encoder';
+        if (sub.celltype?.startsWith('Decoder')) return 'Decoder';
         return device.type as logicGateTypes;
     }
 
@@ -463,7 +483,7 @@
         <Minimap width={100} corner="NE" slot="minimap" />
         <ThemeToggle main="LogiCap" corner="NW" alt="LogiCap" slot="toggle" />
         {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
-            <!-- For gateType, uses celltype to identify Encoder and use its own Svelte file -->
+            <!-- For gateType, uses celltype to identify hardcoded circuit and use its own Svelte file -->
             <Circuit
                 gateType={getGateType(device)}
                 position={device.position}
