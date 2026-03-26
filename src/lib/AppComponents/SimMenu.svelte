@@ -141,7 +141,7 @@
             const device = circuit.devices[deviceId];
             if (device.type === 'Subcircuit') {
                 const celltype = (device as Subcomponent).celltype;
-                if ((celltype?.startsWith('Encoder_') || celltype === 'Demux') && !isSubUsedElsewhere(celltype, get(currentCircuit), circuitSave)) {
+                if ((celltype === 'Demux' || celltype?.startsWith('Encoder_') || celltype?.startsWith('Decoder_')) && !isSubUsedElsewhere(celltype, get(currentCircuit), circuitSave)) {
                     circuitSave.deleteSubcomponent(celltype);
                 }
             }

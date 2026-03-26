@@ -17,13 +17,13 @@
 
     //calculate size, alignment from number of inputs/outputs
     const width = 55;
-    const height = 40 + (23 * inputs);
-    const outputOffset = height / outputs;
+    const height = 40 + (23 * outputs);
+    const inputOffset = height / inputs;
 
 </script>
 
 
-<!-- SVG of the Encoder -->
+<!-- SVG of the Decoder -->
 <svg
     width={width}
     height={height}
@@ -42,7 +42,7 @@
 
     <!-- 0 Label -->
     <text
-        x="10"
+        x="40"
         y="19"
         text-anchor="start"
         dominant-baseline="middle"
@@ -51,18 +51,7 @@
     >
         0
     </text>
-    <!-- V-bit Label -->
-    <text
-        x="40"
-        y="19"
-        text-anchor="start"
-        dominant-baseline="middle"
-        font-size="150%"
-        fill="white"
-    >
-        V
-    </text>
-    <!-- Pri Label -->
+    <!-- Dec Label -->
     <text
         x=25%
         y=50%
@@ -71,7 +60,7 @@
         font-size="200%"
         fill="white"
     >
-        Pri
+        Dec
     </text>
 </svg>
 
@@ -83,7 +72,7 @@
         ioId={(index + 1).toString()}
         id={nodeId}
         side="west"
-        offset={[-7.5, 13 + (25 * index)]}
+        offset={[-7.5, 13 + inputOffset * index]}
         usePixelOffset={true}
     />
 {/each}
@@ -98,7 +87,7 @@
             (`out${index+1}_` + nodeId) as outputAnchorName
         ]}
         side="east"
-        offset={[50, 13 + outputOffset * index]}
+        offset={[50, 13 + (25 * index)]}
         usePixelOffset={true}
     />
 {/each}

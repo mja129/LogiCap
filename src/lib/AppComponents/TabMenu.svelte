@@ -7,7 +7,7 @@
     let currentTabs: string[] = $state([]);
     circuitSave.getSubcomponents().subscribe((subcomponents) => {
         currentTabs = [circuitSave.getMainCircuitName(), ...subcomponents.filter((s: string) => 
-        !s.startsWith('Encoder_') && s !== 'Demux')]; //exclude hard-coded circuits
+        s !== 'Demux' && !s.startsWith('Encoder_') && !s.startsWith('Decoder_'))]; //exclude hard-coded circuits
     });
     let currentTab: string = $state(''); // value will be set on subscribe
     currentCircuit.subscribe(currentCircuit => {

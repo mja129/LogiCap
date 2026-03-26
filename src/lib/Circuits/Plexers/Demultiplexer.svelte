@@ -4,9 +4,9 @@
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
 
     // Constant offsets for the anchors
-    type MuxAnchors = 'in0' | 'sel' | 'out0' | 'out1'
+    type DemuxAnchors = 'in0' | 'sel' | 'out0' | 'out1'
 
-    const anchorOffsets: Record<MuxAnchors, [number, number]> = {
+    const anchorOffsets: Record<DemuxAnchors, [number, number]> = {
         in0: [-6.5, 35],
         sel: [24.5, 95],
         out0: [53.75, 10],
@@ -22,7 +22,7 @@
     } = $props()
 </script>
 
-<!-- SVG of the Mux -->
+<!-- SVG of the Demux -->
 <svg
     width="75"
     height="80"

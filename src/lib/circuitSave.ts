@@ -3,6 +3,7 @@ import { get, type Readable, writable, type Writable } from 'svelte/store'
 import type { XYPair } from 'svelvet'
 
 import { encoderMap } from '@Util/Hardcoded Circuits/encoderCircuits'
+import { decoderMap } from '@Util/Hardcoded Circuits/decoderCircuits'
 import { DEMUX } from '@Util/Hardcoded Circuits/demuxCircuit'
 
 type SaveDataFormat = {
@@ -53,13 +54,13 @@ function injectHardcodedSubcircuits(saveData: SaveDataFormat) {
     for (const circ of allCircuits) {
         for (const subcircuitName of circ.circuit.subcircuits) {
             // Check if it's a hardcoded circuit and that it's not already injected
-            //Encoder check
-            if (subcircuitName.startsWith('Encoder_') && !(subcircuitName in saveData.subcircuits)) {
+            if((subcircuitName === 'Demux' && !(subcircuitName in saveData.subcircuits))) {
                 // Inject it
-                saveData.subcircuits[subcircuitName] = encoderMap[subcircuitName];
-            //Demux check
-            } else if((subcircuitName === 'Demux' && !(subcircuitName in saveData.subcircuits))) {
                 saveData.subcircuits['Demux'] = DEMUX
+            } else if (subcircuitName.startsWith('Encoder_') && !(subcircuitName in saveData.subcircuits)) {
+                saveData.subcircuits[subcircuitName] = encoderMap[subcircuitName];
+            } else if (subcircuitName.startsWith('Decoder_') && !(subcircuitName in saveData.subcircuits)) {
+                saveData.subcircuits[subcircuitName] = decoderMap[subcircuitName];
             }
         }
     }
@@ -240,7 +241,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
                 ...saveData,
                 subcircuits: Object.fromEntries(
                     Object.entries(saveData.subcircuits).filter(([key]) => 
-                        !key.startsWith('Encoder_') && key !== 'Demux')
+                        key !== 'Demux' && !key.startsWith('Encoder_') && !key.startsWith('Decoder_'))
                 )
             };
             return JSON.stringify(stripped);
