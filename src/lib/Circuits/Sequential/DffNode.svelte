@@ -3,28 +3,15 @@
     import { CircuitEngine, getRunning, tickSignal } from '@CircuitEngine'
     import { onDestroy } from 'svelte'
     import { get } from 'svelte/store'
-    import { CircuitStore } from '@CircuitStore'
 
-    // Left side: D, clk
-    const leftOffsets: Record<string, [number, number]> = {
-        in:  [-7, 25],
-        clk: [-7, 55],
+    // SVG is 88x66. Body: x=5, y=5, w=78, h=56.
+    // All anchor positions are at HALF + n*GRID_SIZE (11 + n*22) for grid alignment.
+    // y=11 → grid row 0, y=33 → grid row 1 (matches old clk grid row), y=99 → right edge
+    const anchorPositions = {
+        in:  { x: -11, y: 11 }, // D input, west upper
+        clk: { x: -11, y: 33 }, // Clock input, west center (grid row 1 — same as before)
+        out: { x: 99,  y: 33 }, // Q output, east center
     }
-    // Top: en, set, aload (optional — uncomment when polarity is enabled)
-    // const topOffsets: Record<string, [number, number]> = {
-    //     en:    [35, -7],
-    //     set:   [75, -7],
-    //     aload: [115, -7],
-    // }
-    // Bottom: arst, srst, clr, ain (optional — uncomment when polarity is enabled)
-    // const bottomOffsets: Record<string, [number, number]> = {
-    //     arst: [25, 127],
-    //     srst: [55, 127],
-    //     clr:  [85, 127],
-    //     ain:  [115, 127],
-    // }
-    // Right: Q
-    const outputOffset: [number, number] = [107, 40];
 </script>
 
 <script lang="ts">
@@ -41,7 +28,7 @@
         stroke: getRunning() ? outputOn ? 'var(--lime-green)' : 'var(--lime-red)' : 'lightgray',
     })
 
-    const tickUnsub = tickSignal.subscribe((tick) => {
+    const tickUnsub = tickSignal.subscribe((_tick) => {
         if (!getRunning()) {
             outputOn = false;
             return;
@@ -63,10 +50,6 @@
         }
     });
 
-    let connections = $derived(
-        get(CircuitStore).connectors[('out_' + nodeId) as outputAnchorName]
-    );
-
     onDestroy(() => {
         tickUnsub();
         engineUnsub();
@@ -74,76 +57,58 @@
 </script>
 
 <svg
-    width="100"
-    height="75"
-    viewBox="0 0 100 75"
+    width="88"
+    height="66"
+    viewBox="0 0 88 66"
     xmlns="http://www.w3.org/2000/svg"
+    style="overflow:visible;"
 >
     <!-- Component body -->
     <rect
         x="5" y="5"
-        width="90" height="65"
+        width="78" height="56"
         fill="black"
         stroke={dffColor.stroke}
         stroke-width="2"
         rx="3"
     />
 
+    <!-- D stub (left, upper) -->
+    <line x1="0" y1="11" x2="5" y2="11" stroke={dffColor.stroke} stroke-width="2"/>
+    <!-- clk stub (left, center) -->
+    <line x1="0" y1="33" x2="5" y2="33" stroke={dffColor.stroke} stroke-width="2"/>
+    <!-- Q stub (right) -->
+    <line x1="83" y1="33" x2="88" y2="33" stroke={dffColor.stroke} stroke-width="4"/>
+
     <!-- Title -->
-    <text x="50" y="20"
+    <text x="44" y="12"
         text-anchor="middle" fill={dffColor.stroke}
         font-size="12" font-weight="bold">DFF</text>
 
     <!-- D label -->
-    <text x="14" y="28" fill={dffColor.stroke}
+    <text x="14" y="14" fill={dffColor.stroke}
         font-size="10" dominant-baseline="middle">D</text>
 
-    <!-- clk label -->
-    <text x="20" y="58" fill={dffColor.stroke}
-        font-size="10" dominant-baseline="middle">clk</text>
-
-    <!-- Clock triangle -->
+    <!-- Clock triangle (centered on clk at y=33) -->
     <polygon
-        points="10,51 17,58 10,65"
+        points="5,26 12,33 5,40"
         fill="none"
         stroke={dffColor.stroke}
         stroke-width="1.5"
     />
 
-    <!-- Top port labels (optional — uncomment when polarity is enabled) -->
-    <!-- <text x="35" y="3" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">en</text>
-    <text x="75" y="3" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">set</text>
-    <text x="115" y="3" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">aload</text> -->
-
-    <!-- Bottom port labels (optional — uncomment when polarity is enabled) -->
-    <!-- <text x="25" y="119" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">arst</text>
-    <text x="55" y="119" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">srst</text>
-    <text x="85" y="119" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">clr</text>
-    <text x="115" y="119" fill={dffColor.stroke}
-        font-size="8" text-anchor="middle">ain</text> -->
+    <!-- clk label -->
+    <text x="20" y="33" fill={dffColor.stroke}
+        font-size="10" dominant-baseline="middle">clk</text>
 
     <!-- Q label -->
-    <text x="82" y="43"
+    <text x="74" y="33"
         text-anchor="end" fill={dffColor.stroke}
         font-size="10" dominant-baseline="middle">Q</text>
 
-    <!-- Output wire stub -->
-    <line
-        x1="95" x2="120"
-        y1="40" y2="40"
-        stroke={dffColor.stroke}
-        stroke-width="4"
-    />
-
     <!-- Output state indicator -->
     <circle
-        cx="80" cy="40" r="5"
+        cx="72" cy="33" r="5"
         fill={dffColor.fill}
         stroke={dffColor.stroke}
         stroke-width="1.5"
@@ -153,38 +118,19 @@
 <!-- D input -->
 <SimulationNodeAnchor
     io="input" ioId="" id={nodeId}
-    side="west" offset={leftOffsets['in']}
+    side="west" position={anchorPositions['in']}
 />
 <!-- clk input -->
 <SimulationNodeAnchor
     io="input" ioId="clk" id={nodeId}
-    side="west" offset={leftOffsets['clk']}
+    side="west" position={anchorPositions['clk']}
     usePortName={true}
 />
-
-<!-- Top anchors: en, set, aload (optional — uncomment when polarity is enabled) -->
-<!-- {#each Object.entries(topOffsets) as [port, offset]}
-    <SimulationNodeAnchor
-        io="input" ioId={port} id={nodeId}
-        side="north" offset={offset}
-        usePortName={true}
-    />
-{/each} -->
-
-<!-- Bottom anchors: arst, srst, clr, ain (optional — uncomment when polarity is enabled) -->
-<!-- {#each Object.entries(bottomOffsets) as [port, offset]}
-    <SimulationNodeAnchor
-        io="input" ioId={port} id={nodeId}
-        side="south" offset={offset}
-        usePortName={true}
-    />
-{/each} -->
 
 <!-- Q output -->
 <SimulationNodeAnchor
     io="output" ioId="" id={nodeId}
-    connections={connections}
-    side="east" offset={outputOffset}
+    side="east" position={anchorPositions['out']}
 />
 
 <style>
