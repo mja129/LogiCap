@@ -32,6 +32,7 @@ import Mux from '@Circuits/Plexers/Multiplexer.svelte'
 import Encoder from '@Circuits/Plexers/Encoder.svelte'
 import DffNode from '@Circuits/Sequential/DffNode.svelte'
 import AdderNode from '@Circuits/Arithmetic/AdderNode.svelte'
+import Display7Node from '@Circuits/InputOutputNodes/Display7Node.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
@@ -45,7 +46,7 @@ export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
 export type plexerTypes = 'Mux' | 'Encoder'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
-export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock'
+export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock' | 'Display7'
 export type sequentialTypes = 'Dff'
 export type arithmeticTypes = 'Addition'
 export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux' | 'Dff' | arithmeticTypes
@@ -73,6 +74,7 @@ type MuxProps = ComponentProps<typeof Mux>
 type EncoderProps = ComponentProps<typeof Encoder>
 type DffNodeProps = ComponentProps<typeof DffNode>
 type AdderNodeProps = ComponentProps<typeof AdderNode>
+type Display7NodeProps = ComponentProps<typeof Display7Node>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -92,6 +94,7 @@ export type AllNodePropsWithoutId =
     | Omit<EncoderProps, 'nodeId'>
     | Omit<DffNodeProps, 'nodeId'>
     | Omit<AdderNodeProps, 'nodeId'>
+    | Omit<Display7NodeProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -117,6 +120,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
             { name: 'Lamp', nodeType: 'Lamp', icon: outputIcon },
             { name: 'Button', nodeType: 'Button', icon: inputIcon },
             { name: 'Clock', nodeType: 'Clock', icon: clockIcon },
+            { name: '7-Segment Display', nodeType: 'Display7', icon: outputIcon },
         ],
     },
     'Sequential': {
@@ -198,5 +202,7 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return DffNode
         case 'Addition':
             return AdderNode
+        case 'Display7':
+            return Display7Node
     }
 }

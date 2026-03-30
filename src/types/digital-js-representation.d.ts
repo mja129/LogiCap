@@ -132,7 +132,15 @@ type Addition = {
     rotation?: number
 }
 
-type Device = Button | Lamp | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition
+type Display7 = {
+    type: 'Display7'
+    label: string
+    bits: 8
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
+type Device = Button | Lamp | Display7 | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition
 type Devices = Record<string, Device>
 
 type IODevice = Button | Lamp | Clock

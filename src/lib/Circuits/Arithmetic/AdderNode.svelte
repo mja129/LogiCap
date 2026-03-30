@@ -6,7 +6,7 @@
     const anchorPositions = {
         in1:  { x: -11, y: 11 }, // west, upper
         in2:  { x: -11, y: 55 }, // west, lower
-        out:  { x: 77,  y: 33 }, // east, center
+        out:  { x: 99,  y: 33 }, // east, center
         cout: { x: 33,  y: -11 }, // north
         cin:  { x: 33,  y: 77 },  // south
     }
@@ -21,9 +21,9 @@
 </script>
 
 <svg
-    width="66"
+    width="88"
     height="66"
-    viewBox="0 0 66 66"
+    viewBox="0 0 88 66"
     xmlns="http://www.w3.org/2000/svg"
     style="max-width:unset; overflow:visible;"
 >
@@ -36,12 +36,12 @@
     <!-- in2 stub (left, lower) -->
     <line x1="0" y1="55" x2="5" y2="55" stroke="lightgray" stroke-width="2"/>
     <!-- out stub (right) -->
-    <line x1="61" y1="33" x2="66" y2="33" stroke="lightgray" stroke-width="2"/>
+    <line x1="83" y1="33" x2="88" y2="33" stroke="lightgray" stroke-width="2"/>
 
     <!-- Body -->
     <rect
         x="5" y="5"
-        width="56" height="56"
+        width="78" height="56"
         fill="black"
         stroke="lightgray"
         stroke-width="2"
@@ -50,7 +50,7 @@
 
     <!-- + symbol -->
     <text
-        x="33" y="33"
+        x="44" y="33"
         text-anchor="middle"
         dominant-baseline="middle"
         font-size="26"

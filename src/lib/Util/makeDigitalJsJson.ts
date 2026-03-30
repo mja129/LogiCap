@@ -267,6 +267,30 @@ function makeDff(
     }
 }
 
+function makeDisplay7(
+    nodeName: string,
+    options?: {
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Display7 {
+    return {
+        type: 'Display7',
+        label: options?.label || nodeName,
+        bits: 8,
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
 function makeAddition(
     nodeName: string,
     options?: {
@@ -331,6 +355,7 @@ export const deviceJsonFactoryMap: Record<
         makeClock(nodeName, ...(options ? [options] : [])),
     Dff: makeDff,
     Addition: makeAddition,
+    Display7: makeDisplay7,
 }
 
 // // Example usage
