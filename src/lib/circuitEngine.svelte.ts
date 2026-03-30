@@ -25,7 +25,7 @@ export const getCurrTick = () => currentTick
 
 let tickRate = $state(1000) // ms between ticks, lower = faster
 export const getTickRate = () => tickRate
-export const setTickRate = (ms: number) => { tickRate = ms }
+export const setTickRate = (hz: number) => { tickRate = hz }
 
 export let tickSignal: Writable<number> = writable(0); // Used to trigger updates in components that subscribe to tickSignal whenever the tick changes
 
