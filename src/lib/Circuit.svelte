@@ -13,6 +13,7 @@
     import { getRunning } from '@CircuitEngine'
     import { GRID_SIZE } from './grid'
     import { canvasTransform } from '@src/App.svelte';
+    import { selectedNodeIds } from './wireModeStore';
 
     // TODO can this be further simplified
     interface SimNodeProps {
@@ -59,12 +60,31 @@
 
     let hasMoved = false;
 
+    // Sync $isSelected from the global selectedNodeIds store
+    $effect(() => {
+        $isSelected = $selectedNodeIds.has(nodeId);
+    });
+
     // This will call getRunning, so stuff still works.
     function onCustomDragStart(e: MouseEvent) {
         if (getRunning()) return;
-        
-        // Let the event propagate so Svelvet still selects the node, 
-        // but because we set locked={true} below, Svelvet won't drag it.
+
+        // Manage selection ourselves since locked={true} prevents Svelvet's nodeSelectLogic
+        selectedNodeIds.update(sel => {
+            const next = new Set(sel);
+            if (e.shiftKey) {
+                if (next.has(nodeId)) next.delete(nodeId);
+                else next.add(nodeId);
+            } else {
+                if (!next.has(nodeId)) {
+                    next.clear();
+                    next.add(nodeId);
+                }
+                // if already selected, keep multi-select as-is (for group drag)
+            }
+            return next;
+        });
+
         isDragging = true;
         hasMoved = false;
         dragStartMouse = { x: e.clientX, y: e.clientY };
@@ -124,14 +144,7 @@
     // used for executing actions on already selected nodes
     let wasSelected = false;
 
-    function syncSelected(node: HTMLElement, sel: boolean) {
-        $isSelected = sel;
-        return {
-            update(sel: boolean) {
-                $isSelected = sel;
-            }
-        };
-    }
+
 </script>
 
 <!-- I added this here because I kept changing the SvelvetNode properties in all
@@ -145,7 +158,6 @@ of the different components now I just need to do it here -->
         editable={false}
         locked={true} 
         id={nodeId}
-        let:selected
         let:node
         on:nodeClicked={(event) => {
             // track here whether node was selected, as it always will be by the time nodeReleased fires
@@ -172,11 +184,10 @@ of the different components now I just need to do it here -->
              is is improperly considered together with Direction, resulting in an incorrect connection angle
         -->
         <div
-            class:selected
+            class:selected={$isSelected}
             style="position: relative; width: max-content; height: max-content; transform:rotate({$rotation}deg); display: flex;"
-            use:syncSelected={selected}
             use:captureSvelvetNode={node}
-            onmousedown={onCustomDragStart} 
+            onmousedown={onCustomDragStart}
         >
             <MyComponent {nodeId} {...nodeProps} />
         </div>

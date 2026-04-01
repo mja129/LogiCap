@@ -83,7 +83,7 @@
     import ZoomThing from './lib/ZoomThing.svelte'
     import { setScale, setTranslation } from '@Util/graphUtils'
     import WireCanvas from './lib/CircuitParts/WireCanvas.svelte'
-    import { wireMode, selectedWireIds } from './lib/wireModeStore'
+    import { wireMode, selectedWireIds, selectedNodeIds } from './lib/wireModeStore'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
@@ -259,27 +259,15 @@
     let setDevices = (d: Devices) => (currentDevicesData = d)
 
     function deletedSelectedNodes(){
-        let domEls = Object.keys(currentDevicesData)
-            .map((x) => 'N-' + x)
-            .map((x) => document.getElementById(x))
-
-        let selected = domEls.filter((x) =>
-            x === null ? false : x.classList.contains('selected')
-        )
-        let not_selected = domEls.filter((x) =>
-            x === null ? false : !x.classList.contains('selected')
-        )
+        const selNodes = get(selectedNodeIds);
+        const ids_to_del = Object.keys(currentDevicesData).filter(id => selNodes.has(id));
 
         let newDeviceList = currentDevicesData
-
-        let ids_to_del = selected.map((x) =>
-            x === null ? '' : x.id.substring(2)
-        )
         ids_to_del.forEach((id) => {
             newDeviceList = CircuitStore.removeCircuitDevice(id)
-            // delete newDeviceList[id]
         })
         currentDevicesData = newDeviceList
+        selectedNodeIds.set(new Set())
 
         // Also delete any selected wire segments
         const selWires = get(selectedWireIds);
@@ -296,19 +284,11 @@
     }
 
     async function copySelectedNodes() {
-        let domEls = Object.keys(currentDevicesData)
-            .map((x) => 'N-' + x)
-            .map((x) => document.getElementById(x))
-
-        let selected = domEls.filter((x) =>
-            x === null ? false : x.classList.contains('selected')
-        )
-        if (selected.length === 0) { // nothing to copy
+        const selNodes = get(selectedNodeIds);
+        const ids_to_copy = Object.keys(currentDevicesData).filter(id => selNodes.has(id));
+        if (ids_to_copy.length === 0) { // nothing to copy
             return;
         }
-        let ids_to_copy = selected.map((x) =>
-            x === null ? '' : x.id.substring(2)
-        )
 
         // TODO redo this
         saveCircuitSave();
