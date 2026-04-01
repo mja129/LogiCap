@@ -321,6 +321,52 @@ function makeAddition(
     }
 }
 
+function makePower(
+    nodeName: string,
+    options?: {
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Power {
+    return {
+        type: 'Power',
+        label: options?.label || nodeName,
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
+function makeGround(
+    nodeName: string,
+    options?: {
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Ground {
+    return {
+        type: 'Ground',
+        label: options?.label || nodeName,
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
 export const deviceJsonFactoryMap: Record<
     string,
     (nodeName: string, options?: any) => Device
@@ -356,6 +402,8 @@ export const deviceJsonFactoryMap: Record<
     Dff: makeDff,
     Addition: makeAddition,
     Display7: makeDisplay7,
+    Power: makePower,
+    Ground: makeGround,
 }
 
 // // Example usage

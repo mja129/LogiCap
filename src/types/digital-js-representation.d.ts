@@ -140,7 +140,21 @@ type Display7 = {
     rotation?: number
 }
 
-type Device = Button | Lamp | Display7 | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition
+type Power = {
+    type: 'Power'
+    label: string
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
+type Ground = {
+    type: 'Ground'
+    label: string
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
+type Device = Button | Lamp | Display7 | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition | Power | Ground
 type Devices = Record<string, Device>
 
 type IODevice = Button | Lamp | Clock
