@@ -7,13 +7,11 @@
     import type { singleIoLogicTypes } from '@CircuitModel'
     import { CircuitStore } from '@CircuitStore'
     import { getViewbox, parseSvg } from '@Util/parseSvg'
-    import { onMount } from 'svelte'
-
-    type SingleLogicGateAnchors = 'in' | 'out'
-
-    const anchorOffsets: Record<SingleLogicGateAnchors, [number, number]> = {
-        in: [-15, 38.7],
-        out: [100, 38],
+    
+    // These shouldn't change -- the svg abides by these. 
+    const anchorPositions = {
+        in: { x: -11, y: 33 }, 
+        out: { x: 77, y: 33 }, 
     }
 
     const gateSVGs: Record<singleIoLogicTypes, string> = {
@@ -35,14 +33,25 @@
         nodeId: string
     } = $props()
 
-    // make the svgFile that we linked into an actual svg on the page as opposed to an image with an 'src={circuitSvgImport}' attribute
     let gateSVGElement: SVGElement;
-    onMount(() => {
+    
+    // Using $effect to match Svelte 5 runes, with a strict exit guard
+    $effect(() => {
+        if (!gateSVGElement) return;
+
         const parsedSvg = parseSvg(gateSVGs[gateType as singleIoLogicTypes])
-        gateSVGElement.setAttribute('viewBox', getViewbox(parsedSvg))
+        
+        // Exact mirror of the dual-gate fix
+        gateSVGElement.style.overflow = "visible";
+        gateSVGElement.setAttribute('viewBox', `0 0 ${width} ${height}`)
         gateSVGElement.setAttribute('width', width.toString())
         gateSVGElement.setAttribute('height', height.toString())
-        gateSVGElement.innerHTML = parsedSvg.innerHTML
+        
+        gateSVGElement.innerHTML = `
+            <g transform="translate(-11,0)">
+                ${parsedSvg.innerHTML}
+            </g>
+        `
     })
 </script>
 
@@ -53,15 +62,13 @@
     ioId=""
     id={nodeId}
     side="west"
-    offset={anchorOffsets['in']}
+    position={anchorPositions['in']}
 />
+
 <SimulationNodeAnchor
     io="output"
     ioId=""
     id={nodeId}
-    connections={get(CircuitStore).connectors[
-        ('out_' + nodeId) as outputAnchorName
-    ]}
     side="east"
-    offset={anchorOffsets['out']}
+    position={anchorPositions['out']}
 />

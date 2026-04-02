@@ -40,7 +40,8 @@
     import { settingsStore } from '@AppComponents/SettingsMenu.svelte'
     import { onDestroy, onMount } from 'svelte'
 
-    import { setLampState } from '@Circuits/InputOutputNodes/Lamp.svelte'
+    // import { setLampState } from '@Circuits/InputOutputNodes/Lamp.svelte'
+    import { wireSignals } from '@CircuitEngine'
     import type { Unsubscriber } from 'svelte/store'
 
     let {
@@ -161,11 +162,9 @@
     }
 
     function getMonitor(
-        digitalJsCircuit: CustomHeadlessCircuit,
-        setWireCallback: Function = (newSignal: number) =>
-            (wireActive = newSignal)
+    digitalJsCircuit: CustomHeadlessCircuit,
+    setWireCallback: Function = (newSignal: number) => (wireActive = newSignal)
     ) {
-        // console.log('Getting monitor')
         const currWire = findWireInEngine(digitalJsCircuit, wireId)
         if (currWire === null) return
 
@@ -173,32 +172,29 @@
             digitalJsCircuit.monitorWire(currWire, (tick: number) => {
                 const wireChange = onWireChange(currWire)
 
-                // wireActive = wireChange // side-effects
-                // external global function that sets this (not param), (like was here b4) is side-effects too
-                setWireCallback(wireChange) // No side-effects basically!
+                setWireCallback(wireChange)
 
-                // get stuff out of the target.
                 const {
                     id: connectedTo,
                     port: toPort,
                     magnet: _,
-                }: Record<
-                    'id' | 'port' | 'magnet',
-                    string | undefined
-                > = currWire.attributes?.target
+                }: Record<'id' | 'port' | 'magnet', string | undefined> = currWire.attributes?.target
 
                 if (!connectedTo || !toPort) return
 
                 setAnchor(toPort, connectedTo, wireChange)
 
-                const labelOutputTo =
-                    connectedTo &&
-                    digitalJsCircuit.getLabelIndex()['outputs'][connectedTo]
+                const labelOutputTo = connectedTo && digitalJsCircuit.getLabelIndex()['outputs'][connectedTo]
 
                 if (!labelOutputTo) return null
 
-                // TODO find a way to abstract this better
-                setLampState(connectedTo, wireChange);
+                // Writing the outputs to a global dictionary 
+                // Instead of calling a Lamp-specific function, we just update the store.
+                // Now the Lamp (and any future components) will instantly react
+                wireSignals.update(currentSignals => {
+                    currentSignals[connectedTo] = wireChange;
+                    return currentSignals;
+                });
             })
         return monitorFn
     }

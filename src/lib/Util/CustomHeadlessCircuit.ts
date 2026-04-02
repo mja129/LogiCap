@@ -40,9 +40,6 @@ function subcircuitParse(circuitJson: any): Subcircuit {
     if (device['type'] == 'Button') {
       device['type'] = 'Input'
       inputs.push(device)
-    } else if (device['type'] == 'Clock') {
-    device['type'] = 'Input'
-    inputs.push(device)
     } else if (device['type'] == 'Lamp') {
       device['type'] = 'Output'
       outputs.push(device)
@@ -135,12 +132,78 @@ function resolveTunnels(devices: Devices, connections: SvelvetConnectors) {
   return { devices, connections }
 }
 
+function resolveConstants(devices: Devices): void {
+    Object.keys(devices).forEach(key => {
+        if (devices[key].type === 'Power') {
+            (devices[key] as any).type = 'Constant';
+            (devices[key] as any).constant = '1';
+        } else if (devices[key].type === 'Ground') {
+            (devices[key] as any).type = 'Constant';
+            (devices[key] as any).constant = '0';
+        }
+    });
+}
+
+function buildAdderSubcircuit(bits: number): Subcircuit {
+    return {
+        devices: {
+            in1_port: { type: 'Input', bits, net: 'in1', order: 0 } as any,
+            in2_port: { type: 'Input', bits, net: 'in2', order: 1 } as any,
+            cin_port: { type: 'Input', bits: 1, net: 'cin', order: 2 } as any,
+            sum_port: { type: 'Output', bits, net: 'out', order: 0 } as any,
+            cout_port: { type: 'Output', bits: 1, net: 'cout', order: 1 } as any,
+            add1: { type: 'Addition', label: 'add1', bits: { in1: bits, in2: bits, out: bits + 1 } } as any,
+            zext: { type: 'ZeroExtend', label: 'zext', extend: { input: 1, output: bits + 1 } } as any,
+            add2: { type: 'Addition', label: 'add2', bits: { in1: bits + 1, in2: bits + 1, out: bits + 1 } } as any,
+            slice_sum: { type: 'BusSlice', label: 'slice_sum', slice: { first: 0, count: bits, total: bits + 1 } } as any,
+            slice_cout: { type: 'BusSlice', label: 'slice_cout', slice: { first: bits, count: 1, total: bits + 1 } } as any,
+        } as Devices,
+        connectors: [
+            { from: { id: 'in1_port', port: 'out' }, to: { id: 'add1', port: 'in1' }, name: 'w_in1' },
+            { from: { id: 'in2_port', port: 'out' }, to: { id: 'add1', port: 'in2' }, name: 'w_in2' },
+            { from: { id: 'cin_port', port: 'out' }, to: { id: 'zext', port: 'in' }, name: 'w_cin' },
+            { from: { id: 'add1', port: 'out' }, to: { id: 'add2', port: 'in1' }, name: 'w_partial' },
+            { from: { id: 'zext', port: 'out' }, to: { id: 'add2', port: 'in2' }, name: 'w_cin_ext' },
+            { from: { id: 'add2', port: 'out' }, to: { id: 'slice_sum', port: 'in' }, name: 'w_full1' },
+            { from: { id: 'add2', port: 'out' }, to: { id: 'slice_cout', port: 'in' }, name: 'w_full2' },
+            { from: { id: 'slice_sum', port: 'out' }, to: { id: 'sum_port', port: 'in' }, name: 'w_sum_out' },
+            { from: { id: 'slice_cout', port: 'out' }, to: { id: 'cout_port', port: 'in' }, name: 'w_cout_out' },
+        ],
+        subcircuits: [],
+    };
+}
+
+function injectAdderSubcircuits(devices: Devices, subcircuitsJson: Record<string, Subcircuit>): void {
+    Object.keys(devices).forEach(key => {
+        const device = devices[key];
+        if (device.type === 'Addition') {
+            const bits = (device as Addition).bits.in1;
+            const subcircuitKey = `_adder_${bits}`;
+            if (!subcircuitsJson[subcircuitKey]) {
+                subcircuitsJson[subcircuitKey] = buildAdderSubcircuit(bits);
+            }
+            devices[key] = {
+                type: 'Subcircuit',
+                label: device.label,
+                celltype: subcircuitKey,
+                inputs: 3,
+                outputs: 2,
+                ...(device.position && { position: device.position }),
+                ...(device.rotation && { rotation: device.rotation }),
+            } as any;
+        }
+    });
+}
+
 export class CustomHeadlessCircuit extends HeadlessCircuit {
     constructor(data: Circuit, options?: CircuitOptions) {
         // Transform the data before passing it to the parent constructor
-        const { devices, connections } = resolveTunnels(structuredClone(data.devices), structuredClone(data.connectors))
-        const standardDigitalJsJson = transformConnections(connections)
+        const clonedDevices = structuredClone(data.devices)
+        resolveConstants(clonedDevices)
+        const { devices, connections } = resolveTunnels(clonedDevices, structuredClone(data.connectors))
         const subcircuitsJson = loadSubcircuits(data.subcircuits)
+        injectAdderSubcircuits(devices, subcircuitsJson)
+        const standardDigitalJsJson = transformConnections(connections)
         const digitalCircuit: DefaultCircuit = { devices: devices, connectors: standardDigitalJsJson, subcircuits: subcircuitsJson }
         console.log('COMPILED CIRCUIT:', digitalCircuit)
         super(digitalCircuit, options)

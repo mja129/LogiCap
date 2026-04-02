@@ -1,24 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg width="100" height="60" viewBox="10 100 490 312"
-    xmlns="http://www.w3.org/2000/svg">
-    <!-- NOR Gate Body -->
-    <path d="
-        M 120,120 
-        L 220,120 
-        Q 360,120 420,256 
-        Q 360,392 220,392 
-        L 120,392 
-        Q 180,336 180,256 
-        Q 180,176 120,120 
-        Z" fill="black"/>
-
-    <!-- Input Lines -->
-    <rect x="16" y="160" width="100" height="18" fill="black"/>
-    <rect x="16" y="340" width="100" height="18" fill="black"/>
-
-    <!-- Inverter (NOT Circle) -->
-    <circle cx="440" cy="256" r="25" fill="transparent" stroke="black" stroke-width="18"/>
-
-    <!-- Output Line -->
-    <rect x="460" y="248" width="120" height="18" fill="black"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 66">
+  <line x1="0" y1="11" x2="25" y2="11" stroke="black" stroke-width="4" />
+  <line x1="0" y1="55" x2="25" y2="55" stroke="black" stroke-width="4" />
+  <path d="M 20 5 Q 35 33 20 61 Q 55 61 73 33 Q 55 5 20 5 Z" fill="black" />
+  <circle cx="77" cy="33" r="4" fill="white" stroke="black" stroke-width="4" />
+  <line x1="81" y1="33" x2="88" y2="33" stroke="black" stroke-width="4" />
 </svg>

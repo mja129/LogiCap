@@ -7,6 +7,7 @@
         type allNodeTypes,
     } from './circuitModel.ts'
     import { onMount, afterUpdate, onDestroy } from 'svelte'
+    import { cancelDrawSignal } from '@src/lib/wireModeStore'
 
     let isMenuOpen = false // local state for toggle menu visibility
     let search = ''
@@ -89,6 +90,9 @@
                 pasteNodes();
             }
             
+            else if (event.key === 'Escape') {
+                cancelDrawSignal.update(() => 1);
+            }
         })
     })
 
