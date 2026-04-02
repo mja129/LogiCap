@@ -91,8 +91,8 @@
 
     function onTickRateInput(event: Event) {
         const input = event.currentTarget as HTMLInputElement
-        const ms = Math.max(1, parseInt(input.value) || 10)
-        setTickRate(ms)
+        const hz = Math.max(1, parseInt(input.value) || 10)
+        setTickRate(hz)
     }
 
     function updateGatesNext(
@@ -201,7 +201,7 @@
         </p>
     </button>
     <div class="tickRateControl" title="Tick rate (ms per tick). Lower = faster.">
-        <label for="tickRateInput">ms</label>
+        <label for="tickRateInput">HZ</label>
         <input
             id="tickRateInput"
             type="number"
