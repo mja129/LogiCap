@@ -17,7 +17,9 @@ import tunnelInputIcon from '@icons/circuits/TunnelIn.png'
 import tunnelOutputIcon from '@icons/circuits/TunnelOut.png'
 import clockIcon from '@icons/circuits/Clock.png'
 import muxIcon from '@icons/circuits/Mux.png'
+import demuxIcon from '@icons/circuits/Demux.png'
 import encIcon from '@icons/circuits/Pri.png'
+import decIcon from '@icons/circuits/Dec.png'
 import dffIcon from '@icons/circuits/inputIcon.png'
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
@@ -29,7 +31,9 @@ import TunnelInput from '@Circuits/Tunnels/TunnelInput.svelte'
 import TunnelOutput from '@Circuits/Tunnels/TunnelOutput.svelte'
 import Clock from '@Circuits/InputOutputNodes/ClockNode.svelte'
 import Mux from '@Circuits/Plexers/Multiplexer.svelte'
+import Demux from '@Circuits/Plexers/Demultiplexer.svelte'
 import Encoder from '@Circuits/Plexers/Encoder.svelte'
+import Decoder from '@Circuits/Plexers/Decoder.svelte'
 import DffNode from '@Circuits/Sequential/DffNode.svelte'
 import AdderNode from '@Circuits/Arithmetic/AdderNode.svelte'
 import Display7Node from '@Circuits/InputOutputNodes/Display7Node.svelte'
@@ -45,7 +49,7 @@ export type NodeMenuGroups = 'Logic Gates' | 'Input/Output' | 'Sequential' | 'Tu
 export type dualInputLogicTypes = 'And' | 'Nand' | 'Or' | 'Nor' | 'Xor' | 'Xnor'
 export type singleIoLogicTypes = 'Repeater' | 'Not'
 export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
-export type plexerTypes = 'Mux' | 'Encoder'
+export type plexerTypes = 'Mux' | 'Demux' | 'Encoder' | 'Decoder'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
 export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock' | 'Display7' | 'Power' | 'Ground'
@@ -73,7 +77,9 @@ type SubcomponentProps = ComponentProps<typeof Subcomponent>
 type TunnelInputProps = ComponentProps<typeof TunnelInput>
 type TunnelOutputProps = ComponentProps<typeof TunnelOutput>
 type MuxProps = ComponentProps<typeof Mux>
+type DemuxProps = ComponentProps<typeof Demux>
 type EncoderProps = ComponentProps<typeof Encoder>
+type DecoderProps = ComponentProps<typeof Decoder>
 type DffNodeProps = ComponentProps<typeof DffNode>
 type AdderNodeProps = ComponentProps<typeof AdderNode>
 type Display7NodeProps = ComponentProps<typeof Display7Node>
@@ -95,7 +101,9 @@ export type AllNodePropsWithoutId =
     | Omit<TunnelInputProps, 'nodeId'>
     | Omit<TunnelOutputProps, 'nodeId'>
     | Omit<MuxProps, 'nodeId'>
+    | Omit<DemuxProps, 'nodeId'>
     | Omit<EncoderProps, 'nodeId'>
+    | Omit<DecoderProps, 'nodeId'>
     | Omit<DffNodeProps, 'nodeId'>
     | Omit<AdderNodeProps, 'nodeId'>
     | Omit<Display7NodeProps, 'nodeId'>
@@ -140,7 +148,6 @@ export const menuJsonData: Writable<menuJsonType> = writable({
     'Tunnels': {
         svg: undefined,
         groupElements: [
-            // TODO give these their own icons
             { name: 'Tunnel Input', nodeType: 'TunnelInput', icon: tunnelInputIcon },
             { name: 'Tunnel Output', nodeType: 'TunnelOutput', icon: tunnelOutputIcon },
         ],
@@ -149,7 +156,9 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         svg: undefined,
         groupElements: [
             { name: 'Mux', nodeType: 'Mux', icon: muxIcon },
+            { name: 'Demux', nodeType: 'Demux', icon: demuxIcon },
             { name: 'Encoder', nodeType: 'Encoder', icon: encIcon },
+            { name: 'Decoder', nodeType: 'Decoder', icon: decIcon }
         ],
     },
     'Arithmetic': {
@@ -196,8 +205,12 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return Lamp
         case 'Mux':
             return Mux
+        case 'Demux':
+            return Demux
         case 'Encoder':
             return Encoder
+        case 'Decoder':
+            return Decoder
         case 'Subcircuit':
             return Subcomponent
         case 'TunnelInput':

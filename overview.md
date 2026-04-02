@@ -173,3 +173,36 @@ BUT, you also need to hardcode that new port name into other stuff to get things
 - Add the new port name to `inputIdentifier` in [digital-js-representation.d.ts](#digital-js-representationdts)
 - Add it to the regex in `findAnchorTargetClassName()` in [linkAnchors.ts](#linkAnchors)
 - Add it to `checkInput` in `checkAnchorRelation()` in [linkAnchors.ts](#linkAnchors)
+
+# Adding a New Hardcoded Component
+
+Just look at other hardcoded components like Encoder or Demux to see implementation specifics,
+but the following files must be changed:
+- Add the component's Svelte file in src\lib\Circuits
+- Add its icon asset in src\assets\icons\circuits
+- Add its hardcoded circuit JSON file in src\lib\Util\Hardcoded Circuits
+    - If there are multiple versions (e.g., 2-1 & 4-2 Encoder), add map at the bottom
+- Make changes in circuitModel.ts
+    - Import icon asset & svelte file
+    - Add to union of applicable type
+    - Add to the props thing (AllNodePropsWithoutId)
+    - Add to menuJsonData with icon
+    - Add case to getComponent()
+- Make changes in makeDigitalJsJson.ts
+    - Import hardcoded circuit (or map)
+    - Add its function
+    - Add to deviceJsonFactoryMap
+- Make changes in App.svelte:
+    - Add to createCanvasDevice()
+    - Add if-statement to getGateType()
+- Make changes in circuitStore.ts:
+    - Add to addCircuitDevice()
+    - Add to removeCircuitDevice()
+- Make changes in SimMenu.svelte:
+    - Add to onTrash()
+- Make changes in circuitSave.ts:
+    - Import hardcoded circuit (or map)
+    - Add to injectHardcodedSubcircuits()
+    - Add to getSaveJson()
+- Make changes in TabMenu.svelte
+- Make changes in SideMenu.svelte

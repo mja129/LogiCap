@@ -142,14 +142,14 @@
     }
 
     function onTrash() {
-        // Before clearing, remove an encoder subcircuits from memory that
+        // Before clearing, remove any hardcoded subcircuits from memory that
         // are only used by this canvas and won't be needed after clearing
         const circuit = get(CircuitStore);
         for (const deviceId in circuit.devices) {
             const device = circuit.devices[deviceId];
             if (device.type === 'Subcircuit') {
                 const celltype = (device as Subcomponent).celltype;
-                if (celltype?.startsWith('Encoder_') && !isSubUsedElsewhere(celltype, get(currentCircuit), circuitSave)) {
+                if ((celltype === 'Demux' || celltype?.startsWith('Encoder_') || celltype?.startsWith('Decoder_')) && !isSubUsedElsewhere(celltype, get(currentCircuit), circuitSave)) {
                     circuitSave.deleteSubcomponent(celltype);
                 }
             }

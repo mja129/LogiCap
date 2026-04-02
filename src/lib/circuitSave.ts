@@ -2,7 +2,9 @@ import { createEmptyCircuit } from '@CircuitStore'
 import { get, type Readable, writable, type Writable } from 'svelte/store'
 import type { XYPair } from 'svelvet'
 
-import { encoderMap } from '@Util/encoderCircuits'
+import { encoderMap } from '@Util/Hardcoded Circuits/encoderCircuits'
+import { decoderMap } from '@Util/Hardcoded Circuits/decoderCircuits'
+import { DEMUX } from '@Util/Hardcoded Circuits/demuxCircuit'
 
 type SaveDataFormat = {
     main_circuit: SingleSaveDataFormat & { display_name: string },
@@ -42,19 +44,23 @@ function createEmptySingleSave() : SingleSaveDataFormat {
 }
 
 /**
- * Encoder subcircuits are stripped from the save format to reduce file size
+ * Hardcoded subcircuits are stripped from the save format to reduce file size
  * since they are hardcoded.
  * This function reinjects them in saveData after loading
  */
-function injectEncoders(saveData: SaveDataFormat) {
+function injectHardcodedSubcircuits(saveData: SaveDataFormat) {
     // Get all the circuits (including subcircuits)
     const allCircuits = [saveData.main_circuit, ...Object.values(saveData.subcircuits)];
     for (const circ of allCircuits) {
-        for (const encoderName of circ.circuit.subcircuits) {
-            // Check if it's an Encoder and the Encoder_# is not already injected
-            if (encoderName.startsWith('Encoder_') && !(encoderName in saveData.subcircuits)) {
+        for (const subcircuitName of circ.circuit.subcircuits) {
+            // Check if it's a hardcoded circuit and that it's not already injected
+            if((subcircuitName === 'Demux' && !(subcircuitName in saveData.subcircuits))) {
                 // Inject it
-                saveData.subcircuits[encoderName] = encoderMap[encoderName];
+                saveData.subcircuits['Demux'] = DEMUX
+            } else if (subcircuitName.startsWith('Encoder_') && !(subcircuitName in saveData.subcircuits)) {
+                saveData.subcircuits[subcircuitName] = encoderMap[subcircuitName];
+            } else if (subcircuitName.startsWith('Decoder_') && !(subcircuitName in saveData.subcircuits)) {
+                saveData.subcircuits[subcircuitName] = decoderMap[subcircuitName];
             }
         }
     }
@@ -85,7 +91,7 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
     let saveData: SaveDataFormat;
     if (circuitSaveJson != null) {
         saveData = parseSaveData(circuitSaveJson);
-        injectEncoders(saveData); //reinject hardcoded encoders not in save
+        injectHardcodedSubcircuits(saveData); //reinject hardcoded circuits not in save
     } else {
         saveData = {
             main_circuit: {
@@ -226,15 +232,16 @@ export function createCircuitSave(circuitSaveJson?: string): CircuitSave {
 
         setSaveJson(saveJson: string) {
             saveData = parseSaveData(saveJson);
-            injectEncoders(saveData); //reinject hardcoded encoders not in save
+            injectHardcodedSubcircuits(saveData); //reinject hardcoded circuits not in save
             subcomponents.set(Object.keys(saveData.subcircuits));
         },
         getSaveJson(): string {
-            // Filter out Encoders before serializing to reduce save file size
+            // Filter out hardcoded ciruits before serializing to reduce save file size
             const stripped = {
                 ...saveData,
                 subcircuits: Object.fromEntries(
-                    Object.entries(saveData.subcircuits).filter(([key]) => !key.startsWith('Encoder_'))
+                    Object.entries(saveData.subcircuits).filter(([key]) => 
+                        key !== 'Demux' && !key.startsWith('Encoder_') && !key.startsWith('Decoder_'))
                 )
             };
             return JSON.stringify(stripped);

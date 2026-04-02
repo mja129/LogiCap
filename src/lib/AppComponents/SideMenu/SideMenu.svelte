@@ -16,7 +16,8 @@
                     svg: old.Subcomponents.svg,
                     groupElements: [
                         ...(subcomponents
-                            .filter((subcircuit: string) => !subcircuit.startsWith('Encoder_')) //don't include hardcoded circuits like Encoder
+                            .filter((subcircuit: string) => 
+                            subcircuit !== 'Demux' && !subcircuit.startsWith('Encoder_') && !subcircuit.startsWith('Decoder_')) //don't include hardcoded circuits like Encoder
                             .map((subcircuit: string) => {
                                 return { name: subcircuit, nodeType: 'Subcircuit', icon: subcomponentIcon} as menuJsonElement;
                             })),

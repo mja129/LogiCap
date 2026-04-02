@@ -209,6 +209,15 @@
                 celltype: tunnelName.toLowerCase(), // make tunnels case insensitive bc everything is capitalized in this font lol
               }
           ) as Devices
+        } else if (gateType == 'Demux') {
+            //Create device
+            newDeviceList = CircuitStore.addCircuitDevice(
+              gateType,
+              uuid,
+              { 
+                celltype: 'Demux'
+             }
+            ) as Devices
         } else if (gateType == 'Encoder') {
         // Get the amount of bits for the Encoder using a prompt()
             let selStr = prompt('Enter number of select bits (1, 2, 3, or 4):')
@@ -227,6 +236,25 @@
                 selbits,
                 celltype: `Encoder_${selbits}`
              } //also passes celltype so it's accessible in circuitStore.ts
+            ) as Devices
+        } else if (gateType == 'Decoder') {
+        // Get the amount of bits for the Decoder using a prompt()
+            let selStr = prompt('Enter number of select bits (1, 2, 3, or 4):')
+            if(!selStr) return
+            let selbits = parseInt(selStr) //convert string to int
+            //Diagnostic
+            if(![1, 2, 3, 4].includes(selbits)) {
+                alert('Invalid number of data bits. Enter either 1, 2, 3, or 4.')
+                return
+            }
+            //Create device and pass bits in
+            newDeviceList = CircuitStore.addCircuitDevice(
+              gateType,
+              uuid,
+              { 
+                selbits,
+                celltype: `Decoder_${selbits}`
+             }
             ) as Devices
         } else if (e.celltype) {
           try {
@@ -255,6 +283,16 @@
         saveCircuitSave();
     }
     // fitView={true}
+
+    //Helper function to map a device to its display gate type
+    //Add a new if-statement for each hard-coded circuit
+    function getGateType(device: CircuitDevice): logicGateTypes {
+        const sub = device as Subcomponent;
+        if (sub.celltype?.startsWith('Demux')) return 'Demux';
+        if (sub.celltype?.startsWith('Encoder')) return 'Encoder';
+        if (sub.celltype?.startsWith('Decoder')) return 'Decoder';
+        return device.type as logicGateTypes;
+    }
 
     let setDevices = (d: Devices) => (currentDevicesData = d)
 
