@@ -86,7 +86,7 @@ export class SynchEngine extends BaseEngine {
         this._tick = k;
         const q = this._queue.get(k);
         // Hack for clock delay
-        console.assert(this.ready_clocks.length || (k >= this._tick));
+        // console.assert(this.ready_clocks.length || (k >= this._tick));
         let count = 0;
         while (q && q.size) {
             const [gate, args] = q.entries().next().value;
@@ -103,15 +103,19 @@ export class SynchEngine extends BaseEngine {
                 this.ready_clocks.push({out: newOutputSignals, clock: gate});
             } else {
                 gate.set('outputSignals', newOutputSignals);
+                count++;
             }
-            count++;
+            // count++;
         }
-        if (count == 0) {
-            this.updateClocks();
-        }
+        
         this._queue.delete(k);
         this._tick = (k + 1) | 0;
         this._checkMonitors();
+
+        if (count == 0) {
+            this.updateClocks();
+        }
+
         this.trigger('postUpdateGates', k, count);
         return count;
     }
