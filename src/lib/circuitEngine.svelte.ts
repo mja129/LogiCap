@@ -77,6 +77,18 @@ export function toggleSimulation() {
         const activeCircuit = get(currentCircuit);
         compileAndSaveCircuit(activeCircuit);
 
+        // if we're a subcircuit, compile in run that subcircuit instead of the main circuit
+        // we might not need this?
+        const isMain = activeCircuit === circuitSave.getMainCircuitName();
+        const stateToRun = isMain
+            ? get(CircuitStore)
+            : circuitSave.getCircuit(activeCircuit)?.circuit;
+
+        if (!stateToRun) {
+            console.warn("Nothing to run");
+            return;
+        }
+
         // just-in-time netlist compilation
         // finding the canvas
         const wireCanvas = document.querySelector('.wire-canvas') as SVGSVGElement;
