@@ -1,17 +1,14 @@
 <script lang="ts" module>
-    import { get } from 'svelte/store'
-    import { CircuitStore } from '@CircuitStore'
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
 
-    // SVG is 80x90. Box body: x=5, y=12, w=70, h=66 (y:12->78)
-    // cout prong goes up from y=12 to y=0 (top)
-    // cin prong goes down from y=78 to y=90 (bottom)
-    const anchorOffsets = {
-        in1:  [-7, 33]  as [number, number], // west, upper third
-        in2:  [-7, 68]  as [number, number], // west, lower third
-        out:  [107, 50] as [number, number], // east, center
-        cout: [50, -4]  as [number, number], // north, top of prong
-        cin:  [50, 103] as [number, number], // south, bottom of prong
+    // SVG is 66x66. Body: x=5, y=5, w=56, h=56.
+    // All anchor positions are at HALF + n*GRID_SIZE (11 + n*22) for grid alignment.
+    const anchorPositions = {
+        in1:  { x: -11, y: 11 }, // west, upper
+        in2:  { x: -11, y: 55 }, // west, lower
+        out:  { x: 99,  y: 33 }, // east, center
+        cout: { x: 33,  y: -11 }, // north
+        cin:  { x: 33,  y: 77 },  // south
     }
 </script>
 
@@ -24,21 +21,27 @@
 </script>
 
 <svg
-    width="80"
-    height="90"
-    viewBox="0 0 80 90"
+    width="88"
+    height="66"
+    viewBox="0 0 88 66"
     xmlns="http://www.w3.org/2000/svg"
-    style="max-width:unset;"
+    style="max-width:unset; overflow:visible;"
 >
     <!-- cout prong (top) -->
-    <line x1="40" y1="0" x2="40" y2="12" stroke="lightgray" stroke-width="2"/>
+    <line x1="33" y1="0" x2="33" y2="5" stroke="lightgray" stroke-width="2"/>
     <!-- cin prong (bottom) -->
-    <line x1="40" y1="78" x2="40" y2="90" stroke="lightgray" stroke-width="2"/>
+    <line x1="33" y1="61" x2="33" y2="66" stroke="lightgray" stroke-width="2"/>
+    <!-- in1 stub (left, upper) -->
+    <line x1="0" y1="11" x2="5" y2="11" stroke="lightgray" stroke-width="2"/>
+    <!-- in2 stub (left, lower) -->
+    <line x1="0" y1="55" x2="5" y2="55" stroke="lightgray" stroke-width="2"/>
+    <!-- out stub (right) -->
+    <line x1="83" y1="33" x2="88" y2="33" stroke="lightgray" stroke-width="2"/>
 
     <!-- Body -->
     <rect
-        x="5" y="12"
-        width="70" height="66"
+        x="5" y="5"
+        width="78" height="56"
         fill="black"
         stroke="lightgray"
         stroke-width="2"
@@ -47,7 +50,7 @@
 
     <!-- + symbol -->
     <text
-        x="40" y="48"
+        x="44" y="33"
         text-anchor="middle"
         dominant-baseline="middle"
         font-size="26"
@@ -56,13 +59,13 @@
     >+</text>
 
     <!-- in1 label -->
-    <text x="10" y="30" font-size="9" fill="lightgray" font-family="monospace" dominant-baseline="middle">in1</text>
+    <text x="8" y="11" font-size="9" fill="lightgray" font-family="monospace" dominant-baseline="middle">in1</text>
     <!-- in2 label -->
-    <text x="10" y="62" font-size="9" fill="lightgray" font-family="monospace" dominant-baseline="middle">in2</text>
+    <text x="8" y="55" font-size="9" fill="lightgray" font-family="monospace" dominant-baseline="middle">in2</text>
     <!-- cout label -->
-    <text x="44" y="6" font-size="7" fill="lightgray" font-family="monospace" dominant-baseline="middle">cout</text>
+    <text x="36" y="3" font-size="7" fill="lightgray" font-family="monospace" dominant-baseline="middle">cout</text>
     <!-- cin label -->
-    <text x="44" y="84" font-size="7" fill="lightgray" font-family="monospace" dominant-baseline="middle">cin</text>
+    <text x="36" y="63" font-size="7" fill="lightgray" font-family="monospace" dominant-baseline="middle">cin</text>
 </svg>
 
 <!-- in1 input (west, upper) -->
@@ -71,7 +74,7 @@
     ioId="1"
     id={nodeId}
     side="west"
-    offset={anchorOffsets['in1']}
+    position={anchorPositions['in1']}
 />
 
 <!-- in2 input (west, lower) -->
@@ -80,7 +83,7 @@
     ioId="2"
     id={nodeId}
     side="west"
-    offset={anchorOffsets['in2']}
+    position={anchorPositions['in2']}
 />
 
 <!-- sum output (east) -->
@@ -89,8 +92,7 @@
     ioId=""
     id={nodeId}
     side="east"
-    connections={get(CircuitStore).connectors[('out_' + nodeId) as outputAnchorName]}
-    offset={anchorOffsets['out']}
+    position={anchorPositions['out']}
 />
 
 <!-- cout output (north / top) -->
@@ -100,8 +102,7 @@
     id={nodeId}
     side="north"
     usePortName={true}
-    connections={get(CircuitStore).connectors[('cout_' + nodeId) as outputAnchorName]}
-    offset={anchorOffsets['cout']}
+    position={anchorPositions['cout']}
 />
 
 <!-- cin input (south / bottom) -->
@@ -111,5 +112,5 @@
     id={nodeId}
     side="south"
     usePortName={true}
-    offset={anchorOffsets['cin']}
+    position={anchorPositions['cin']}
 />

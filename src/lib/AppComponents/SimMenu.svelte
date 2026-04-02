@@ -91,8 +91,8 @@
 
     function onTickRateInput(event: Event) {
         const input = event.currentTarget as HTMLInputElement
-        const ms = Math.max(1, parseInt(input.value) || 10)
-        setTickRate(ms)
+        const hz = Math.max(1, parseInt(input.value) || 10)
+        setTickRate(hz)
     }
 
     function updateGatesNext(
@@ -142,14 +142,14 @@
     }
 
     function onTrash() {
-        // Before clearing, remove an encoder subcircuits from memory that
+        // Before clearing, remove any hardcoded subcircuits from memory that
         // are only used by this canvas and won't be needed after clearing
         const circuit = get(CircuitStore);
         for (const deviceId in circuit.devices) {
             const device = circuit.devices[deviceId];
             if (device.type === 'Subcircuit') {
                 const celltype = (device as Subcomponent).celltype;
-                if (celltype?.startsWith('Encoder_') && !isSubUsedElsewhere(celltype, get(currentCircuit), circuitSave)) {
+                if ((celltype === 'Demux' || celltype?.startsWith('Encoder_') || celltype?.startsWith('Decoder_')) && !isSubUsedElsewhere(celltype, get(currentCircuit), circuitSave)) {
                     circuitSave.deleteSubcomponent(celltype);
                 }
             }
@@ -201,7 +201,7 @@
         </p>
     </button>
     <div class="tickRateControl" title="Tick rate (ms per tick). Lower = faster.">
-        <label for="tickRateInput">ms</label>
+        <label for="tickRateInput">HZ</label>
         <input
             id="tickRateInput"
             type="number"

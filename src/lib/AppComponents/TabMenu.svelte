@@ -8,7 +8,8 @@ import { compileAndSaveCircuit } from '../circuitEngine.svelte'
 
     let currentTabs: string[] = $state([]);
     circuitSave.getSubcomponents().subscribe((subcomponents) => {
-        currentTabs = [circuitSave.getMainCircuitName(), ...subcomponents.filter((s: string) => !s.startsWith('Encoder_'))]; //exclude hard-coded circuits
+        currentTabs = [circuitSave.getMainCircuitName(), ...subcomponents.filter((s: string) => 
+        s !== 'Demux' && !s.startsWith('Encoder_') && !s.startsWith('Decoder_'))]; //exclude hard-coded circuits
     });
     let currentTab: string = $state(''); // value will be set on subscribe
     currentCircuit.subscribe(currentCircuit => {

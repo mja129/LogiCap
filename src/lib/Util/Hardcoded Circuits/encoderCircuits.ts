@@ -1,4 +1,4 @@
-import type { SingleSaveDataFormat } from '../circuitSave'
+import type { SingleSaveDataFormat } from '../../circuitSave'
 
 // Hard-coded Priority Encoder circuits
 
@@ -4011,20 +4011,3 @@ export const encoderMap: Record<string, SingleSaveDataFormat> = {
     'Encoder_3': ENCODER_8_3,
     'Encoder_4': ENCODER_16_4,
 }
-
-// export const SAMPLE: SingleSaveDataFormat = {
-//   circuit: {
-//       devices: {
-        
-//       },
-//       connectors: {
-        
-//       },
-//       subcircuits: [],
-//       wireManipulations: {
-
-//       }
-//     },
-//     zoom: 1,
-//     translation: {x: 0, y: 0}
-// }

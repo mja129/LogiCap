@@ -132,6 +132,18 @@ function resolveTunnels(devices: Devices, connections: SvelvetConnectors) {
   return { devices, connections }
 }
 
+function resolveConstants(devices: Devices): void {
+    Object.keys(devices).forEach(key => {
+        if (devices[key].type === 'Power') {
+            (devices[key] as any).type = 'Constant';
+            (devices[key] as any).constant = '1';
+        } else if (devices[key].type === 'Ground') {
+            (devices[key] as any).type = 'Constant';
+            (devices[key] as any).constant = '0';
+        }
+    });
+}
+
 function buildAdderSubcircuit(bits: number): Subcircuit {
     return {
         devices: {
@@ -186,7 +198,9 @@ function injectAdderSubcircuits(devices: Devices, subcircuitsJson: Record<string
 export class CustomHeadlessCircuit extends HeadlessCircuit {
     constructor(data: Circuit, options?: CircuitOptions) {
         // Transform the data before passing it to the parent constructor
-        const { devices, connections } = resolveTunnels(structuredClone(data.devices), structuredClone(data.connectors))
+        const clonedDevices = structuredClone(data.devices)
+        resolveConstants(clonedDevices)
+        const { devices, connections } = resolveTunnels(clonedDevices, structuredClone(data.connectors))
         const subcircuitsJson = loadSubcircuits(data.subcircuits)
         injectAdderSubcircuits(devices, subcircuitsJson)
         const standardDigitalJsJson = transformConnections(connections)

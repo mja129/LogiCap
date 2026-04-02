@@ -2,7 +2,7 @@
 
     import { CircuitStore } from '@CircuitStore'
     import { canvasTransform } from '@src/App.svelte'
-    import { wireMode, cancelDrawSignal, selectedWireIds } from '@src/lib/wireModeStore'
+    import { wireMode, cancelDrawSignal, selectedWireIds, selectedNodeIds } from '@src/lib/wireModeStore'
     import { GRID_SIZE } from '@src/lib/grid'
     import { onMount } from 'svelte'
     import { get } from 'svelte/store'
@@ -115,6 +115,7 @@
      * some reason :DDDD) to stop the drag.
      */
     function deselectNodes() {
+        selectedNodeIds.set(new Set());
         var wrapper = document.querySelector('.svelvet-wrapper');
         if (wrapper) {
             wrapper.dispatchEvent(new MouseEvent('mousedown'));
@@ -250,6 +251,9 @@
                 boxSelecting = true;
             } else if (!e.shiftKey) {
                 selectedWireIds.set(new Set());
+                if (!(e.target as HTMLElement).closest?.('.svelvet-node')) {
+                    selectedNodeIds.set(new Set());
+                }
             }
         }
         // Deselect wires if box select has moved significantly

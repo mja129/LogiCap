@@ -2,7 +2,9 @@ import { circuitSave } from '@src/App.svelte'
 import type { SingleSaveDataFormat } from '../circuitSave'
 
 //Hardcoded Encoder Circuits
-import { encoderMap } from './encoderCircuits'
+import { encoderMap } from './Hardcoded Circuits/encoderCircuits'
+import { decoderMap } from './Hardcoded Circuits/decoderCircuits'
+import { DEMUX } from './Hardcoded Circuits/demuxCircuit'
 
 // These functions should use eachother.
 //
@@ -118,6 +120,33 @@ function makeMux(
     }
 }
 
+//Demux (hardcoded)
+function makeDemux(
+    nodeName: string,
+    options?: { position?: { x: number; y: number }, rotation?: number }
+): Subcomponent {
+    //Inject hardcoded circuit
+    circuitSave.createSubcomponent('Demux');
+    circuitSave.setCircuit('Demux', DEMUX);
+
+    return {
+        type: 'Subcircuit',
+        label: nodeName,
+        inputs: 2,
+        outputs: 2,
+        celltype: 'Demux',
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
+        }),
+    }
+}
+
 //Priority Encoder
 function makeEncoder(
     nodeName: string,
@@ -136,6 +165,36 @@ function makeEncoder(
         inputs: 2 ** selbits, //2^bits
         outputs: selbits + 1, //1 for valid bit
         celltype: encoderType, //used to determine which Encoder_# to use so different types don't overwrite each other
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+            ...(options?.rotation && {
+                rotation: options.rotation
+            }),
+        }),
+    }
+}
+
+//Decoder
+function makeDecoder(
+    nodeName: string,
+    options?: { selbits?:number, position?: { x: number; y: number }, rotation?: number }
+): Subcomponent {
+    //Inject hardcoded circuit based on selbits
+    const selbits = options!.selbits
+    const decoderType = options!.celltype
+
+    circuitSave.createSubcomponent(decoderType);
+    circuitSave.setCircuit(decoderType, decoderMap[decoderType]);
+
+    return {
+        type: 'Subcircuit',
+        label: nodeName,
+        inputs: selbits,
+        outputs: 2 ** selbits,
+        celltype: decoderType, //used to determine which Decoder_# to use so different types don't overwrite each other
         ...(options?.position && {
             position: {
                 x: options.position.x,
@@ -267,6 +326,30 @@ function makeDff(
     }
 }
 
+function makeDisplay7(
+    nodeName: string,
+    options?: {
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Display7 {
+    return {
+        type: 'Display7',
+        label: options?.label || nodeName,
+        bits: 8,
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
 function makeAddition(
     nodeName: string,
     options?: {
@@ -285,6 +368,52 @@ function makeAddition(
             out: options?.bits?.out || 8,
         },
         ...(options?.signed && { signed: options.signed }),
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
+function makePower(
+    nodeName: string,
+    options?: {
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Power {
+    return {
+        type: 'Power',
+        label: options?.label || nodeName,
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
+function makeGround(
+    nodeName: string,
+    options?: {
+        label?: string
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Ground {
+    return {
+        type: 'Ground',
+        label: options?.label || nodeName,
         ...(options?.position && {
             position: {
                 x: options.position.x,
@@ -320,7 +449,9 @@ export const deviceJsonFactoryMap: Record<
     Repeater: (nodeName, options?) =>
         makeLogicNode('Repeater', nodeName, ...(options ? [options] : [])),
     Mux: makeMux,
+    Demux: makeDemux,
     Encoder: makeEncoder,
+    Decoder: makeDecoder,
     Subcircuit: (nodeName, options?) => 
         makeSubcomponentNode(nodeName, options.celltype as string, options.inputs as number, options.outputs as number, ...(options ? [options] : [])), 
     TunnelInput: (nodeName, options?) =>
@@ -331,6 +462,9 @@ export const deviceJsonFactoryMap: Record<
         makeClock(nodeName, ...(options ? [options] : [])),
     Dff: makeDff,
     Addition: makeAddition,
+    Display7: makeDisplay7,
+    Power: makePower,
+    Ground: makeGround,
 }
 
 // // Example usage

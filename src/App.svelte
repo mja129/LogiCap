@@ -83,7 +83,7 @@
     import ZoomThing from './lib/ZoomThing.svelte'
     import { setScale, setTranslation } from '@Util/graphUtils'
     import WireCanvas from './lib/CircuitParts/WireCanvas.svelte'
-    import { wireMode, selectedWireIds } from './lib/wireModeStore'
+    import { wireMode, selectedWireIds, selectedNodeIds } from './lib/wireModeStore'
 
     // the Devices part of the digitalJS json. (manually synched with the CircuitStore)
     let currentDevicesData: Devices = $state({ ...$CircuitStore.devices })
@@ -209,6 +209,15 @@
                 celltype: tunnelName.toLowerCase(), // make tunnels case insensitive bc everything is capitalized in this font lol
               }
           ) as Devices
+        } else if (gateType == 'Demux') {
+            //Create device
+            newDeviceList = CircuitStore.addCircuitDevice(
+              gateType,
+              uuid,
+              { 
+                celltype: 'Demux'
+             }
+            ) as Devices
         } else if (gateType == 'Encoder') {
         // Get the amount of bits for the Encoder using a prompt()
             let selStr = prompt('Enter number of select bits (1, 2, 3, or 4):')
@@ -227,6 +236,25 @@
                 selbits,
                 celltype: `Encoder_${selbits}`
              } //also passes celltype so it's accessible in circuitStore.ts
+            ) as Devices
+        } else if (gateType == 'Decoder') {
+        // Get the amount of bits for the Decoder using a prompt()
+            let selStr = prompt('Enter number of select bits (1, 2, 3, or 4):')
+            if(!selStr) return
+            let selbits = parseInt(selStr) //convert string to int
+            //Diagnostic
+            if(![1, 2, 3, 4].includes(selbits)) {
+                alert('Invalid number of data bits. Enter either 1, 2, 3, or 4.')
+                return
+            }
+            //Create device and pass bits in
+            newDeviceList = CircuitStore.addCircuitDevice(
+              gateType,
+              uuid,
+              { 
+                selbits,
+                celltype: `Decoder_${selbits}`
+             }
             ) as Devices
         } else if (e.celltype) {
           try {
@@ -256,30 +284,28 @@
     }
     // fitView={true}
 
+    //Helper function to map a device to its display gate type
+    //Add a new if-statement for each hard-coded circuit
+    function getGateType(device: CircuitDevice): logicGateTypes {
+        const sub = device as Subcomponent;
+        if (sub.celltype?.startsWith('Demux')) return 'Demux';
+        if (sub.celltype?.startsWith('Encoder')) return 'Encoder';
+        if (sub.celltype?.startsWith('Decoder')) return 'Decoder';
+        return device.type as logicGateTypes;
+    }
+
     let setDevices = (d: Devices) => (currentDevicesData = d)
 
     function deletedSelectedNodes(){
-        let domEls = Object.keys(currentDevicesData)
-            .map((x) => 'N-' + x)
-            .map((x) => document.getElementById(x))
-
-        let selected = domEls.filter((x) =>
-            x === null ? false : x.classList.contains('selected')
-        )
-        let not_selected = domEls.filter((x) =>
-            x === null ? false : !x.classList.contains('selected')
-        )
+        const selNodes = get(selectedNodeIds);
+        const ids_to_del = Object.keys(currentDevicesData).filter(id => selNodes.has(id));
 
         let newDeviceList = currentDevicesData
-
-        let ids_to_del = selected.map((x) =>
-            x === null ? '' : x.id.substring(2)
-        )
         ids_to_del.forEach((id) => {
             newDeviceList = CircuitStore.removeCircuitDevice(id)
-            // delete newDeviceList[id]
         })
         currentDevicesData = newDeviceList
+        selectedNodeIds.set(new Set())
 
         // Also delete any selected wire segments
         const selWires = get(selectedWireIds);
@@ -296,19 +322,11 @@
     }
 
     async function copySelectedNodes() {
-        let domEls = Object.keys(currentDevicesData)
-            .map((x) => 'N-' + x)
-            .map((x) => document.getElementById(x))
-
-        let selected = domEls.filter((x) =>
-            x === null ? false : x.classList.contains('selected')
-        )
-        if (selected.length === 0) { // nothing to copy
+        const selNodes = get(selectedNodeIds);
+        const ids_to_copy = Object.keys(currentDevicesData).filter(id => selNodes.has(id));
+        if (ids_to_copy.length === 0) { // nothing to copy
             return;
         }
-        let ids_to_copy = selected.map((x) =>
-            x === null ? '' : x.id.substring(2)
-        )
 
         // TODO redo this
         saveCircuitSave();
