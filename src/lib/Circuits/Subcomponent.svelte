@@ -1,12 +1,12 @@
 <script lang="ts" module>
     import { get } from 'svelte/store'
-
     import { CircuitStore } from '@CircuitStore'
-
     import SimulationNodeAnchor from '@CircuitParts/Anchor.svelte'
+    import { GRID_SIZE } from '@src/lib/grid'
 
-    const anchorDiameter = 15;
-    const anchorPadding = 5;
+    const ANCHOR_SPACING = 2 * GRID_SIZE  // 44px between anchors — even multiple keeps grid alignment
+    const WIDTH = 6 * GRID_SIZE           // 132px — MUST be an even multiple of GRID_SIZE
+                                          // so width/2 is a multiple of GRID_SIZE after Svelvet center-snaps
 </script>
 
 <script lang="ts">
@@ -23,33 +23,40 @@
         outputs: number
     } = $props();
 
-    // calculate size, alignment from number of inputs/outputs
-    const width = 100; // TODO should this change?
-    const height = ((anchorDiameter + anchorPadding) * Math.max(inputs, outputs)) + anchorPadding;
-    const inputOffset = ((height - ((anchorDiameter + anchorPadding) * inputs) + anchorPadding) / 2.0) + 1;
-    const outputOffset = ((height - ((anchorDiameter + anchorPadding) * outputs) + anchorPadding) / 2.0) + 1;
+    // Height: enough rows for the larger side, plus one row of padding top+bottom
+    const height = (Math.max(inputs, outputs) + 1) * ANCHOR_SPACING;
+
+    // Center each group vertically, snapping start Y to the nearest grid unit
+    const HALF_GRID = GRID_SIZE / 2;
+    const inputStartY  = GRID_SIZE;
+    const outputStartY = GRID_SIZE;
+
+    // Mirror the LogicGate convention: inputs hang one grid unit left of origin,
+    // outputs sit one grid unit left of the right edge (to match the wire endpoint)
+    const inputPositions  = Array.from({ length: inputs  }, (_, i) => ({
+        x: -GRID_SIZE + HALF_GRID,
+        y: inputStartY  + i * ANCHOR_SPACING + HALF_GRID
+    }));
+    const outputPositions = Array.from({ length: outputs }, (_, i) => ({
+        x: WIDTH + HALF_GRID,
+        y: outputStartY + i * ANCHOR_SPACING + HALF_GRID
+    }));
 </script>
 
 <svg
-    width={width}
+    width={WIDTH}
     height={height}
-    viewBox="0 0 {width} {height}"
+    viewBox="0 0 {WIDTH} {height}"
     xmlns="http://www.w3.org/2000/svg"
-    style="max-width:unset;"
+    style="max-width:unset; overflow:visible;"
 >
-    <rect
-        x="0"
-        y="0"
-        width={width}
-        height={height}
-        fill="black"
-    />
+    <rect x="0" y={GRID_SIZE} width={WIDTH} height={height - GRID_SIZE * 3} fill="black" />
     <text
         x="50%"
-        y="50%"
+        y="43%"
         text-anchor="middle"
         dominant-baseline="middle"
-        textLength="{width * 0.8}px"
+        textLength="{WIDTH * 0.8}px"
         lengthAdjust="spacingAndGlyphs"
         font-size="200%"
         fill="white"
@@ -58,26 +65,25 @@
     </text>
 </svg>
 
-{#each { length: inputs } as _, index}
+{#each inputPositions as pos, index}
     <SimulationNodeAnchor
         io="input"
         ioId={(index + 1).toString()}
         id={nodeId}
         side="west"
-        offset={[-7.5, inputOffset + ((anchorDiameter + anchorPadding) * index)]}
-        usePixelOffset={true}
+        position={pos}
     />
 {/each}
-{#each { length: outputs } as _, index}
+
+{#each outputPositions as pos, index}
     <SimulationNodeAnchor
         io="output"
         ioId={(index + 1).toString()}
         id={nodeId}
         connections={get(CircuitStore).connectors[
-            (`out${index+1}_` + nodeId) as outputAnchorName
+            (`out${index + 1}_` + nodeId) as outputAnchorName
         ]}
         side="east"
-        offset={[width - 5, outputOffset + ((anchorDiameter + anchorPadding) * index)]}
-        usePixelOffset={true}
+        position={pos}
     />
 {/each}

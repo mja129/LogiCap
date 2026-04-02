@@ -2,7 +2,7 @@ import { CircuitStore } from '@CircuitStore'
 import { Vector3vl } from '3vl'
 import { writable, get, type Writable } from 'svelte/store';
 import { CustomHeadlessCircuit } from '@Util/CustomHeadlessCircuit';
-import { canvasTransform } from '@src/App.svelte';
+import { circuitSave, canvasTransform, currentCircuit } from '@src/App.svelte';
 import { buildPortMap, compileCircuitConnections } from './CircuitParts/WireNetting';
 
 //Two Vectors, both 1 bit, one is on (1) and off (0)
@@ -43,17 +43,44 @@ Object.defineProperty(CustomHeadlessCircuit.prototype, "running", {
 */
 
 /*
+    Creating a utility for compiling and saving. This will be called on every tab departure, including delete
+*/
+export function compileAndSaveCircuit(circuitName: string) {
+    const wireCanvas = document.querySelector('.wire-canvas') as SVGSVGElement;
+    if (!wireCanvas) return;
+
+    const rect = wireCanvas.getBoundingClientRect();
+    const transform = get(canvasTransform);
+    const portMap = buildPortMap(rect, transform);
+    const segments = get(CircuitStore).wireSegments;
+    const compiledConnectors = compileCircuitConnections(segments, portMap);
+
+    // Keep CircuitStore in sync
+    CircuitStore.update(c => { c.connectors = compiledConnectors; return c; });
+
+    // Persist into circuitSave so loadSubcircuits() finds it later
+    const saved = circuitSave.getCircuit(circuitName);
+    if (saved) {
+        saved.circuit.connectors = compiledConnectors;
+        circuitSave.setCircuit(circuitName, saved);
+    }
+}
+
+/*
     Toggles running
 */
 export function toggleSimulation() {
 
     if (!running) {
         console.log("Simulation Started")
+        // compile whatever tab is currently open
+        const activeCircuit = get(currentCircuit);
+        compileAndSaveCircuit(activeCircuit);
 
         // just-in-time netlist compilation
         // finding the canvas
         const wireCanvas = document.querySelector('.wire-canvas') as SVGSVGElement;
-        let finalCircuitState = get(CircuitStore);
+        const finalCircuitState = get(CircuitStore);
 
         if(wireCanvas) {
             console.log("Compiling circuit nets...");

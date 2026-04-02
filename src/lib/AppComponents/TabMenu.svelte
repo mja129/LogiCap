@@ -4,6 +4,8 @@
 </script>
 
 <script lang="ts">
+import { compileAndSaveCircuit } from '../circuitEngine.svelte'
+
     let currentTabs: string[] = $state([]);
     circuitSave.getSubcomponents().subscribe((subcomponents) => {
         currentTabs = [circuitSave.getMainCircuitName(), ...subcomponents.filter((s: string) => !s.startsWith('Encoder_'))]; //exclude hard-coded circuits
@@ -32,6 +34,7 @@
 
         // if the deleted tab is the current tab, switch to the primary tab
         if (currentTab === tabName) {
+            compileAndSaveCircuit(currentTab);
             setCurrentTab(circuitSave.getMainCircuitName());
         }
 
@@ -43,6 +46,7 @@
         if (currentTab === tabName) { // no need to do anything
             return;
         }
+        compileAndSaveCircuit(currentTab);
         setCurrentCircuit(tabName);
     }
 
