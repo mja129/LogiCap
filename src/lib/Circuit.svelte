@@ -1,6 +1,6 @@
 <script lang="ts" module>
     import { Node } from 'svelvet'
-    import { setContext, type Component, type Snippet } from 'svelte'
+    import { setContext, onDestroy, type Component, type Snippet } from 'svelte'
     import NodeMenu from '@CircuitParts/NodeMenu.svelte'
     import {
         getComponent,
@@ -13,7 +13,7 @@
     import { getRunning } from '@CircuitEngine'
     import { GRID_SIZE } from './grid'
     import { canvasTransform } from '@src/App.svelte';
-    import { selectedNodeIds } from './wireModeStore';
+    import { selectedNodeIds, nodePositionRegistry } from './wireModeStore';
 
     // TODO can this be further simplified
     interface SimNodeProps {
@@ -33,18 +33,17 @@
     setContext('selected', isSelected);
 
     // I'm making a custom dragging flow, since Svelte's internal snapping seems to be really difficult to work with
-    let svelvetNodeStore: any = null;
     let isDragging = false;
     let dragStartMouse = { x: 0, y: 0 };
-    let dragStartNode = { x: 0, y: 0 };
+    let groupStartPositions = new Map<string, { x: number; y: number }>();
 
     function snapToGrid(value: number): number {
         return Math.round(value / GRID_SIZE) * GRID_SIZE;
     }
 
     function captureSvelvetNode(el: HTMLElement, nodeObj: any) {
-        svelvetNodeStore = nodeObj;
-        
+        nodePositionRegistry.update(m => { m.set(nodeId, nodeObj.position); return m; });
+
         // Initial Drop Fix
         if (initialPos === undefined) {
             setTimeout(() => {
@@ -58,6 +57,10 @@
         return {};
     }
 
+    onDestroy(() => {
+        nodePositionRegistry.update(m => { m.delete(nodeId); return m; });
+    });
+
     let hasMoved = false;
 
     // Sync $isSelected from the global selectedNodeIds store
@@ -68,6 +71,9 @@
     // This will call getRunning, so stuff still works.
     function onCustomDragStart(e: MouseEvent) {
         if (getRunning()) return;
+
+        // Capture pre-click selection state before the store is mutated
+        wasSelected = $selectedNodeIds.has(nodeId);
 
         // Manage selection ourselves since locked={true} prevents Svelvet's nodeSelectLogic
         selectedNodeIds.update(sel => {
@@ -88,9 +94,14 @@
         isDragging = true;
         hasMoved = false;
         dragStartMouse = { x: e.clientX, y: e.clientY };
-        
-        const currentPos: Position = get(svelvetNodeStore.position);
-        dragStartNode = { x: currentPos.x, y: currentPos.y };
+
+        // Snapshot starting positions for all selected nodes
+        const registry = get(nodePositionRegistry);
+        groupStartPositions = new Map();
+        for (const id of get(selectedNodeIds)) {
+            const posStore = registry.get(id);
+            if (posStore) groupStartPositions.set(id, { ...get(posStore) });
+        }
 
         window.addEventListener('mousemove', onCustomDragMove);
         window.addEventListener('mouseup', onCustomDragEnd);
@@ -99,7 +110,6 @@
     function onCustomDragMove(e: MouseEvent) {
         if (!isDragging) return;
 
-        // Factor in the zoom scale so the mouse delta perfectly matches the canvas
         const dx = (e.clientX - dragStartMouse.x);
         const dy = (e.clientY - dragStartMouse.y);
 
@@ -111,12 +121,15 @@
         if (!hasMoved) return;
         const scale = get(canvasTransform).scale;
 
-        // Applying the mathematical grid in real-time
-        const newX = snapToGrid(dragStartNode.x + dx / scale);
-        const newY = snapToGrid(dragStartNode.y + dy / scale);
-
-        // Instantly update Svelvet visually
-        svelvetNodeStore.position.set({ x: newX, y: newY });
+        // Move every selected node by the same delta
+        const registry = get(nodePositionRegistry);
+        for (const [id, startPos] of groupStartPositions) {
+            const posStore = registry.get(id);
+            if (posStore) posStore.set({
+                x: snapToGrid(startPos.x + dx / scale),
+                y: snapToGrid(startPos.y + dy / scale),
+            });
+        }
     }
 
     function onCustomDragEnd(e: MouseEvent) {
@@ -126,10 +139,13 @@
         window.removeEventListener('mousemove', onCustomDragMove);
         window.removeEventListener('mouseup', onCustomDragEnd);
 
-        // Only save position if we actually dragged
+        // Persist final positions for all nodes that moved
         if (hasMoved) {
-            const finalPos: Position = get(svelvetNodeStore.position);
-            $CircuitStore.devices[nodeId].position = { x: finalPos.x, y: finalPos.y };
+            const registry = get(nodePositionRegistry);
+            for (const id of groupStartPositions.keys()) {
+                const posStore = registry.get(id);
+                if (posStore) $CircuitStore.devices[id].position = { ...get(posStore) };
+            }
         }
     }
 
@@ -144,6 +160,17 @@
     // used for executing actions on already selected nodes
     let wasSelected = false;
 
+    // Bridges Svelvet's internal box-selection state into selectedNodeIds.
+    // locked={true} means Svelvet only sets selected=true via box selection (never via click),
+    // so syncing true→store is safe. The false case is omitted: WireCanvas already calls
+    // selectedNodeIds.set(new Set()) when the canvas background is clicked (same moment Svelvet clears).
+    function bridgeBoxSelection(_el: HTMLElement, selected: boolean) {
+        return {
+            update(selected: boolean) {
+                if (selected) selectedNodeIds.update(sel => new Set(sel).add(nodeId));
+            }
+        };
+    }
 
 </script>
 
@@ -156,13 +183,10 @@ of the different components now I just need to do it here -->
         drop={initialPos !== undefined ? false : 'cursor'}
         position={initialPos}
         editable={false}
-        locked={true} 
+        locked={true}
         id={nodeId}
         let:node
-        on:nodeClicked={(event) => {
-            // track here whether node was selected, as it always will be by the time nodeReleased fires
-            wasSelected = event.detail.e.currentTarget.classList.contains('selected');
-        }}
+        let:selected
         on:nodeReleased={(event) => {
             // block rotation during simulation
             // rotation should also only be allowed if the element is already selected
@@ -187,6 +211,7 @@ of the different components now I just need to do it here -->
             class:selected={$isSelected}
             style="position: relative; width: max-content; height: max-content; transform:rotate({$rotation}deg); display: flex;"
             use:captureSvelvetNode={node}
+            use:bridgeBoxSelection={selected}
             onmousedown={onCustomDragStart}
         >
             <MyComponent {nodeId} {...nodeProps} />
