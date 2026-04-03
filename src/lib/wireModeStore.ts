@@ -7,3 +7,5 @@ export const selectedNodeIds = writable<Set<string>>(new Set());
 
 // Maps nodeId → svelvet position store, so the dragging node can move all selected nodes together
 export const nodePositionRegistry = writable<Map<string, Writable<{ x: number; y: number }>>>(new Map());
+
+export const wireMoveOffset = writable<{dgx: number, dgy: number} | null>(null);

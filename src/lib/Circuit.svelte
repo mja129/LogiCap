@@ -13,7 +13,7 @@
     import { getRunning } from '@CircuitEngine'
     import { GRID_SIZE } from './grid'
     import { canvasTransform } from '@src/App.svelte';
-    import { selectedNodeIds, nodePositionRegistry } from './wireModeStore';
+    import { selectedNodeIds, wireMoveOffset, selectedWireIds, nodePositionRegistry } from './wireModeStore';
 
     // TODO can this be further simplified
     interface SimNodeProps {

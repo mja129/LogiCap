@@ -2,7 +2,7 @@
 
     import { CircuitStore } from '@CircuitStore'
     import { canvasTransform } from '@src/App.svelte'
-    import { wireMode, cancelDrawSignal, selectedWireIds, selectedNodeIds } from '@src/lib/wireModeStore'
+    import { wireMode, cancelDrawSignal, selectedWireIds, selectedNodeIds, wireMoveOffset } from '@src/lib/wireModeStore'
     import { GRID_SIZE } from '@src/lib/grid'
     import { onMount } from 'svelte'
     import { get } from 'svelte/store'
@@ -20,6 +20,8 @@
 
     // for moving wires
     let clickStart: GridPoint | null = null;
+    let moveStart: GridPoint | null = null;
+    let moveSnapshot: WireSegment[] = [];
     // for selecting wires
     let clickedWire: string | null = null;
 
@@ -107,6 +109,35 @@
         dragActive = false;
     }
 
+    function finalizeWireMove() {
+        if (!moveStart) return;
+        const offset = get(wireMoveOffset);
+        wireMoveOffset.set(null);
+        if (offset && (offset.dgx !== 0 || offset.dgy !== 0)) {
+            const snapshotMap = new Map(moveSnapshot.map(s => [s.id, s]));
+            CircuitStore.update(circuit => {
+                circuit.wireSegments = circuit.wireSegments.map(seg => {
+                    const snap = snapshotMap.get(seg.id);
+                    if (snap) {
+                        return {
+                            ...seg,
+                            from: { gx: snap.from.gx + offset.dgx, gy: snap.from.gy + offset.dgy },
+                            to:   { gx: snap.to.gx   + offset.dgx, gy: snap.to.gy   + offset.dgy },
+                        };
+                    }
+                    return seg;
+                });
+                return circuit;
+            });
+        } else if (clickedWire) {
+            deselectNodes();
+            selectedWireIds.set(new Set([clickedWire]));
+        }
+        moveStart = null;
+        moveSnapshot = [];
+        clickedWire = null;
+    }
+
     /*
      * Superb level of jank here.
      * To deselect svelvet stuff, need to fire a mousedown on the svelvet canvas to deselect
@@ -128,26 +159,24 @@
         if ($wireMode == 0) {
             var target = e.target as HTMLElement;
             if (target.classList.contains('wire')) {
-                var id = target.dataset.id as string;
-                selectedWireIds.update(s => {
-                    const next = new Set(s);
-                    // If shift key is down, toggle select on this wire
-                    if (e.shiftKey) {
-                        if (next.has(id)) {next.delete(id);} else {next.add(id);}
-                    // otherwise, if this wire is selected, we want to move whole selection
-                    // if not selected, deselect all and select this wire
+                const id = target.dataset.id as string;
+                if (e.shiftKey) {
+                    selectedWireIds.update(s => {
+                        const next = new Set(s);
+                        if (next.has(id)) { next.delete(id); } else { next.add(id); }
+                        return next;
+                    });
+                } else {
+                    if (!get(selectedWireIds).has(id)) {
+                        deselectNodes();
+                        selectedWireIds.set(new Set([id]));
                     } else {
-                        if (next.has(id)) {
-                            // MOVE SELECTED WIRES/NODES
-                            // If next mouseup is on the same wire, we want to just select this one
-                            clickedWire = id;
-                        } else {
-                            deselectNodes();
-                            return new Set([id]);
-                        }
+                        clickedWire = id;
                     }
-                    return next;
-                });
+                    moveStart = eventToGrid(e);
+                    moveSnapshot = get(CircuitStore).wireSegments.filter(s => get(selectedWireIds).has(s.id));
+                    wireMoveOffset.set({ dgx: 0, dgy: 0 });
+                }
             }
         } else {
             if (drawStart == null) {
@@ -186,13 +215,8 @@
                 finalizeWire();
             }
         } else {
-            // If mouseup is on the same wire as we mousedowned on, clear selection and select this wire
-            // CLICKEDWIRE SHOULD BE NULLED IF MOUSEMOVE DETECTS WE'RE MOVING SELECTION
-            var target = e.target as HTMLElement;
-            if (target.classList.contains('wire') && (clickedWire && target.dataset.id as string == clickedWire)) {
-                deselectNodes();
-                selectedWireIds.update(() => new Set([target.dataset.id as string]));
-                clickedWire == null;
+            if (moveStart) {
+                finalizeWireMove();
             }
         }
     }
@@ -219,10 +243,14 @@
     onMount(() => {
         // Finalize or cancel a wire draw when the mouse is released outside the SVG
         function handleWindowMouseUp(e: MouseEvent) {
-            if (!dragActive || e.button !== 0) {return;}
-            dragActive = false;
-            if (cursorPoint && drawStart && (cursorPoint.gx !== drawStart.gx || cursorPoint.gy !== drawStart.gy)) {
-                finalizeWire();
+            if (e.button !== 0) { return; }
+            if (dragActive) {
+                dragActive = false;
+                if (cursorPoint && drawStart && (cursorPoint.gx !== drawStart.gx || cursorPoint.gy !== drawStart.gy)) {
+                    finalizeWire();
+                }
+            } else if (moveStart) {
+                finalizeWireMove();
             }
         }
         // Cancel draw and box selection when the mouse leaves the browser window
@@ -250,15 +278,24 @@
                 boxSelectEnd = pos;
                 boxSelecting = true;
             } else if (!e.shiftKey) {
-                selectedWireIds.set(new Set());
                 if (!(e.target as HTMLElement).closest?.('.svelvet-node')) {
+                    selectedWireIds.set(new Set());
                     selectedNodeIds.set(new Set());
                 }
             }
         }
-        // Deselect wires if box select has moved significantly
+        // Handle wire moves and box-select deselection
         function handleDocMouseMove(e: MouseEvent) {
-            if ($wireMode == 0 && boxSelectStart) {
+            if ($wireMode !== 0) return;
+            if (moveStart) {
+                const pt = eventToGrid(e);
+                const dgx = pt.gx - moveStart.gx;
+                const dgy = pt.gy - moveStart.gy;
+                if (dgx !== 0 || dgy !== 0) {
+                    clickedWire = null;
+                }
+                wireMoveOffset.set({ dgx, dgy });
+            } else if (boxSelectStart) {
                 const pt = screenToCanvas(e.clientX, e.clientY);
                 const dx = Math.abs(pt.x - boxSelectStart.x);
                 const dy = Math.abs(pt.y - boxSelectStart.y);
@@ -358,17 +395,17 @@
                 />
             {/each}
 
-            <!-- Render selected wires -->
+            <!-- Render selected wires (with live move offset applied) -->
             {#each $CircuitStore.wireSegments.filter(s => $selectedWireIds.has(s.id)) as seg (seg.id)}
                 <line
                     class="wire-l wire selected"
                     class:draggable={$wireMode == 0}
                     onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
-                    x1={gp(seg.from.gx)}
-                    y1={gp(seg.from.gy)}
-                    x2={gp(seg.to.gx)}
-                    y2={gp(seg.to.gy)}
+                    x1={gp(seg.from.gx + ($wireMoveOffset?.dgx ?? 0))}
+                    y1={gp(seg.from.gy + ($wireMoveOffset?.dgy ?? 0))}
+                    x2={gp(seg.to.gx  + ($wireMoveOffset?.dgx ?? 0))}
+                    y2={gp(seg.to.gy  + ($wireMoveOffset?.dgy ?? 0))}
                     stroke-width="4"
                     stroke-linecap="round"
                 />
@@ -377,8 +414,8 @@
                     class:draggable={$wireMode == 0}
                     onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
-                    cx={gp(seg.from.gx)}
-                    cy={gp(seg.from.gy)}
+                    cx={gp(seg.from.gx + ($wireMoveOffset?.dgx ?? 0))}
+                    cy={gp(seg.from.gy + ($wireMoveOffset?.dgy ?? 0))}
                     r="4"
                 />
                 <circle
@@ -386,8 +423,8 @@
                     class:draggable={$wireMode == 0}
                     onmousedown={(e) => {if ($wireMode == 0) {e.stopPropagation(); onMouseDown(e);}}}
                     data-id={seg.id}
-                    cx={gp(seg.to.gx)}
-                    cy={gp(seg.to.gy)}
+                    cx={gp(seg.to.gx  + ($wireMoveOffset?.dgx ?? 0))}
+                    cy={gp(seg.to.gy  + ($wireMoveOffset?.dgy ?? 0))}
                     r="4"
                 />
             {/each}
