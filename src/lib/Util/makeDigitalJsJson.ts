@@ -403,6 +403,43 @@ function makePower(
     }
 }
 
+// BusGroup: N 1-bit inputs → 1 N-bit output.
+// groups: array of bit widths per slot, e.g. [1,1,1,1] for 4×1-bit inputs.
+function makeBusGroup(
+    nodeName: string,
+    options?: {
+        groups?: number[]
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): BusGroup {
+    return {
+        type: 'BusGroup',
+        label: nodeName,
+        groups: options?.groups ?? [1, 1],
+        ...(options?.position && { position: options.position }),
+        ...(options?.rotation && { rotation: options.rotation }),
+    }
+}
+
+// BusUngroup: 1 N-bit input → N separate outputs.
+function makeBusUngroup(
+    nodeName: string,
+    options?: {
+        groups?: number[]
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): BusUngroup {
+    return {
+        type: 'BusUngroup',
+        label: nodeName,
+        groups: options?.groups ?? [1, 1],
+        ...(options?.position && { position: options.position }),
+        ...(options?.rotation && { rotation: options.rotation }),
+    }
+}
+
 function makeGround(
     nodeName: string,
     options?: {
@@ -465,6 +502,8 @@ export const deviceJsonFactoryMap: Record<
     Display7: makeDisplay7,
     Power: makePower,
     Ground: makeGround,
+    BusGroup: makeBusGroup,
+    BusUngroup: makeBusUngroup,
 }
 
 // // Example usage

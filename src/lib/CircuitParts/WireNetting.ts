@@ -147,7 +147,7 @@ export function buildPortMap(
         const type = isInput ? 'input' : 'output';
         
         // this regex didn't catch subcircuits
-        const anchorIdMatch = Array.from(anchor.classList).find(c => /^(in\d+|in_|out\d+|out_|sel_)/.test(c));
+        const anchorIdMatch = Array.from(anchor.classList).find(c => /^(in\d+|in_|out\d+|out_|cout_|cin_|sel_)/.test(c));
         
         if (anchorIdMatch) {
             portMap[`${gx},${gy}`] = { type, anchorId: anchorIdMatch };

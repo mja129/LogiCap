@@ -8,7 +8,8 @@
 
     let { nodeId }: { nodeId: string } = $props()
 
-    let signalOn = $derived($wireSignals[nodeId] === 1);
+    // wireSignals is keyed by anchorId: "in_<nodeId>" for Lamp's single input port
+    let signalOn = $derived(($wireSignals[`in_${nodeId}`]?.[0] ?? 0) === 1);
 
     let lampColor = $derived({
         fill: getRunning() ? (signalOn ? 'green' : 'red') : 'gray',

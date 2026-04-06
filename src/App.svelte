@@ -69,7 +69,7 @@
     import { onMount } from 'svelte'
     import { Svelvet, Minimap, ThemeToggle } from 'svelvet'
 
-    import type { logicGateTypes } from '@CircuitModel'
+    import type { logicGateTypes, allNodeTypes } from '@CircuitModel'
 
     import SideMenu from '@AppComponents/SideMenu/SideMenu.svelte'
 
@@ -190,7 +190,7 @@
 
     // called on "drop" in sidemenugroupitem.svelte
     function createCanvasDevice(e: MouseEvent & { gateType: string, celltype?: string, inputs?: number, outputs?: number }) {
-        const gateType: logicGateTypes = e.gateType as logicGateTypes
+        const gateType: allNodeTypes = e.gateType as allNodeTypes
         // this gate will update the store and then the subscribe will update the
         // list of circuits currently active on the screen
 
@@ -271,6 +271,19 @@
             console.log('circuit add aborted')
             return
           }
+        } else if (gateType === 'BusGroup' || gateType === 'BusUngroup') {
+            const bitsStr = prompt(`Enter number of bits (2–16):`)
+            if (!bitsStr) return
+            const bits = parseInt(bitsStr)
+            if (isNaN(bits) || bits < 2 || bits > 16) {
+                alert('Invalid number of bits. Enter a value between 2 and 16.')
+                return
+            }
+            newDeviceList = CircuitStore.addCircuitDevice(
+                gateType,
+                uuid,
+                { groups: Array(bits).fill(1) }
+            ) as Devices
         } else {
           newDeviceList = CircuitStore.addCircuitDevice(
               gateType,
@@ -508,7 +521,7 @@
                         width: 80,
                         height: 50,
                         ...((device as Subcomponent).celltype && { celltype: (device as Subcomponent).celltype, inputs: (device as Subcomponent).inputs, outputs: (device as Subcomponent).outputs }),
-                        // Add any other specific props your node components need
+                        ...((device as BusGroup).groups && { groups: (device as BusGroup).groups }),
                     }}
                 />
             {/each}
