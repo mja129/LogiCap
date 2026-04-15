@@ -440,6 +440,33 @@ function makeBusUngroup(
     }
 }
 
+function makeConstant(
+    nodeName: string,
+    options?: {
+        label?: string
+        bits?: number
+        value?: number
+        position?: { x: number; y: number }
+        rotation?: number
+    }
+): Constant {
+    return {
+        type: 'Constant',
+        label: options?.label || nodeName,
+        bits: options?.bits ?? 8,
+        value: options?.value ?? 0,
+        ...(options?.position && {
+            position: {
+                x: options.position.x,
+                y: options.position.y,
+            },
+        }),
+        ...(options?.rotation && {
+            rotation: options.rotation,
+        }),
+    }
+}
+
 function makeGround(
     nodeName: string,
     options?: {
@@ -500,6 +527,7 @@ export const deviceJsonFactoryMap: Record<
     Dff: makeDff,
     Addition: makeAddition,
     Display7: makeDisplay7,
+    Constant: makeConstant,
     Power: makePower,
     Ground: makeGround,
     BusGroup: makeBusGroup,

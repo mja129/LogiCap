@@ -39,6 +39,7 @@ import AdderNode from '@Circuits/Arithmetic/AdderNode.svelte'
 import Display7Node from '@Circuits/InputOutputNodes/Display7Node.svelte'
 import PowerNode from '@Circuits/InputOutputNodes/PowerNode.svelte'
 import GroundNode from '@Circuits/InputOutputNodes/GroundNode.svelte'
+import ConstantNode from '@Circuits/InputOutputNodes/ConstantNode.svelte'
 import BusGroupNode from '@Circuits/Bus/BusGroupNode.svelte'
 import BusUngroupNode from '@Circuits/Bus/BusUngroupNode.svelte'
 
@@ -54,7 +55,7 @@ export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
 export type plexerTypes = 'Mux' | 'Demux' | 'Encoder' | 'Decoder'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
-export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock' | 'Display7' | 'Power' | 'Ground'
+export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock' | 'Display7' | 'Power' | 'Ground' | 'Constant'
 export type sequentialTypes = 'Dff'
 export type arithmeticTypes = 'Addition'
 export type busTypes = 'BusGroup' | 'BusUngroup'
@@ -90,6 +91,7 @@ type PowerNodeProps = ComponentProps<typeof PowerNode>
 type GroundNodeProps = ComponentProps<typeof GroundNode>
 type BusGroupNodeProps = ComponentProps<typeof BusGroupNode>
 type BusUngroupNodeProps = ComponentProps<typeof BusUngroupNode>
+type ConstantNodeProps = ComponentProps<typeof ConstantNode>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -116,6 +118,7 @@ export type AllNodePropsWithoutId =
     | Omit<GroundNodeProps, 'nodeId'>
     | Omit<BusGroupNodeProps, 'nodeId'>
     | Omit<BusUngroupNodeProps, 'nodeId'>
+    | Omit<ConstantNodeProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -144,6 +147,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
             { name: '7-Segment Display', nodeType: 'Display7', icon: outputIcon },
             { name: 'Power', nodeType: 'Power', icon: inputIcon },
             { name: 'Ground', nodeType: 'Ground', icon: outputIcon },
+            { name: 'Constant', nodeType: 'Constant', icon: inputIcon },
         ],
     },
     'Sequential': {
@@ -242,5 +246,7 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return BusGroupNode
         case 'BusUngroup':
             return BusUngroupNode
+        case 'Constant':
+            return ConstantNode
     }
 }

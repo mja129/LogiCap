@@ -140,6 +140,12 @@ function resolveConstants(devices: Devices): void {
         } else if (devices[key].type === 'Ground') {
             (devices[key] as any).type = 'Constant';
             (devices[key] as any).constant = '0';
+        } else if (devices[key].type === 'Constant') {
+            const bits: number = (devices[key] as any).bits ?? 8;
+            const value: number = (devices[key] as any).value ?? 0;
+            // Clamp value to the representable range and encode as a binary string
+            const clamped = value & ((Math.pow(2, bits) - 1) | 0);
+            (devices[key] as any).constant = clamped.toString(2).padStart(bits, '0');
         }
     });
 }

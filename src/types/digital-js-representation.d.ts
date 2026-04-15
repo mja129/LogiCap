@@ -140,6 +140,15 @@ type Display7 = {
     rotation?: number
 }
 
+type Constant = {
+    type: 'Constant'
+    label: string
+    bits: number
+    value: number
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
 type Power = {
     type: 'Power'
     label: string
@@ -173,7 +182,7 @@ type BusUngroup = {
     rotation?: number
 }
 
-type Device = Button | Lamp | Display7 | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition | Power | Ground | BusGroup | BusUngroup
+type Device = Button | Lamp | Display7 | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition | Constant | Power | Ground | BusGroup | BusUngroup
 type Devices = Record<string, Device>
 
 type IODevice = Button | Lamp | Clock

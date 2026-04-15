@@ -522,6 +522,7 @@
                         height: 50,
                         ...((device as Subcomponent).celltype && { celltype: (device as Subcomponent).celltype, inputs: (device as Subcomponent).inputs, outputs: (device as Subcomponent).outputs }),
                         ...((device as BusGroup).groups && { groups: (device as BusGroup).groups }),
+                        ...(device.type === 'Constant' && { bits: (device as Constant).bits, value: (device as Constant).value }),
                     }}
                 />
             {/each}
