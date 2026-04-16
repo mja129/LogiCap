@@ -500,7 +500,7 @@
             {#each Object.entries(currentDevicesData) as [nodeId, device] (nodeId)}
                 <!-- For gateType, uses celltype to identify Encoder and use its own Svelte file -->
                 <Circuit
-                    gateType={((device as Subcomponent).celltype?.startsWith('Encoder') ? 'Encoder' : device.type) as logicGateTypes}
+                    gateType={getGateType(device)}
                     position={device.position}
                     {nodeId}
                     nodeProps={{
