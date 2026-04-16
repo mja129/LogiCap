@@ -94,7 +94,7 @@ class SynchEngine extends _base.BaseEngine {
     this._tick = k;
     const q = this._queue.get(k);
     // Hack for clock delay
-    console.assert(this.ready_clocks.length || k >= this._tick);
+    // console.assert(this.ready_clocks.length || (k >= this._tick));
     let count = 0;
     while (q && q.size) {
       const [gate, args] = q.entries().next().value;
@@ -108,21 +108,37 @@ class SynchEngine extends _base.BaseEngine {
       if ('_clock_hack' in newOutputSignals) {
         delete newOutputSignals['_clock_hack'];
         // this._enqueue(gate);
+        // do not increment count here, the clock hasn't propagated yet
+        // it's just deferred into ready_clocks.
+        // if we counted it, count would be 1, and the updateClocks() call would never fire, freezing the sim
         this.ready_clocks.push({
           out: newOutputSignals,
           clock: gate
         });
       } else {
         gate.set('outputSignals', newOutputSignals);
+        // only count gates that immediately produced outputs this tick
+        count++;
       }
-      count++;
+      // count++;
     }
-    if (count == 0) {
-      this.updateClocks();
-    }
+
+    // so we delete the current tick's bucket and advance _tick before calling updateclocks()
+    // updateClocks() calls enqueue, which uses this._tick to decide which bucket
+    // to place the clock in. if we called updateclocks() before this, _tick would still be k
+    // and the clock would be enqueued into the tick k bucket which we're about to delete
+    // so the sim freezes
     this._queue.delete(k);
     this._tick = k + 1 | 0;
     this._checkMonitors();
+
+    // now that tick is k+1, it's safe to flush ready_clocks. the clock will be
+    // enqueued into the k+1 bucket, which is clean and won't be deleted
+    // count == 0 means nothing propagated this tick, which is exacly when a 
+    // clock needs to be flushed to keep the sim moving
+    if (count == 0) {
+      this.updateClocks();
+    }
     this.trigger('postUpdateGates', k, count);
     return count;
   }

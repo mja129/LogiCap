@@ -8,7 +8,7 @@
      * Anchor x: 91 aligns to next vertical grid dot.
      * Anchor y: 33 (vertically centered).
      */
-    const anchorPosition = { x: 91, y: 33 };
+    const anchorPosition = { x: 99, y: 33 };
 </script>
 
 <script lang="ts">
@@ -20,9 +20,9 @@
 </script>
 
 <svg
-    width="66"
-    height="66"
-    viewBox="0 0 66 66"
+    width="80"
+    height="80"
+    viewBox="0 0 80 80"
     xmlns="http://www.w3.org/2000/svg"
     style="max-width:unset; overflow:visible; display: block;"
 >
@@ -46,7 +46,7 @@
     <line
         x1="33"
         y1="33"
-        x2="88"
+        x2="99"
         y2="33"
         stroke={color.stroke}
         stroke-width="4"
