@@ -53,12 +53,12 @@
     <rect x="0" y={GRID_SIZE} width={WIDTH} height={height - GRID_SIZE * 3} fill="black" />
     <text
         x="50%"
-        y="43%"
+        y="37%"
         text-anchor="middle"
         dominant-baseline="middle"
         textLength="{WIDTH * 0.8}px"
         lengthAdjust="spacingAndGlyphs"
-        font-size="200%"
+        font-size="150%"
         fill="white"
     >
         {celltype}
