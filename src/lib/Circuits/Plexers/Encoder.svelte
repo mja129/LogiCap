@@ -16,12 +16,19 @@
     } = $props()
 
     //calculate size, alignment from number of inputs/outputs
-    const width = 55;
-    const height = 40 + (23 * inputs);
-    const outputOffset = height / outputs;
+    const width = 99;
+    const height = 33  + (22 * inputs);
+
+    const inputPositions  = Array.from({ length: inputs  }, (_, i) => ({
+        x: 11,
+        y: 11 + i * 22
+    }));
+    const outputPositions = Array.from({ length: outputs }, (_, i) => ({
+        x: 77,
+        y: 11 + i * 44
+    }));
 
 </script>
-
 
 <!-- SVG of the Encoder -->
 <svg
@@ -29,46 +36,46 @@
     height={height}
     viewBox="0 0 {width} {height}"
     xmlns="http://www.w3.org/2000/svg"
-    style="max-width:unset;"
+    style="max-width:unset; overflow:visible;"
 >
     <!-- Box -->
     <rect
-        x="0" y="0"
-        width = {width}
+        x="11" y="-5"
+        width = "66"
         height = {height}
         stroke="lightgray"
-        stroke-width="1"
+        stroke-width="2"
     />
 
     <!-- 0 Label -->
     <text
-        x="10"
-        y="19"
+        x="21"
+        y="12"
         text-anchor="start"
         dominant-baseline="middle"
-        font-size="150%"
+        font-size="25"
         fill="white"
     >
         0
     </text>
     <!-- V-bit Label -->
     <text
-        x="40"
-        y="19"
+        x="58"
+        y="11"
         text-anchor="start"
         dominant-baseline="middle"
-        font-size="150%"
+        font-size="25"
         fill="white"
     >
         V
     </text>
     <!-- Pri Label -->
     <text
-        x=25%
+        x="28"
         y=50%
         text-anchor="start"
         dominant-baseline="middle"
-        font-size="200%"
+        font-size="30"
         fill="white"
     >
         Pri
@@ -77,19 +84,17 @@
 
 <!-- Dynamically add/offset inputs and outputs depending on selbits, similar to subcomp -->
 <!-- Inputs Nodes -->
-{#each { length: inputs } as _, index}
+{#each inputPositions as pos, index}
     <SimulationNodeAnchor
         io="input"
         ioId={(index + 1).toString()}
         id={nodeId}
-        side="west"
-        offset={[-7.5, 13 + (25 * index)]}
-        usePixelOffset={true}
+        position={pos}
     />
 {/each}
 
 <!-- Output Nodes -->
-{#each { length: outputs } as _, index}
+{#each outputPositions as pos, index}
     <SimulationNodeAnchor
         io="output"
         ioId={(index + 1).toString()}
@@ -97,8 +102,6 @@
         connections={get(CircuitStore).connectors[
             (`out${index+1}_` + nodeId) as outputAnchorName
         ]}
-        side="east"
-        offset={[50, 13 + outputOffset * index]}
-        usePixelOffset={true}
+        position={pos}
     />
 {/each}
