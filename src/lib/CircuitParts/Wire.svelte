@@ -27,6 +27,7 @@
         CircuitEngine,
         onWireChange,
         findWireInEngine,
+        extractBits,
     } from '@CircuitEngine'
 
     import { setAnchor, getWireIdFromDOM } from './wireUtils.ts'
@@ -188,11 +189,12 @@
 
                 if (!labelOutputTo) return null
 
-                // Writing the outputs to a global dictionary 
+                // Writing the outputs to a global dictionary
                 // Instead of calling a Lamp-specific function, we just update the store.
-                // Now the Lamp (and any future components) will instantly react
+                // Now the Lamp (and any future components) will instantly react.
+                // Key is anchorId (e.g. "in_Lamp_uuid") to support multi-bit signals.
                 wireSignals.update(currentSignals => {
-                    currentSignals[connectedTo] = wireChange;
+                    currentSignals[`${toPort}_${connectedTo}`] = extractBits(currWire.attributes?.signal);
                     return currentSignals;
                 });
             })

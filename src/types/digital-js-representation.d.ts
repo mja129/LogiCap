@@ -140,6 +140,15 @@ type Display7 = {
     rotation?: number
 }
 
+type Constant = {
+    type: 'Constant'
+    label: string
+    bits: number
+    value: number
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
 type Power = {
     type: 'Power'
     label: string
@@ -154,7 +163,26 @@ type Ground = {
     rotation?: number
 }
 
-type Device = Button | Lamp | Display7 | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition | Power | Ground
+// BusGroup: N 1-bit inputs → 1 N-bit bus output
+// groups: array of per-group bit-widths, e.g. [1,1,1,1] for 4×1-bit inputs
+type BusGroup = {
+    type: 'BusGroup'
+    label: string
+    groups: number[]
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
+// BusUngroup: 1 N-bit bus input → N separate outputs
+type BusUngroup = {
+    type: 'BusUngroup'
+    label: string
+    groups: number[]
+    position?: { x: number; y: number }
+    rotation?: number
+}
+
+type Device = Button | Lamp | Display7 | LogicGate | TunnelInput | TunnelOutput | Subcomponent | Clock | Mux | Dff | Addition | Constant | Power | Ground | BusGroup | BusUngroup
 type Devices = Record<string, Device>
 
 type IODevice = Button | Lamp | Clock
@@ -202,7 +230,8 @@ type GateType = string
 type UUID = string
 
 // this key will kinda 
-type outputAnchorPrefix = 'out' | 'cout'
+// 'out' and 'cout' for standard gates; 'out0'…'outN' for BusUngroup outputs
+type outputAnchorPrefix = 'out' | 'cout' | `out${number}`
 type outputAnchorName = `${outputAnchorPrefix}_${GateType}_${UUID}`
 type inputGateName = `${GateType}_${UUID}`
 type inputIdentifier = `in${number}` | `in` | `sel` | `clk` | `cin`

@@ -39,6 +39,9 @@ import AdderNode from '@Circuits/Arithmetic/AdderNode.svelte'
 import Display7Node from '@Circuits/InputOutputNodes/Display7Node.svelte'
 import PowerNode from '@Circuits/InputOutputNodes/PowerNode.svelte'
 import GroundNode from '@Circuits/InputOutputNodes/GroundNode.svelte'
+import ConstantNode from '@Circuits/InputOutputNodes/ConstantNode.svelte'
+import BusGroupNode from '@Circuits/Bus/BusGroupNode.svelte'
+import BusUngroupNode from '@Circuits/Bus/BusUngroupNode.svelte'
 
 // Types that represent the different groups
 // as well as each node group based off of if they are handled in the same file.
@@ -52,10 +55,11 @@ export type tunnelTypes = 'TunnelInput' | 'TunnelOutput'
 export type plexerTypes = 'Mux' | 'Demux' | 'Encoder' | 'Decoder'
 export type logicGateTypes = singleIoLogicTypes | dualInputLogicTypes | tunnelTypes | plexerTypes
 
-export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock' | 'Display7' | 'Power' | 'Ground'
+export type ioNodeTypes = 'Button' | 'Lamp' | 'Clock' | 'Display7' | 'Power' | 'Ground' | 'Constant'
 export type sequentialTypes = 'Dff'
 export type arithmeticTypes = 'Addition'
-export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux' | 'Dff' | arithmeticTypes
+export type busTypes = 'BusGroup' | 'BusUngroup'
+export type allNodeTypes = logicGateTypes | ioNodeTypes | tunnelTypes | 'Subcircuit' | 'Clock' | 'Mux' | 'Dff' | arithmeticTypes | busTypes
 
 // types for the structure of the menu
 // this object is also used when dragging and dropping from SideMenuGroupItems.svelte
@@ -85,6 +89,9 @@ type AdderNodeProps = ComponentProps<typeof AdderNode>
 type Display7NodeProps = ComponentProps<typeof Display7Node>
 type PowerNodeProps = ComponentProps<typeof PowerNode>
 type GroundNodeProps = ComponentProps<typeof GroundNode>
+type BusGroupNodeProps = ComponentProps<typeof BusGroupNode>
+type BusUngroupNodeProps = ComponentProps<typeof BusUngroupNode>
+type ConstantNodeProps = ComponentProps<typeof ConstantNode>
 
 // needed in SimNode.svelte
 // So far we don't need to worry about initializing SimNode, with specific props.
@@ -109,6 +116,9 @@ export type AllNodePropsWithoutId =
     | Omit<Display7NodeProps, 'nodeId'>
     | Omit<PowerNodeProps, 'nodeId'>
     | Omit<GroundNodeProps, 'nodeId'>
+    | Omit<BusGroupNodeProps, 'nodeId'>
+    | Omit<BusUngroupNodeProps, 'nodeId'>
+    | Omit<ConstantNodeProps, 'nodeId'>
 
 // add back in nodeId
 export type AllNodeProps = AllNodePropsWithoutId & Record<'nodeId', string>
@@ -137,6 +147,7 @@ export const menuJsonData: Writable<menuJsonType> = writable({
             { name: '7-Segment Display', nodeType: 'Display7', icon: outputIcon },
             { name: 'Power', nodeType: 'Power', icon: inputIcon },
             { name: 'Ground', nodeType: 'Ground', icon: outputIcon },
+            { name: 'Constant', nodeType: 'Constant', icon: inputIcon },
         ],
     },
     'Sequential': {
@@ -165,6 +176,8 @@ export const menuJsonData: Writable<menuJsonType> = writable({
         svg: undefined,
         groupElements: [
             { name: 'Adder', nodeType: 'Addition', icon: inputIcon },
+            { name: 'Bus Group', nodeType: 'BusGroup', icon: inputIcon },
+            { name: 'Bus Ungroup', nodeType: 'BusUngroup', icon: outputIcon },
         ],
     },
     'Subcomponents': {
@@ -229,5 +242,11 @@ export function getComponent(type: allNodeTypes) : Component<AllNodeProps> {
             return PowerNode
         case 'Ground':
             return GroundNode
+        case 'BusGroup':
+            return BusGroupNode
+        case 'BusUngroup':
+            return BusUngroupNode
+        case 'Constant':
+            return ConstantNode
     }
 }

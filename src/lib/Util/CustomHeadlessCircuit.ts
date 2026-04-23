@@ -140,53 +140,106 @@ function resolveConstants(devices: Devices): void {
         } else if (devices[key].type === 'Ground') {
             (devices[key] as any).type = 'Constant';
             (devices[key] as any).constant = '0';
+        } else if (devices[key].type === 'Constant') {
+            const bits: number = (devices[key] as any).bits ?? 8;
+            const value: number = (devices[key] as any).value ?? 0;
+            // Clamp value to the representable range and encode as a binary string
+            const clamped = value & ((Math.pow(2, bits) - 1) | 0);
+            (devices[key] as any).constant = clamped.toString(2).padStart(bits, '0');
         }
     });
 }
 
-function buildAdderSubcircuit(bits: number): Subcircuit {
+// Subcircuit for cout only (no cin): single addition with extended output bits.
+// No floating cin input, so no x-propagation issue.
+function buildAdderSubcircuitCoutOnly(bits: number): Subcircuit {
     return {
         devices: {
-            in1_port: { type: 'Input', bits, net: 'in1', order: 0 } as any,
-            in2_port: { type: 'Input', bits, net: 'in2', order: 1 } as any,
-            cin_port: { type: 'Input', bits: 1, net: 'cin', order: 2 } as any,
-            sum_port: { type: 'Output', bits, net: 'out', order: 0 } as any,
-            cout_port: { type: 'Output', bits: 1, net: 'cout', order: 1 } as any,
-            add1: { type: 'Addition', label: 'add1', bits: { in1: bits, in2: bits, out: bits + 1 } } as any,
-            zext: { type: 'ZeroExtend', label: 'zext', extend: { input: 1, output: bits + 1 } } as any,
-            add2: { type: 'Addition', label: 'add2', bits: { in1: bits + 1, in2: bits + 1, out: bits + 1 } } as any,
-            slice_sum: { type: 'BusSlice', label: 'slice_sum', slice: { first: 0, count: bits, total: bits + 1 } } as any,
-            slice_cout: { type: 'BusSlice', label: 'slice_cout', slice: { first: bits, count: 1, total: bits + 1 } } as any,
+            in1_port:   { type: 'Input',  bits,     net: 'in1',  order: 0 } as any,
+            in2_port:   { type: 'Input',  bits,     net: 'in2',  order: 1 } as any,
+            sum_port:   { type: 'Output', bits,     net: 'out',  order: 0 } as any,
+            cout_port:  { type: 'Output', bits: 1,  net: 'cout', order: 1 } as any,
+            add1:       { type: 'Addition', label: 'add1', bits: { in1: bits, in2: bits, out: bits + 1 } } as any,
+            slice_sum:  { type: 'BusSlice', label: 'slice_sum',  slice: { first: 0,    count: bits, total: bits + 1 } } as any,
+            slice_cout: { type: 'BusSlice', label: 'slice_cout', slice: { first: bits, count: 1,    total: bits + 1 } } as any,
         } as Devices,
         connectors: [
-            { from: { id: 'in1_port', port: 'out' }, to: { id: 'add1', port: 'in1' }, name: 'w_in1' },
-            { from: { id: 'in2_port', port: 'out' }, to: { id: 'add1', port: 'in2' }, name: 'w_in2' },
-            { from: { id: 'cin_port', port: 'out' }, to: { id: 'zext', port: 'in' }, name: 'w_cin' },
-            { from: { id: 'add1', port: 'out' }, to: { id: 'add2', port: 'in1' }, name: 'w_partial' },
-            { from: { id: 'zext', port: 'out' }, to: { id: 'add2', port: 'in2' }, name: 'w_cin_ext' },
-            { from: { id: 'add2', port: 'out' }, to: { id: 'slice_sum', port: 'in' }, name: 'w_full1' },
-            { from: { id: 'add2', port: 'out' }, to: { id: 'slice_cout', port: 'in' }, name: 'w_full2' },
-            { from: { id: 'slice_sum', port: 'out' }, to: { id: 'sum_port', port: 'in' }, name: 'w_sum_out' },
-            { from: { id: 'slice_cout', port: 'out' }, to: { id: 'cout_port', port: 'in' }, name: 'w_cout_out' },
+            { from: { id: 'in1_port',  port: 'out' }, to: { id: 'add1',      port: 'in1' }, name: 'w_in1'  },
+            { from: { id: 'in2_port',  port: 'out' }, to: { id: 'add1',      port: 'in2' }, name: 'w_in2'  },
+            { from: { id: 'add1',      port: 'out' }, to: { id: 'slice_sum', port: 'in'  }, name: 'w_sum'  },
+            { from: { id: 'add1',      port: 'out' }, to: { id: 'slice_cout',port: 'in'  }, name: 'w_cout' },
+            { from: { id: 'slice_sum', port: 'out' }, to: { id: 'sum_port',  port: 'in'  }, name: 'w_sum_out'  },
+            { from: { id: 'slice_cout',port: 'out' }, to: { id: 'cout_port', port: 'in'  }, name: 'w_cout_out' },
         ],
         subcircuits: [],
     };
 }
 
-function injectAdderSubcircuits(devices: Devices, subcircuitsJson: Record<string, Subcircuit>): void {
+// Subcircuit for cin + cout: two-stage addition.
+// Only used when cin is actually wired (so it's driven to 0 or 1, never x).
+function buildAdderSubcircuit(bits: number): Subcircuit {
+    return {
+        devices: {
+            in1_port:   { type: 'Input',  bits,     net: 'in1',  order: 0 } as any,
+            in2_port:   { type: 'Input',  bits,     net: 'in2',  order: 1 } as any,
+            cin_port:   { type: 'Input',  bits: 1,  net: 'cin',  order: 2 } as any,
+            sum_port:   { type: 'Output', bits,     net: 'out',  order: 0 } as any,
+            cout_port:  { type: 'Output', bits: 1,  net: 'cout', order: 1 } as any,
+            add1:       { type: 'Addition', label: 'add1', bits: { in1: bits,     in2: bits,     out: bits + 1 } } as any,
+            zext:       { type: 'ZeroExtend', label: 'zext', extend: { input: 1, output: bits + 1 } } as any,
+            add2:       { type: 'Addition', label: 'add2', bits: { in1: bits + 1, in2: bits + 1, out: bits + 1 } } as any,
+            slice_sum:  { type: 'BusSlice', label: 'slice_sum',  slice: { first: 0,    count: bits, total: bits + 1 } } as any,
+            slice_cout: { type: 'BusSlice', label: 'slice_cout', slice: { first: bits, count: 1,    total: bits + 1 } } as any,
+        } as Devices,
+        connectors: [
+            { from: { id: 'in1_port',   port: 'out' }, to: { id: 'add1',       port: 'in1' }, name: 'w_in1'      },
+            { from: { id: 'in2_port',   port: 'out' }, to: { id: 'add1',       port: 'in2' }, name: 'w_in2'      },
+            { from: { id: 'cin_port',   port: 'out' }, to: { id: 'zext',       port: 'in'  }, name: 'w_cin'      },
+            { from: { id: 'add1',       port: 'out' }, to: { id: 'add2',       port: 'in1' }, name: 'w_partial'  },
+            { from: { id: 'zext',       port: 'out' }, to: { id: 'add2',       port: 'in2' }, name: 'w_cin_ext'  },
+            { from: { id: 'add2',       port: 'out' }, to: { id: 'slice_sum',  port: 'in'  }, name: 'w_full1'    },
+            { from: { id: 'add2',       port: 'out' }, to: { id: 'slice_cout', port: 'in'  }, name: 'w_full2'    },
+            { from: { id: 'slice_sum',  port: 'out' }, to: { id: 'sum_port',   port: 'in'  }, name: 'w_sum_out'  },
+            { from: { id: 'slice_cout', port: 'out' }, to: { id: 'cout_port',  port: 'in'  }, name: 'w_cout_out' },
+        ],
+        subcircuits: [],
+    };
+}
+
+function injectAdderSubcircuits(devices: Devices, connections: SvelvetConnectors, subcircuitsJson: Record<string, Subcircuit>): void {
     Object.keys(devices).forEach(key => {
         const device = devices[key];
         if (device.type === 'Addition') {
             const bits = (device as Addition).bits.in1;
-            const subcircuitKey = `_adder_${bits}`;
+
+            // Only use the cin/cout subcircuit when those ports are actually wired.
+            // cin is an input → appears as a target anchor in connection values.
+            // cout is an output → appears as a key in connections.
+            const cinAnchor = `cin_${key}`;
+            const coutAnchor = `cout_${key}`;
+            const cinConnected = Object.values(connections).some(targets =>
+                (targets as [string, string][]).some(([, anchorId]) => anchorId === cinAnchor)
+            );
+            const coutConnected = coutAnchor in connections;
+
+            if (!cinConnected && !coutConnected) {
+                // Neither cin nor cout is wired — native Addition handles this correctly.
+                return;
+            }
+
+            // Choose subcircuit variant based on which carry ports are wired.
+            // Only inject cin into the subcircuit when it's actually driven (avoids x-propagation).
+            const subcircuitKey = cinConnected ? `_adder_full_${bits}` : `_adder_cout_${bits}`;
             if (!subcircuitsJson[subcircuitKey]) {
-                subcircuitsJson[subcircuitKey] = buildAdderSubcircuit(bits);
+                subcircuitsJson[subcircuitKey] = cinConnected
+                    ? buildAdderSubcircuit(bits)
+                    : buildAdderSubcircuitCoutOnly(bits);
             }
             devices[key] = {
                 type: 'Subcircuit',
                 label: device.label,
                 celltype: subcircuitKey,
-                inputs: 3,
+                inputs: cinConnected ? 3 : 2,
                 outputs: 2,
                 ...(device.position && { position: device.position }),
                 ...(device.rotation && { rotation: device.rotation }),
@@ -202,7 +255,7 @@ export class CustomHeadlessCircuit extends HeadlessCircuit {
         resolveConstants(clonedDevices)
         const { devices, connections } = resolveTunnels(clonedDevices, structuredClone(data.connectors))
         const subcircuitsJson = loadSubcircuits(data.subcircuits)
-        injectAdderSubcircuits(devices, subcircuitsJson)
+        injectAdderSubcircuits(devices, connections, subcircuitsJson)
         const standardDigitalJsJson = transformConnections(connections)
         const digitalCircuit: DefaultCircuit = { devices: devices, connectors: standardDigitalJsJson, subcircuits: subcircuitsJson }
         console.log('COMPILED CIRCUIT:', digitalCircuit)

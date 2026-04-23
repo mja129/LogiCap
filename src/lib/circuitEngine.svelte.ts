@@ -9,6 +9,18 @@ import { buildPortMap, compileCircuitConnections } from './CircuitParts/WireNett
 let oneBit: Vector3vl = Vector3vl.ones(1);
 let zeroBit: Vector3vl = Vector3vl.zeros(1);
 
+// Extract all bits from a Vector3vl signal as a number array.
+// Each element is 1 (high), 0 (low), or -1 (undefined/tri-state).
+export function extractBits(sig: any): number[] {
+    if (!sig) return [-1];
+    const n: number = sig.bits ?? 1;
+    return Array.from({ length: n }, (_, i) => {
+        const a = sig._avec[i] ?? 0;
+        const b = sig._bvec[i] ?? 0;
+        return (a === b) ? a : -1;
+    });
+}
+
 export let CircuitEngine: Writable<CustomHeadlessCircuit | null> = writable<CustomHeadlessCircuit | null>(null); //The null might be a little schizo
 
 // this is why we want circuitEngine.svelte.ts
@@ -18,12 +30,13 @@ export let monitoredWires: Set<string> = new Set() //For reupping on change
 export const getRunning = () => running
 
 // Naurr
-export let wireSignals = writable<Record<string, number>>({}); //Wire signal store
+// Maps anchorId (e.g. "in_Lamp_uuid", "in0_BusGroup_uuid") -> bit array
+export let wireSignals = writable<Record<string, number[]>>({}); //Wire signal store
 
 let currentTick = $state(0)
 export const getCurrTick = () => currentTick
 
-let tickRate = $state(1000) // ms between ticks, lower = faster
+let tickRate = $state(300) // ms between ticks, lower = faster
 export const getTickRate = () => tickRate
 export const setTickRate = (hz: number) => { tickRate = hz }
 
@@ -158,31 +171,26 @@ function start() {
     currEngine.updateGates();
     currentTick = currEngine.tick;
 
-    const currentStates: Record<string, number> = {};
-    
+    const currentStates: Record<string, number[]> = {};
+
     // Grab the map of logical connections that were already (hopefully) built when start was selected
     // eg: { "out_Mux_123": [ ["Lamp_456", "in_Lamp_456"] ] }
     const connectorsMap = get(CircuitStore).connectors;
-    
+
     // Loop through every single connection
     for (const [sourceAnchor, targets] of Object.entries(connectorsMap)) {
         for (const target of targets as [string, string][]) {
-            const targetDeviceId = target[0]; // e.g., "Lamp_456"
-            const targetAnchorId = target[1]; // e.g., "in_Lamp_456"
+            const targetAnchorId = target[1]; // e.g., "in_Lamp_456", "in0_BusGroup_456"
 
             // DigitalJS uniquely names its wires by combining the source and target ports
             const wireName = `${sourceAnchor}-${targetAnchorId}`;
-            
+
             // Using the existing function to find the live Backbone wire model
             const wire = findWireInEngine(currEngine, wireName);
-            
+
             if (wire && wire.attributes && wire.attributes.signal) {
-                // Extract the 1 or 0 safely
-                const sig = wire.attributes.signal;
-                const logicValue = (sig._avec[0] === sig._bvec[0]) ? sig._avec[0] : 0;
-                
-                // map the signal directly to the receiving Component's ID
-                currentStates[targetDeviceId] = logicValue;
+                // Extract all bits keyed by the target anchor ID
+                currentStates[targetAnchorId] = extractBits(wire.attributes.signal);
             }
         }
     }
@@ -227,23 +235,13 @@ export function findWireInEngine(
     This is just to make less annoying by passing in id instead of a wire object
 */
 
-export function onWireChange(wire: any) {
-    let logicValue: number
-    if (wire.attributes.signal) {
-        if (
-            wire.attributes.signal._avec[0] ==
-            wire.attributes.signal._bvec[0]
-        ) {
-            logicValue = wire.attributes.signal._avec[0]
-        } else {
-            logicValue = -1
-        }
-        // console.log(
-        //     `${wireId} has changed signal to ${logicValue} at tick ${tick}`
-        // )
-        return logicValue
-    }
-    return -1
+// Returns a single number (-1/0/1) for wire coloring purposes (uses bit 0).
+export function onWireChange(wire: any): number {
+    const sig = wire.attributes?.signal;
+    if (!sig) return -1;
+    const a = sig._avec[0] ?? 0;
+    const b = sig._bvec[0] ?? 0;
+    return (a === b) ? a : -1;
 }
 
 
