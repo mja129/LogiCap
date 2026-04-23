@@ -19,12 +19,12 @@ import { compileAndSaveCircuit } from '../circuitEngine.svelte'
     function createTab(): void {
         const nextTabId = currentTabs
             .map((tab: string) => {
-                const match = tab.match(/^sub_(\d+)$/);
+                const match = tab.match(/^SUB_(\d+)$/);
                 return match ? parseInt(match[1]) : null;
             })
             .filter((num: number | null) => num !== null)
             .reduce((a, b) => a > b ? a : b, 0) + 1;
-        circuitSave.createSubcomponent(`sub_${nextTabId}`);
+        circuitSave.createSubcomponent(`SUB_${nextTabId}`);
     }
 
     function deleteTab(tabName: string) {
@@ -72,7 +72,7 @@ import { compileAndSaveCircuit } from '../circuitEngine.svelte'
             return;
         }
 
-        const newTabName = tabNewName.trim();
+        const newTabName = tabNewName.trim().toUpperCase();
         if (!newTabName) {
             return;
         }

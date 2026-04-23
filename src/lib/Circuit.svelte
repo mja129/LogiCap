@@ -194,22 +194,31 @@ of the different components now I just need to do it here -->
             if (getRunning() || !wasSelected || event.detail.e.shiftKey) {
                 return;
             }
+            const before = get(nodePositionRegistry).get(nodeId);
+            console.log('position before rotate:', before ? get(before) : null);
 
             // rotate
             $rotation = ($rotation + 90) % 360;
             // do not set Node rotation property, see below
             //event.detail.node.rotation.set($rotation);
             $CircuitStore.devices[nodeId].rotation = $rotation;
+
+            setTimeout(() => {
+                const after = get(nodePositionRegistry).get(nodeId);
+                console.log('position after rotate:', after ? get(after) : null);
+            }, 50);
+
         }}
     >
         <!--
             Node's rotation property causes bugs with wire connections, so apply it ourselves.
             Specifically, when determining the connection angle of a wire into an anchor,
              is is improperly considered together with Direction, resulting in an incorrect connection angle
+             changing the transform origin so that rotation doesn't bork logic gates.
         -->
         <div
             class:selected={$isSelected}
-            style="position: relative; width: max-content; height: max-content; transform:rotate({$rotation}deg); display: flex;"
+            style="position: relative; width: max-content; height: max-content; transform:rotate({$rotation}deg); transform-origin: 33px 33px; display: flex;"
             use:captureSvelvetNode={node}
             use:bridgeBoxSelection={selected}
             onmousedown={onCustomDragStart}
