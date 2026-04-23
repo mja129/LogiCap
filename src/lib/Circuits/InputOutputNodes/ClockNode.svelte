@@ -14,7 +14,6 @@
         width = 88,
         height = 88,
         nodeId,
-        frequency = 1, // how many ticks between each toggle
     }: {
         width?: number
         height?: number
@@ -24,19 +23,7 @@
 
     let signalOn: boolean = $state(false);
 
-    const registerMenu = getContext<(s: Snippet) => void>('registerMenu');
 
-    // Frequency menu input — initialized to current frequency
-    let freqInput: number = $state(frequency);
-
-    // Apply new frequency from the menu
-    function applyFrequency() {
-        frequency = freqInput;
-    }
-
-    onMount(() => {
-        registerMenu(clockMenu);
-    });
 
     // Color reflects simulation state: gray when idle, green/red when running
     let buttonColor = $derived({
@@ -145,17 +132,6 @@
     <circle cx="33" cy="33" r="3" fill={buttonColor.stroke} />
 </svg>
 
-{#snippet clockMenu()}
-    <label>
-        Frequency (ticks):
-        <input
-            type="number"
-            min="1"
-            bind:value={freqInput}
-        />
-    </label>
-    <button onclick={applyFrequency}>Apply</button>
-{/snippet}
 
 <SimulationNodeAnchor
     io="output"

@@ -13,8 +13,9 @@
 
     const GRID = 22
     const HALF = 11
-    const svgW = 66
-    const svgH = $derived(groups.length * GRID)
+    const svgW = 88
+    const svgH = $derived(groups.length === 2 ? 3 * GRID : groups.length * GRID)
+    const pinSpacing = $derived(groups.length === 2 ? 2 * GRID : GRID)
     const inY = $derived(Math.round((svgH / 2 - HALF) / GRID) * GRID + HALF)
 </script>
 
@@ -30,7 +31,7 @@
 
     <!-- Output stubs -->
     {#each groups as _, i}
-        {@const y = GRID / 2 + i * GRID}
+        {@const y = HALF + i * pinSpacing}
         <line x1={svgW - 5} y1={y} x2={svgW + 22} y2={y} stroke="lightgray" stroke-width="2"/>
     {/each}
 
@@ -62,6 +63,6 @@
         ioId={String(i)}
         id={nodeId}
         side="east"
-        position={{ x: svgW + 11, y: GRID / 2 + i * GRID }}
+        position={{ x: svgW + 11, y: HALF + i * pinSpacing }}
     />
 {/each}
