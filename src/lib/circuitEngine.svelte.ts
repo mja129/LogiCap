@@ -36,7 +36,7 @@ export let wireSignals = writable<Record<string, number[]>>({}); //Wire signal s
 let currentTick = $state(0)
 export const getCurrTick = () => currentTick
 
-let tickRate = $state(1000) // ms between ticks, lower = faster
+let tickRate = $state(300) // ms between ticks, lower = faster
 export const getTickRate = () => tickRate
 export const setTickRate = (hz: number) => { tickRate = hz }
 
