@@ -102,6 +102,7 @@ But anyways, this file is where the sausage gets made.
 The .svelte files for the menus.
 Highlights:
 - The SideMenu files handle the rendering of the left side component menu. The listeners that handle new components being dropped live in here
+    - Note: when adding a new category to SideMenu, clear localStorage so the random lines get repopulated correctly
 - We will certainly be messing with SimMenu.svelte and TabMenu.svelte. These are svelte files with not too much going on, so I'd recommend maybe glancing at them. At their core, svelte files are just fancy html files.
 
 # Circuit.svelte

@@ -83,7 +83,7 @@
 
     // svg shouldn't be here.
     function rng(maxInt: number): number {
-        return Math.floor(Math.random() * maxInt) + 1
+        return Math.floor(Math.random() * maxInt)
     }
 
     let randomLineSelectionStore = localStorage.getItem(
@@ -98,7 +98,7 @@
     if (randomLineSelectionStore === null) {
         const selections: number[] = menuGroupNames.map((groupName: string) => {
             // index of possible lines to select
-            const randNum = rng(randomLineSelectionGroup.length - 1)
+            const randNum = rng(randomLineSelectionGroup.length)
             // number of the svg in the assets/sketchLineSvg folder.
             const selection: number = randomLineSelectionGroup[randNum]
 
