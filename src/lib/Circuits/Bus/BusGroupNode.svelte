@@ -13,12 +13,12 @@
 
     const GRID = 22
     const HALF = 11
-    const svgW = 66
-    // Height: one grid cell per input, anchored at half-grid steps
-    const svgH = $derived(groups.length * GRID)
-    // Snap output to the nearest half-grid row (N*22+11) so wire endpoints align.
-    // For even input counts, svgH/2 lands on a full-grid position which is 11px
-    // away from any wire snap point — snapping to HALF-grid fixes that.
+    const svgW = 88
+    // N=2 uses 3 rows so the bus output lands on its own center grid row (y=33),
+    // separate from both input rows (y=11, y=55). For N>2 one row per input.
+    const svgH = $derived(groups.length === 2 ? 3 * GRID : groups.length * GRID)
+    // Pin spacing: for N=2 spread inputs across the outer two rows (skip the center).
+    const pinSpacing = $derived(groups.length === 2 ? 2 * GRID : GRID)
     const outY = $derived(Math.round((svgH / 2 - HALF) / GRID) * GRID + HALF)
 </script>
 
@@ -31,7 +31,7 @@
 >
     <!-- Input stubs -->
     {#each groups as _, i}
-        {@const y = GRID / 2 + i * GRID}
+        {@const y = HALF + i * pinSpacing}
         <line x1="-22" y1={y} x2="5" y2={y} stroke="lightgray" stroke-width="2"/>
     {/each}
 
@@ -57,7 +57,7 @@
         ioId={String(i)}
         id={nodeId}
         side="west"
-        position={{ x: -11, y: GRID / 2 + i * GRID }}
+        position={{ x: -11, y: HALF + i * pinSpacing }}
     />
 {/each}
 
