@@ -11,16 +11,28 @@ import xorIcon from '@icons/circuits/Xor.webp'
 import xnorIcon from '@icons/circuits/Xnor.webp'
 import nandIcon from '@icons/circuits/Nand.webp'
 import notIcon from '@icons/circuits/Not.webp'
+
 import outputIcon from '@icons/circuits/outputIcon.png'
 import inputIcon from '@icons/circuits/inputIcon.png'
-import tunnelInputIcon from '@icons/circuits/TunnelIn.png'
-import tunnelOutputIcon from '@icons/circuits/TunnelOut.png'
 import clockIcon from '@icons/circuits/Clock.png'
+import seg7Icon from '@icons/circuits/Seg7.png'
+import powerIcon from '@icons/circuits/Power.png'
+import groundIcon from '@icons/circuits/Ground.png'
+import constantIcon from '@icons/circuits/Constant.png'
 import muxIcon from '@icons/circuits/Mux.png'
 import demuxIcon from '@icons/circuits/Demux.png'
 import encIcon from '@icons/circuits/Pri.png'
 import decIcon from '@icons/circuits/Dec.png'
-import dffIcon from '@icons/circuits/inputIcon.png'
+
+import tunnelInputIcon from '@icons/circuits/TunnelIn.png'
+import tunnelOutputIcon from '@icons/circuits/TunnelOut.png'
+
+import dffIcon from '@icons/circuits/DFF.png'
+
+import adderIcon from '@icons/circuits/Adder.png'
+import busGroupIcon from '@icons/circuits/BusGroup.png'
+import busUngroupIcon from '@icons/circuits/BusUngroup.png'
+
 
 import LogicGate from '@Circuits/LogicGates/LogicGate.svelte'
 import SingleIoLogic from '@Circuits/LogicGates/SingleIoLogic.svelte'
@@ -144,10 +156,10 @@ export const menuJsonData: Writable<menuJsonType> = writable({
             { name: 'Lamp', nodeType: 'Lamp', icon: outputIcon },
             { name: 'Button', nodeType: 'Button', icon: inputIcon },
             { name: 'Clock', nodeType: 'Clock', icon: clockIcon },
-            { name: '7-Segment Display', nodeType: 'Display7', icon: outputIcon },
-            { name: 'Power', nodeType: 'Power', icon: inputIcon },
-            { name: 'Ground', nodeType: 'Ground', icon: outputIcon },
-            { name: 'Constant', nodeType: 'Constant', icon: inputIcon },
+            { name: '7-Segment Display', nodeType: 'Display7', icon: seg7Icon },
+            { name: 'Power', nodeType: 'Power', icon: powerIcon },
+            { name: 'Ground', nodeType: 'Ground', icon: groundIcon },
+            { name: 'Constant', nodeType: 'Constant', icon: constantIcon },
         ],
     },
     'Sequential': {
@@ -175,9 +187,9 @@ export const menuJsonData: Writable<menuJsonType> = writable({
     'Arithmetic': {
         svg: undefined,
         groupElements: [
-            { name: 'Adder', nodeType: 'Addition', icon: inputIcon },
-            { name: 'Bus Group', nodeType: 'BusGroup', icon: inputIcon },
-            { name: 'Bus Ungroup', nodeType: 'BusUngroup', icon: outputIcon },
+            { name: 'Adder', nodeType: 'Addition', icon: adderIcon },
+            { name: 'Bus Group', nodeType: 'BusGroup', icon: busGroupIcon },
+            { name: 'Bus Ungroup', nodeType: 'BusUngroup', icon: busUngroupIcon },
         ],
     },
     'Subcomponents': {
