@@ -25,6 +25,14 @@ This project was designed and built by:
   - Full-stack, frontend-focused
 - **Gabriel Schmidt**  
 
+- **Matthew Anderson**  
+  - Wire grid overhaul
+- **Ezra Cheifetz**  
+  - Hardcoded subcircuits (sidebar)
+- **Carson Gollinger**  
+  - Signal propagation overhaul
+- **William Waite**
+  - Created 9 components & Multi-bit wires & sim speed
 ## Why is it called LogicAp? 🤔
 The name *LogicAp* is derived from the combination of "Logic" and "Capstone," highlighting that this project started as our senior capstone project.
 
@@ -57,17 +65,25 @@ The name *LogicAp* is derived from the combination of "Logic" and "Capstone," hi
 - Settings menu for customization ⚙️
 
 ### Circuit Devices
-- Single Input/Output Logic Gates ➡️⬅️
-- Dual Input/Output Logic Gates 🔀
-- Lamp and Button components 💡🔘
+- Logic Gates
+- Input/Output
+- Plexers
+- Tunnels
+- Sequential
+- Arithmetic
+- Subcomponents
 
 ## Future Features
 
 - More granular editing functionality
-- Manipulate "step" and "straight" curves
-- Toolbar with different editing tools
 - Convert drawn circuit images into LogicAp-compatible formats
 - Integrate Yosys to DigitalJS for outputting circuit representation in different formats ([Yosys2DigitalJS GitHub](https://github.com/tilk/yosys2digitaljs))
+- N-input gates
+- More multi-bit support
+- Colored wires showing signal
+- Wire/node selection and movement
+- Naming input anchors on subcomponents
+- Better wire drawing utility
 - Add support for more types of logic gates
 
 ## Architecture 🏗️
