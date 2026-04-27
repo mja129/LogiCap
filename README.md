@@ -9,9 +9,9 @@
   </tr>
 </table>
 
-![LogicAp image](https://jmsjoseph.github.io/LogiCap/metaImage.png)
+![LogicAp image](./metaImage.png)
 
-LogicAp is a fully functional logic simulator developed as part of the CS1980 course at the University of Pittsburgh in Spring 2025.
+LogicAp is a fully functional logic simulator developed as part of the CS1980 course at the University of Pittsburgh from Spring 2025–Spring 2026.
 
 ## Contributors 🤝
 
@@ -24,11 +24,10 @@ This project was designed and built by:
 - **Mason McGinnis**  
   - Full-stack, frontend-focused
 - **Gabriel Schmidt**  
-
 - **Matthew Anderson**  
   - Wire grid overhaul
 - **Ezra Cheifetz**  
-  - Hardcoded subcircuits (sidebar)
+  - Hardcoded subcircuits (Plexers) & scrollbar
 - **Carson Gollinger**  
   - Signal propagation overhaul
 - **William Waite**
@@ -52,12 +51,14 @@ The name *LogicAp* is derived from the combination of "Logic" and "Capstone," hi
 - Sync circuit with local storage to persist after reload 💾
 - Save and load circuit as JSON 📂
 - Tabs for organizing different circuits 🗂️
+- Change simulation speed 🕐
 
 ### Circuit Manipulation
 - Manipulate wires 🔌
 - Drag and drop nodes onto the canvas 🖱️
 - Rotate nodes and wires (NSEW) 🔄
 - Support for multiple wire types in one circuit 🔗
+- Support for multi-bit wires using busses
 
 ### User Interface
 - Command menu for quick actions ⌨️
@@ -75,9 +76,6 @@ The name *LogicAp* is derived from the combination of "Logic" and "Capstone," hi
 
 ## Future Features
 
-- More granular editing functionality
-- Convert drawn circuit images into LogicAp-compatible formats
-- Integrate Yosys to DigitalJS for outputting circuit representation in different formats ([Yosys2DigitalJS GitHub](https://github.com/tilk/yosys2digitaljs))
 - N-input gates
 - More multi-bit support
 - Colored wires showing signal
@@ -85,16 +83,19 @@ The name *LogicAp* is derived from the combination of "Logic" and "Capstone," hi
 - Naming input anchors on subcomponents
 - Better wire drawing utility
 - Add support for more types of logic gates
+- More granular editing functionality
+- Convert drawn circuit images into LogicAp-compatible formats
+- Integrate Yosys to DigitalJS for outputting circuit representation in different formats ([Yosys2DigitalJS GitHub](https://github.com/tilk/yosys2digitaljs))
 
-## Architecture 🏗️
+### Unresolved Issues
 
-![Architecture Diagram](./images/architecture.png)
+- **Cat**
 
 ## License 📄
 
 MIT License (MIT)
 
-Copyright (c) 2025 - Sean Shmulevich, Joseph Secosky, Mason McGinnis, Gabriel Schmidt
+Copyright (c) 2026 - Sean Shmulevich, Joseph Secosky, Mason McGinnis, Gabriel Schmidt
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
